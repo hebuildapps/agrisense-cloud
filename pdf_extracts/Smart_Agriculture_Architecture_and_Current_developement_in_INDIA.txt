@@ -1,0 +1,607 @@
+--- Page 1 ---
+
+International Journal of Technology, Management & Knowledge Processing 
+ 
+12 
+ 
+Smart Agriculture Architecture and Current 
+State in India 
+ Parul Verma 
+Amity Institute of Information Technology, Amity University Uttar Pradesh, Lucknow, India. pverma1@lko.amity.edu 
+ 
+ 
+ 
+ 
+Abstract--The IoT (Internet of Things) is going hand in hand with 
+every domain. The agriculture domain is also set to exploit the 
+benefits of IoT. Smart agriculture, Precision farming are the 
+buzzwords in the agriculture domain. It will help farmers in getting 
+more and more benefits of their crops and can also help them in 
+avoiding many issues related to weather and soil conditions which 
+are harmful to their crops. Farmers can keep an eye on various 
+factors like changing weather conditions, soil and fertilizers, pest 
+control, cattle, etc. by using the precision farming concept. Use of 
+smart sensors and analyzing data received from them will lead to the 
+precision farming concept. Precision farming is the latest concept in 
+the agriculture field whereby making using of wireless technologies 
+one can do precise and controlled farming. Agriculture is an 
+important pillar of the Indian economy hence integrating technology 
+with agriculture will give rise to a new era and will strengthen the 
+economy as well. This paper is outlined to discuss the role of IoT in 
+the Agriculture
+ domain, Smart Agriculture Framework, and the 
+analytics that can be done on data accessed through smart devices. 
+The paper will also outline current state of smart agriculture in 
+India. 
+ 
+Keywords: 
+IoT, Agriculture Domain, Precision Farming, Smart Agriculture, 
+Internet of Things 
+ 
+I. INTRODUCTION 
+The IoT (Internet of Things) is a set of interconnected 
+devices which are basically mechanical or digital in nature. 
+All such devices have their unique identification number. 
+These IoT devices are capable enough to transfer information 
+or data over the network and do not require any human 
+intervention for the same. IoT is being used in versatile 
+domains like smart homes, smart classes, health care, 
+business, and agriculture. The traditional IoT architecture 
+collects data from sensors, actuators, wearables, and others 
+dispersed IoT devices. The collected data is being transmitted 
+to the central repository, where it is processed collectively or 
+transmitted further. 
+IoT is changing the way each domain is working now a days. 
+The agriculture industry also needs to draw benefits of IoT 
+and should make remarkable success by overcoming various 
+challenges of weather changes and other environmental 
+factors. Incorporating IoT will lead to the smart farming 
+concept and it will enable t h e agriculture industry to 
+increas
+e 
+operational efficiency, lower costs, reduce waste, and 
+improve the quality of their yield. 
+ 
+In today’s scenario, with the increasing population, more 
+food is required, and to fulfill the demand the agriculture 
+industry and farmers need to work in smartly. Despite the 
+various weather conditions, rising temperature, and weather 
+fluctuations, farmers need to adapt the latest technology to 
+face these challenges. Using this technology productivity of 
+the farmers may be improved. 
+ 
+The smart farming concept is ready to change the entire 
+concept of traditional farming. The smart farming system 
+works in a way where every activity related to crops and fields 
+can be monitored. The sensors can record light, humidity, 
+temperature, soil moisture, etc., and help farmers to monitor 
+their crops from anywhere and take appropriate steps to 
+improve their crop performance. IoT is not going to help 
+farmers to improve traditional farming ways only. The new 
+concepts also originate with the usage of these sensors and 
+actuators like organic farming, family farming preservation of 
+high-quality varieties etc. Smart farming provides great 
+benefits like water usage in an efficient manner or optimization 
+of various inputs. 
+ 
+IoT is being used in agriculture in many ways, and it 
+conver
+ts normal farming to smart farming. There are many 
+different techniques or technology by which IoT comes into 
+the picture and plays a vital role in the Agriculture domain. It 
+makes farming more precise and hence known as Precision 
+Farming. 
+ 
+II. LITERATURE REVIEW 
+ 
+Various researchers have worked in this area and proposed 
+algorithms and approaches to meet smart farming demands 
+Liu et al. [1] suggested approach which is based on precision 
+irrigation. Ersin et al [2] proposed an irrigation system that 
+makes use of a microcontroller. They justified their proposed 
+system is quite efficient as compared to other conventional 
+methods. Agarwal et. al.[3] proposed smart irrigation system. 
+They utilized Raspberry pi and Arduino for developing such 
+kind of smart system. Koprda et al.[4] also proposed a similar 
+kind of smart irrigation system based on the microcontroller 
+concept. Ahouandjinou et al. [5] 
+VOLUME 1, ISSUE 1, AUG 2021
+
+--- Page 2 ---
+
+International Journal of Technology, Management & Knowledge Processing 
+ 
+13 
+ 
+demonstrated the usage of farm pest detection by making use 
+of ultrasonic sensors. Goap et al. [6] proposed IoT based 
+agriculture system, whereas Smith et al. [7] used Machine 
+Learning approaches for soil classification. Kwok et al. [8] 
+suggested plant detection using deep learning and then, based 
+on plant type, its appropriate irrigation amount required. 
+Deep learning and altitude-based economic irrigation 
+approach has been discussed in the research by Wang, 
+Muzzammel, Raheel et al. [9]. The study of current literature 
+and work of various researchers emphasized the active role of 
+IoT and Machine Learning techniques in Smart Farming. 
+ 
+ 
+III. MAJOR APPLICATIONS OF IoT IN 
+AGRICULTURE 
+ 
+IoT can be well exploited by using of upcoming techniques 
+like Machine Learning, Deep Learning, Data Analytics to 
+improve the performance of the Agriculture domain and give 
+better results to the farmer. The latest wireless IoT sensors can 
+be integrated with the agriculture setup in the current scenario 
+to increase agriculture performance. 
+ 
+A. Precision Farming 
+It is one of the most popular applications of IoT in 
+agriculture. Precision farming , as in literal terms, refers to 
+accurate and controlled farming. It uses sensors, control 
+systems, robotics, and autonomous vehicles to perform a 
+variety of activities. By using high-speed internet, mobile 
+devices and satellites that are low in cost can lead to precision 
+farming concept. 
+ 
+B. Livestock Monitoring 
+The farmers who have large farm setups may use IoT 
+setup to track the data regarding the location and health of 
+their cattle. The information collected through the sensors 
+help them to visualize and identify the animals who are not 
+well. They can further keep sick animals separate from the 
+healthier one and thus stop spreading the disease. 
+ 
+C. Field Observation 
+By making use of IoT sensors, farmers can keep track of 
+updated information about their fields. Complete information 
+about their fields can be stored at one central location and 
+easily accessed by farmers to make quick decisions 
+accordingly. 
+ 
+D. Climate Conditions 
+Agriculture is mainly dependent upon climatic conditions. 
+Smart sensors can be implemented to mount weather stations 
+to get updated and the latest information regarding the 
+weather. These sensors are placed across the field and collect 
+data from a field which is further transmitted to the 
+cloud. The further analysis of such data will help in taking 
+decisions for specific type of crops and to decisions to 
+improve the quality and quantity of crops. Few such IoT 
+devices are-all METEO, Smart elements and Pycno. 
+E. Smart Greenhouses 
+Smart greenhouses can be implemented with the help of 
+IoT sensors. These smart greenhouses are capable in 
+managing climatic conditions without human intervention. 
+Environmental conditions in a smart greenhouse can be 
+managed very easily from the remote location as well. These 
+sensors eliminate the need of manual monitoring. Cloud 
+servers can be used for processing of data and to also apply 
+control action. Such effective designs give good solutions to 
+famers without having manual intervention. There are 
+companies which are providing solar powered IoT sensors 
+that can be used to monitor water consumption by messages 
+to farmer through SMS alerts. 
+IV. SMART AGRICULTURE AND DATA 
+ANALYTICS 
+ 
+A. Precision Farming 
+Soil features analysis is the most important aspect of 
+agriculture. Soil features analysis gives direction to farmers to 
+take different decisions regarding their crops. Soil nutrient 
+level decides the fate of the crops. Features like a type of soil, 
+application of fertilizer, cropping history, level of irrigation, 
+topography, etc., give deep insight about the various factors 
+related to soil. In the current situation many manufacturers are 
+providing smart sensors that farmers can use to keep a track of 
+various soil features and take further decisions based on its 
+status. Agrocare is one of the solutions for farmers. They can 
+analyze multiple soil samples and make further decisions 
+[10]. Drought is a crucial factor that effects agriculture 
+greatly. To deal with this issue, Authors [11] used SMOS L2 
+to calculate the Soil Water Deficit Index (SWDI) in Spain. In 
+[12], used MODIS (Moderate Resolution Imaging 
+Spectroradiometer) to record various soil properties to 
+estimate the risk of land degradation. [13] used sensor that is 
+vision-based robot known as Agribot for sowing seeds. 
+ 
+B. Irrigation Data 
+The current scenario of the water crisis puts an utmost 
+demand for its proper utilization in the agriculture field. The 
+required amount of water should be provided to the crops at 
+the required time. Estimation of accurate water demand of a 
+crop is a difficult task as many other factors are also associated 
+with it. A precise wireless system that can provide accurate 
+water demand will lead to a better crop health. A significant 
+increase in crop efficiency is expected with the use of IoT-
+based techniques. One example for such a case is irrigation 
+management by assessing crop water stress index [14]. To 
+calculate CWSI, one needs to record the crop canopy of 
+different time zones and temperatures. Intelligent farm 
+monitoring systems use field sensors connected to central 
+sever meant for processing and analysing data collected from 
+farm sensors. A prominent example is VRI (Variable Rate 
+Irrigation) optimization by CropMetrics [15], 
+VOLUME 1, ISSUE 1, AUG 2021
+
+--- Page 3 ---
+
+International Journal of Technology, Management & Knowledge Processing 
+ 
+14 
+ 
+that performs based on variability of soil and helps in 
+efficiency of water usage. 
+ 
+C. Fertilizer 
+A balanced quantity of nutrients is required for healthy 
+crops. Improper quantity of nutrients will spoil the quality of 
+crops and soil also many times. In smart agriculture, the exact 
+amount of nutrient requirements can be traced, reducing the 
+risk of negative effects on soil and crop. Latest IoT sensors 
+based approaches help in estimating the nutrient requirements 
+of the crops with better accuracy.[16,17] One example for 
+that is NDVI (Normalized Difference Vegetation Index) , 
+which uses of satellite images to monitor nutrient 
+requirements of crops[18,19]. Besides these other benefits of 
+IoT are fertigation [20] and chemigation; these techniques 
+used fertilizers, pesticides, etc., through irrigation system 
+only. 
+ 
+D. Forecasting of Crop Yield 
+Monitoring the crop yield is the most crucial aspect of 
+Smart Agriculture/ Precision farming. Analysis of crop yield, 
+quality of grains and moisture content directs the farmers to 
+make appropriate decisions. Yield monitoring helps farmers 
+in better planning about their crops. The yield quality depends 
+on various parameters. One of them is the quality of pollens 
+that play an important role in predicting of seed yields under 
+changing environment. [21-23]. Analysis of quality of and 
+maturity of yield helps farmers determine the correct time of 
+harvesting as well. FarmRTX App can be linked to a yield 
+monitor developed by [24] that can be installed for yield 
+monitoring. It provides the live status of harvest. 
+ 
+V. SMART AGRICULTURE 
+ARCHITECTURE 
+ 
+ 
+Smart agriculture architecture may have the following layers- 
+ Innermost layer (Sensor Layer) 
+ Middle layer (Network Layer and Service Layer) 
+ Topmost layer (Application Layer) 
+ 
+Sensor Layer is the most important layer of IoT-based smart 
+farming architecture. There are various sensors that can be 
+placed in smart farming architecture and can trap variety of 
+data. These sensors are meant to keep track of moisture, soil 
+chemical properties, ph level, and many more important data. 
+In smart farming architecture variety of sensors are placed to 
+measure different crop attributes. 
+ 
+Optical sensors- are used to record various properties of soil. 
+These sensors used light reflection information to capture 
+information that data is further analyzed with 
+photogrammetry techniques. The information may be related 
+to moisture, color of soil, vegetation, temperature, height, size, 
+and position of plants. 
+ 
+ 
+ 
+ 
+Fig. 1 Smart Agriculture Architecture 
+ 
+Electrochemical sensors are used to collect data regarding soil 
+nutrients and their pH level. Location sensors can be used to 
+access spatial information using GPS satellites. Weather 
+stations are different units which are placed at a different 
+location in the farming area. These stations trap data related 
+to airflow, wind speed, humidity level, solar radiation, 
+direction of a wind, etc. 
+ 
+Network Layer- WSN (Wireless Sensor Network) 
+communication protocols are used at this layer. WSNs 
+facilitate monitoring of crop quality as well as surveillance of 
+crops. WSN helps in regular monitoring of various 
+environmental factors and helps the farmer in achieving 
+maximum productivity. The sensors at this layer used 
+different topologies depending upon application like 
+precision farming, field irrigation management, or crop 
+management. For smart agriculture, there is no specific 
+communication technology and routing protocol. There is a 
+vast variation in usage of various communication 
+technologies. There are a variety of protocols that work in 
+precision agriculture. Few of them are like- ZigBee, LoRa, 
+6LoWPAN, RFID etc. 
+ 
+Service Layer makes an important component of smart 
+agriculture architecture. The processes at the service layer 
+enable the advanced cultivation procedure, and it also helps 
+boos
+t productivity. Information Management is deployed at 
+the service layer. The farmers can make use of the data stored 
+at service layer. Farmer can collect data from various WSN 
+nodes and can analyze them as well by using historical data 
+as well. Mahout and other IoT platforms help in performing 
+Big Data Analytics in the agriculture domain. The data mining 
+process is 
+VOLUME 1, ISSUE 1, AUG 2021
+
+--- Page 4 ---
+
+International Journal of Technology, Management & Knowledge Processing 
+ 
+15 
+ 
+based on Hadoop or Apache Spark, which can find hidden 
+patterns in the collected data. 
+ 
+Application Layer provides the visualization results after the 
+review and data analytics performed by the service layer. The 
+application layer is responsible for presenting the results in a 
+user-understandable way, and it will help in field optimization, 
+pesticide drift control, to name a few. There are a variety of 
+applications that are used in smart agriculture framework at 
+application layer like- Variable Rate Fertilizer, Variable 
+Spraying application, Weed Mapping Application, and other 
+IoT based applications help farmers in decision making. 
+ 
+VI. CHALLENGES FOR SMART FARMING 
+Smart farming is a new vibe that utilizes the latest 
+technology trends like AI, IoT, Machine learning to improve 
+the agriculture performance. The important aspect of smart 
+farming is implementing various sensors and other devices 
+used to collect relevant data required for analysis purposes. 
+Technology is changing very fast; hence to cater to the latest 
+updations in the architecture is a difficult task. Desides that, 
+network bandwidth is also one of the issues in the 
+implementation of smart farming. There are various other 
+challenges or issues that smart farming faces- 
+Standards interoperability 
+Interoperability is the major concern while implementation of 
+Smart Farming architecture. Technology is growing leap and 
+bounds. Every day, some new IoT tools and platforms are 
+hitting the market. These tools and platforms do not follow 
+the same standards, resulting in interoperability issues that 
+lead to lack of uniform data analysis and visualization. 
+ 
+Lack of sufficient knowledge 
+At the center of smart farming we have farmers who are not 
+very comfortable with these technological aspects. Training 
+farmers for the basic concepts and utilization of 
+various smart 
+devices is of utmost importance. Lack of knowledge will lead to 
+disastrous results. 
+ 
+Internet Connectivity 
+A major hurdle in the implementation of smart farming 
+architecture is the poor internet connectivity in rural areas. 
+Poor network bandwidth issues also make the implementation 
+of smart farming architecture quite tricky. 
+ 
+Scalability 
+Farmers have a varied size of farms; hence they need IoT 
+devices that should be scalable , which means that the same 
+technology should apply to all sizes of farms. These devices 
+are, in general, configured manually; hence it is also a concern 
+area. The devices and tools used for smart farming should be 
+self-configurable to draw maximum benefits. 
+Energy Consumption 
+It is another critical challenge in the case of smart farming. To 
+implement smart farming architecture, many data centers, 
+gateways, and hubs are required to make sensors operable and 
+lead to heavy energy consumption. It needs more energy 
+sources to restock that energy. 
+ 
+Technology failure 
+Too much dependency on technology will lead to some 
+serious risks for the crops too. Failure of technology at any 
+point in time will lead to crop damages and can affect farmers. 
+For example, failure of smart sensors can lead to overwatering 
+or under watering of crops and can have serious impact on 
+crops. 
+ 
+Security Concerns 
+Security is a significant concern and challenge as well in 
+smart farming. Data theft, As the count of middleware 
+technology, endpoints, and IoT devices in active use in 
+agriculture is increasing, the number of entry-points for 
+malicious third- party programs is going up as well. Since the 
+third-party attacks on a complex IoT system are often 
+decentralized, detecting, and removing them emerges as a big 
+challenge. 
+ 
+VII. CURRENT STATE OF 
+SMART AGRICULTURE IN 
+INDIA 
+Precision farming is a base of Smart Agriculture. 
+Precision farming is dependent upon GPS (Global Positioning 
+System) technology which makes use of sensors. Precision 
+agriculture provides accurate information about the 
+requirements of water, fertilizers, pesticides, etc. The grain 
+requirement of India is going to reach 480 million tons by the 
+year 2050. To attain such requirement, there is an utmost need 
+to adapt the concept of Precision farming. Applying various 
+precision farming technologies in a balanced way will lead to 
+promising results in India as well. Precision farming can be 
+categorized into soft and hard. Soft precision farming 
+involves human intervention for management and decision- 
+making. However, hard precision farming is all dependent 
+upon GPS, RS (Remote Sensing), VRT (Variable Rate 
+Technology), etc. 
+ 
+Being the second largest producer of sugarcane, India 
+should adapt precision farming concept for it and harvest the 
+benefits of it. Besides that, in other fruit and vegetable 
+farming has already started adapting these automated systems 
+for better production results. 
+ 
+A. Precision Farming Adoption in India 
+ 
+India should start adapting the precision farming concept 
+for small farms where sensors and small robots will 
+contribute. These may run on various renewable fuels like 
+VOLUME 1, ISSUE 1, AUG 2021
+
+--- Page 5 ---
+
+International Journal of Technology, Management & Knowledge Processing 
+ 
+16 
+ 
+biofuels and also on electricity that may be produced by 
+agriculture residues. The US and Europe had already 
+adapted small robots to get precise irrigation water 
+requirement, weed removal and harvesting. India should 
+also look forward in 
+this direction and should adopt such 
+techniques. Japan and the US utilized drones for disease 
+identification in farms. India is the ideal country where 
+small farms can introduce these concepts of precision 
+farming. 
+ 
+Though there are high precision farming profits , but 
+still it is in a nascent stage in India. Many companies like 
+TKK (Tata Kisan Kendra), Trimble and Fasal that are 
+working on this concept and will soon be introduced to 
+the farmers in India. The TCL (Tata Chemicals Limited) 
+is already working in this direction and trying to convert 
+the whole 
+farming business by using of advanc ed 
+techniques. TCL is already propagating its services through 
+TKK to use and understand remote-sensing techniques for 
+assessing of soil condition, health of crop, prediction of 
+crop yield and pest invasions. 
+ 
+VIII. CONCLUSION 
+ 
+IoT is having promising role in agriculture domain. 
+Various researchers had justified its importance in 
+agriculture domain. Agriculture plays an important role in 
+economy of various countries. Performance improvement 
+in farming by making use of IoT is setting a new 
+benchmark. Latest discoveries of sensors and upgraded 
+protocols are now set to support agriculture domain. 
+Agriculture industry should exploit the benefits of these 
+latest technologies and should improve the performance 
+level. 
+ 
+ 
+REFERENCES 
+ 
+[1] Y. Liu, Z.H. Ren, D.M. Li, X.K. Tian, Z.N. Lu, The research of precision 
+irrigation decision support system based on genetic algorithm, in: Proc. 2006 
+Int. Conf. Mach. Learn. Cybern., 2006: pp. 3123 –3127. 
+doi:10.1109/ICMLC.2006.258403. 
+ 
+[2] Ç. Ersin, R. Gürbüz, A.K. Yakut, Application of an automatic plant 
+irrigation system based arduino microcontroller using solar energy, in: Solid 
+State Phenom., 2016: pp. 237–241. 
+doi:10.4028/www.scientific.net/SSP.251.237. 
+ 
+[3] N. Agrawal, S. Singhal, Smart drip irrigation system using raspberry pi 
+and arduino, in: Int. Conf. Comput. Commun. Autom. ICCCA 2015, 2015: 
+pp. 928– 932. doi:10.1109/CCAA.2015.7148526. 
+ 
+[4] S. Koprda, Z. Balogh, D. Hrubý, M. Turčáni, Proposal of the 
+irrigation system using low-cost Arduino system as part of a smart home, 
+in: SISY 2015 
+- IEEE 13th Int. Symp. Intell. Syst. Informatics, Proc., 2015: pp. 229 –
+233. doi:10.1109/SISY.2015.7325385. 
+ 
+[5] A.S.R.M. Ahouandjinou, P.M.A.F. Kiki, K. Assogba, Smart 
+environment monitoring system by using sensors ultrasonic detection of 
+farm pests, in: BioSMART 2017 - Proc. 2nd Int. Conf. Bio-Engineering 
+Smart Technol., 2017. doi:10.1109/BIOSMART.2017.8095319. 
+ 
+[6] A. Goap, D. Sharma, A.K. Shukla, C.R. Krishna, An IoT based smart 
+irrigation management system using Machine learning and open source 
+technologies, Elsevier, 2019 doi:10.1007/978-3-030-26763-6 
+ 
+[7] D. Smith, W. Peng, Machine learning approaches for soil classification 
+in a multi-agent deficit irrigation control system, in: Proc. IEEE Int. Conf. 
+Ind. Technol., 2009. doi:10.1109/ICIT.2009.4939641. 
+ 
+[8] J. Kwok, Y. Sun, A smart IoT-based irrigation system with 
+automated plant recognition using deep learning, ACM Int. Conf. 
+Proceeding Ser. (2018) 87–91. doi:10.1145/3177457.3177506. 
+ 
+[9] R. Muzzammel, Intelligent Technologies and Applications, 
+Springer Singapore, 2019. doi:10.1007/978-981-13-6052-7. 
+ 
+[10] Accessed: Apr. 15, 2019.
+ [Online]. https:// www.agrocares.com/en/products/lab-in-
+the-box/ 
+ 
+[11] Martínez F, J.; González- Z, A.; Sánchez, N.; Gumuzzio, A.; 
+Herrero-J, C.M. "Satellite soil moisture for agricultural drought 
+monitoring: Assessment of the SMOS derived Soil Water Deficit 
+Index". Remote Sensing of Environment, Vol 177, May 2016, 
+ 
+[12] Vågen et al., T.-G. Vågen, L.A. Winowiecki, J.E. Tondoh, L.T. 
+Desta, 
+T. Gumbricht, "Mapping of soil properties and land 
+degradation risk in Africa using MODIS reflectance" Geoderma, vol 
+263, 2016, pp. 216-225 
+ 
+[13] P. V. Santhi, N. Kapileswar, V. K. R. Chenchela and C. H. V. S. 
+Prasad, "Sensor and vision based autonomous AGRIBOT for 
+sowing seeds," International Conf. on Energy, Communication, 
+Data Analytics and Soft Computing, Chennai, 2017, 
+ 
+[14] USDA. http://www.usda.gov (accessed December 22, 2018). 
+ 
+[15] Jacob LaRue, Cole Fredrick, "Decision process for the 
+application of variable rate irrigation", American Society of 
+Agricultural and 
+ Biological Engineers, Dallas, Texas, July 29 - August 1, 2012 
+ 
+[16] https://
+www.iof2020.eu/latest/news/2017/09/why-the 
+internet-of- things-is-reinventing-plant-fertilization. 
+ 
+[17] Lavanya G, Rani C, Ganeshkumar P, "An automated low cost IoT 
+based Fertilizer Intimation System for smart agriculture", Sustainable 
+Computing: Informatics and Systems, 2019. 
+ 
+[18] Benincasa, P., Antognelli, S., Brunetti, L., Fabbri, C., Natale, A., 
+Sartoretti, V, Vizzari, M. "Reliability of NDVI Derived by High 
+Resolution Satellite and UAV Compared to In-Field Methods for the 
+Evaluation of Early Crop N Status and Grain Yield in Wheat", 
+Experimental Agriculture, 54(4), 2018, 604-622. 
+ 
+[19] Hongli Liu; Xi Wang; Jin Bing-kun, "Study on Ndvi 
+Optimization of Corn Variable Fertilizer Applicator", Agricultural 
+Engineering, 
+Sep-Dec 2018, Vol. 56 Issue 3, p193-202. 10
+ 
+ 
+[20] G. Villarrubia, J. F. De Paz, D. H. De La Iglesia, J. Bajo, 
+"Combining Multi-Agent Systems and Wireless Sensor Networks 
+for Monitoring Crop Irrigation" Sensors, Aug 2017, 17(8): 1775 
+ 
+[21] A. Wietzke, C. Westphal, P. Gras, M. Kraft, K. Pfohl, P. 
+Karlovsky, E. Pawelzik, T. Tscharntke, I. Smit, "Insect pollination 
+as a key factor for strawberry physiology and marketable fruit 
+quality", Agriculture, Ecosystems & Environment, Vol 258, 2018. 
+ 
+[22] Chung SO, Choi MC, Lee KH, Kim YJ, Hong SJ, Li M. 
+VOLUME 1, ISSUE 1, AUG 2021
+
+--- Page 6 ---
+
+International Journal of Technology, Management & Knowledge Processing 
+ 
+17 
+ 
+Sensing technologies for grain crop yield monitoring systems: A review. 
+Journal of Biosystem Engineering, 2016, 41:408-417 
+ 
+[23] Majid Amini Dehaghi, "Effects of Biological and Chemical 
+Fertilizers Nitrogen on Yield Quality and Quantity in Cumin", 
+Journal of Chemical Health Risks, 4(2), 2014, 55 64. 
+ 
+[24] https://www.farmtrx.com/ 
+ 
+VOLUME 1, ISSUE 1, AUG 2021

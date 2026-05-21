@@ -1,0 +1,1402 @@
+--- Page 1 ---
+
+Online Processing of Vehicular Data on the Edge Through an
+Unsupervised TinyML Regression Technique
+PEDRO ANDRADE, IV ANOVITCH SILV A, MARIANNE DINIZ, and THOMMAS FLORES,Federal
+University of Rio Grande do Norte, Brazil
+DANIEL G. COSTA, INEGI, Faculty of Engineering, University of Porto, Portugal
+EDUARDO SOARES, Lancaster University, United Kingdom
+The Internet of Things (IoT) has made it possible to include everyday objects in a connected network, allowing them to
+intelligently process data and respond to their environment. Thus, it is expected that those objects will gain an intelligent
+understanding of their environment and be able to process data more eiciently than before. Particularly, such edge com-
+puting paradigm has allowed the execution of inference methods on resource-constrained devices such as microcontrollers,
+signiicantly changing the way IoT applications have evolved in recent years. However, although this scenario has supported
+the development of Tiny Machine Learning (TinyML) approaches on such devices, there are still some challenges that require
+further investigation when optimizing data streaming on the edge. Therefore, this article proposes a new unsupervised
+TinyML regression technique based on the typicality and eccentricity of the samples to be processed. Moreover, the proposed
+technique also exploits a Recursive Least Squares (RLS) ilter approach. Combining all these features, the proposed method
+uses similarities between samples to identify patterns when processing data streams, predicting outcomes based on these
+patterns. The results obtained through the extensive experimentation utilizing vehicular data streams were highly encouraging.
+The proposed algorithm was meticulously compared with the RLS algorithm and Convolutional Neural Networks (CNN). It
+exhibited signiicantly superior performance, with mean squared errors that were 4.68 and 12.02 times lower, respectively,
+compared to the aforementioned techniques.
+CCS Concepts: · Computer systems organization → Embedded systems ; Algorithm; Edge Computing; · Machine
+Learning→ Tiny Machine Learning (TinyML).
+Additional Key Words and Phrases: Eccentricity, Typicality, TinyML, Unsupervised Learning, Regression, Vehicular networks.
+1 INTRODUCTION
+The Internet of Things (IoT) is a rapidly growing communication paradigm that predicts that everyday objects
+will be equipped with microcontrollers and communication capabilities, allowing users to have greater immersion
+and deeper interactions through new applications and services in areas such as agriculture, medical assistance,
+smart city systems and industrial automation [ 23, 26, 69]. Cisco’s Global Cloud Index estimates that nearly 26.9
+billion devices will be part of the IoT landscape by 2026 [ 3]. However, the large variety of IoT applications and
+devices, as well as their trend for heterogeneity, makes it challenging to develop a solution to fulill all the
+presented requirements. This challenge has motivated an increase in the number of approaches for IoT systems
+Authors’ addresses: Pedro Andrade, pedro.meira.055@ufrn.edu.br; Ivanovitch Silva, ivanovitch.silva@ufrn.edu.br; Marianne Diniz, marianne.
+diniz.086@ufrn.edu.br; Thommas Flores, thommas.lores.101@ufrn.edu.br, Federal University of Rio Grande do Norte, Lagoa Nova, Natal,
+RN, Brazil, 59078-900; Daniel G. Costa, danielgcosta@fe.up.pt, INEGI, Faculty of Engineering, University of Porto, Porto, Portugal; Eduardo
+Soares, edu.soares999@gmail.com, Lancaster University, Lancaster, United Kingdom.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that
+copies are not made or distributed for proit or commercial advantage and that copies bear this notice and the full citation on the irst page.
+Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy
+otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciic permission and/or a fee. Request permissions from
+permissions@acm.org.
+© 2023 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+1539-9087/2023/4-ART $15.00
+https://doi.org/10.1145/3591356
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 2 ---
+
+2 • Andrade et al.
+design, some of which are not practical in many ways. In this scenario of novelties, Cloud computing and Edge
+computing are essential concepts for IoT platforms, gaining a lot of attention lately [27, 78].
+Most IoT platforms have relied on cloud computing when performing machine learning tasks [ 16]. For that,
+raw data streams are usually transmitted toward the cloud, or even considering only minimal processing before
+data transmission. Raw data streams are usually transmitted toward the cloud or even considering only minimal
+processing before data transmission. However, given the high volume of IoT data streams in many applications,
+it becomes hard to deal with this communication scenario that may be easily associated with excessive energy
+consumption and increased infrastructural problems [ 47, 56]. IoT platforms are increasingly shifting towards
+edge computing, where data is processed on devices rather than in the cloud, to reduce data transmission and
+associated energy consumption and infrastructure issues. Edge computing can also reduce latency by bringing
+distributed computing closer to the data source. By processing data on edge, more straightforward tasks can be
+handled locally, leaving the cloud server to focus on more complex demands that require greater computational
+power [17].
+Computing on the edge of an application often requires some data treatment, opening up the possibility of
+using machine learning (ML) techniques for that. However, in many applications, the employed devices are
+resource constrained, operating with microcontrollers (MCU) with limited processing and storage capabilities. In
+such a way, MCU-based devices impose an inherent challenge to the execution of complex machine learning
+algorithms [
+63]. In this context, a concept known in the literature as Tiny Machine Learning (TinyML) has
+emerged [62], which is indeed focused on itting ML models for devices with limited resources [71].
+Generally speaking, it is necessary to seek the best trade-of between the adopted restricted hardware and the
+software endowed with an ML algorithm for a desired application [ 2]. Currently, TinyML is more often applied
+for audio processing, computer vision, and natural language processing problems [ 41]. However, with the advent
+of smart city initiatives, other areas have become suitable for TinyML. In fact, some development platforms
+and libraries such as TensorFlow, PyTorch and Scikit-Learn are already been exploited to support the expected
+TinyML revolution [22, 53].
+This article developed a regression algorithm based on the TinyML principle targeted at interconnected vehicles.
+The proposed algorithm is based on the TEDA algorithm [ 5] designed for the detection of data outliers, and
+the AutoCloud algorithm [ 12] used for data classiication/clustering. We have adapted these algorithms to the
+context of regression problems, particularly for a vehicular application scenario due to the dynamics of the input
+process, which is quite fast and more adapted to the intended data stream [55, 72].
+Therefore, in this emerging context of the Internet of Intelligent Vehicles (IoIV), which highly relies on
+embedded sensors [ 60], the proposed algorithm will be exploited to predict the instantaneous fuel consumption
+of the considered vehicles. Such prediction will allow a vehicle’s fuel system to calculate the amount of fuel
+needed for acceleration, which could save fuel when accurately predicted. Since computer-driven sensors already
+collect data about several variables in a modern vehicle, providing eiciency and maintenance data as well as
+indirect data to improve the driving experience, the TinyML-based processing of such data could provide relevant
+information that can not only improve the eiciency of the vehicles but also its signiicance within a smart city
+context [34].
+The contributions of this article are threefold. First, a new lightweight online unsupervised regression technique
+will be developed following the principles of the TinyML paradigm, i.e., the developed technique requires low
+computational efort and low energy consumption, and can be embedded in resource-constrained devices. Second,
+a comprehensive analysis of the coniguration parameters and the acceptable ranges for the algorithm settings
+will be conducted, including discussions about the weights of the recursive least squares ilters. Finally, the
+proposed approach will be evaluated considering classic methods in the literature, bringing important comparison
+results. Such contributions are very signiicant to this research area and they have not been proposed before to
+the best of our knowledge.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 3 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 3
+The remainder of this article is organized as follows. Section 2 brings recent developments in the areas of
+Internet of Things, Edge computing, and TinyML. Section 3 describes the fundamentals of TEDA and AutoCloud,
+two algorithms that were used as the basis for our regression technique. The proposed approach is described in
+Section 4. Section 5 presents the experimental results, discussing the performed comparisons and achievements.
+Finally, Section 6 presents our conclusions, followed by the references of this work.
+2 RELATED WORKS
+Today, the Internet of Things (IoT) is everywhere. From refrigerators to intelligent lights, from sensors to
+microphones, from smart vehicles to personal assistants, these devices and the networks they create provide
+the cornerstone for several applications in areas such as autonomous vehicles and smart cities [ 1, 66]. Actually,
+IoT applications can get very complex, with potentially hundreds of data sources ( e.g., sensors and actuators
+sending diferent data types to the cloud in massive quantities [ 76]). This scenario opens up the possibility of
+decentralizing data computation by bringing it to the edge of the applications, known as łedge computingž [ 39].
+According to [70], edge computing refers to computing resources that are physically close to the middle of
+a network. These resources act as both data consumers and data generators/producers, with local sensors and
+actuators constantly monitoring a device while it operates in its environment. In essence, this means that more
+tools are on the scene, instead of just data collectors. Another deinition of edge computing was developed
+in [81], deining three layers of computing: cloud, fog, and edge. Starting at the bottom, the edge computing layer
+represents the sensors and actuators on the conceptual łedgež of the applications, with the other layers providing
+connectivity with diferent abstractions and transmission ranges. While fog nodes contain routers, gateways, and
+hubs, the cloud is usually implemented as a software platform for centralized data processing for many other
+kinds of applications, with lower latency but higher processing and storage capacity when compared to the edge
+layer.
+Data processing is usually reasonably reduced in the edge layer, but this scenario has been changing with
+machine learning techniques for low-resource devices, as presented in this work. Unfortunately, limitations in
+computational power make it challenging to deploy machine learning algorithms on edge devices. In fact, TinyML
+addresses this issue by processing local data but only transmitting necessary information to the cloud for further
+computation. This avoids the consumption of a large amount of bandwidth and thus decreases communication
+costs [66].
+Indeed, in recent years, edge computing and TinyML have emerged as a major trend. Incorporating low-energy
+microcontroller units (MCUs), for example, has enabled electronic devices to be more intelligent in everything
+from industrial monitoring sensors to refrigerator controllers. In short, MCUs are cheap, widespread, have low
+energy consumption, and are presented in reduced size usually in a single-chip implementation. However, their
+main constraints are the reduced memory (KB or MB) and their low-frequency processors [4, 71].
+The possibility of running machine-learning techniques with energy consumption on the order of ?? opens
+up a wide variety of applications [ 79]. TinyML systems are more than two to three orders of magnitude cheaper
+and more power-eicient than traditional machine learning systems [ 40]. On the other hand, cloud-based machine
+learning conigurations cost more in terms of battery power, network bandwidth, and latency time. Therefore,
+these issues can limit the deployment of many models for problems where data is generated [ 28]. There are also
+initiatives aimed at implementing ML algorithms in ultra-resource-constrained printed circuits such as [ 8] and
+[49] that focus on popular classiication algorithms.
+Recent works in the ield of TinyML have exploited two major approaches. The irst strategy is to use machine
+learning development libraries and tools to deploy models into microcontrollers. Libraries such as TensorFlow,
+PyTorch, and Scikit-Learn have the function of porting models to run on microcontrollers based on quantization
+and pruning approaches [ 79]. Those libraries allow taking a model trained in another environment and applying
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 4 ---
+
+4 • Andrade et al.
+it in a resource-constrained device. In this case, it is common for the TinyML solutions to use any supervised
+learning model [58]. On the other hand, the second strategy consists of adding a co-processor, i.e., a more powerful
+computational device, to perform in an initial phase of training to make inferences. Meanwhile, on the edge
+device, there would only be the model retraining with the updating of the weights, based on new input data.
+Another possibility for this strategy is to use the most robust hardware only when the edge system detects more
+complex situations, then the co-processor takes over the task, updates the model, and ports this new knowledge
+to the embedded system. In this type of approach, the used techniques can be either supervised or unsupervised.
+The contributions in this article do not it into any of these previously mentioned approaches, as the developed
+technique does not require prior knowledge of the data or a training phase. The proposed model is unsupervised
+and it is trained with the input of new data, having the ability to adapt to changes and concept evolution.
+Considering diferent ways to develop, deploy and train TinyML models, it is possible to mention and classify
+many works in the literature that have been devoted to using machine learning techniques on devices with
+limited resources. For the approach through supervised training and then quantization, we can cite, for example,
+[48]. In the context of the COVID-19 pandemic, they have proposed a face mask detection architecture for
+implementation in microcontrollers. A trained TinyML model is quantized using the TensorFlow Lite framework.
+Another solution was implemented to detect coughs in real-time on an Arduino Nano BLE Sense through training
+a dataset of coughs running under only 20 KB RAM memory [68].
+Neural networks can be optimized in several ways as shown in [ 7], where one of the possibilities is through the
+use of pruning and quantization techniques. The TinyML literature contains a collection of contributions for dis-
+cretely packing compression neural network-based models into devices with limited resources. For instance, [ 24]
+used statistical quantization of a neural network model to estimate the parameters of a battery in a microcontroller.
+A more complex model based on Convolutional Neural Networks (CNNs) with a reduced size was also deployed
+onto a memory-limited microcontroller unit [ 29]. Network pruning was used to increase the generalization
+performance for a classiication problem and satisfy the reduced-memory constraints. A similar idea was also
+used to reduce the computational inference demand on Recurrent Neural Networks (RNNs), where quantized
+matrices were adopted [ 44]. Quantized neural networks adapted to resource-constrained devices have also been
+implemented in other contexts, such as for detecting feeding events [ 51], keyword spotting applications [ 15, 18],
+for multiple purpose uses [74, 77] and IoT applications [10, 35, 46].
+Regarding the strategy that uses co-processing to perform training outside the edge device, there are approaches
+with all types of supervision. Additionally, in some references there is the use of techniques with online learning,
+after an initial phase of training and learning [ 50], [ 57]. The work in [ 50] is quite complete, as it compares
+supervised (CNN), unsupervised (SOM), semi-supervised (CNN + SOM), and online unsupervised (DSOM)
+techniques, bringing important results to the area.
+The work in [59] also uses the concepts of online learning and it is called TinyOL (TinyML with online learning).
+First, training is carried out using the pre-collected data. Thus, the TinyOL technique allows updating the layer’s
+weights in the online setting, not needing to store the historical data for future training. In [ 20], initially, the DNN
+(Deep Neural Network) is trained, and then a post-training quantization based on a hyperparameter optimization
+technique is performed, enabling faster computing on resource-constrained devices ( e.g., edge devices) for online
+learning applications. The work in [ 25] also introduces a knowledge transfer mechanism obtained from Deep
+Learning and KNN models trained on a more powerful computational unit. After training, there is continuous
+support for the embedded system on the edge. Diferently, authors in [ 9] focused on object detection. A Shallow
+Neural Network (SHNN) is implemented on the edge device, being connected with a DNN that resides on the
+most powerful device. In many cases, the DNN will not be needed and a shallower model will suice. However,
+when signiicant changes occur, the DNN is used and must transfer the knowledge to the shallow model, updating
+its weights. Finally, an online training concept is proposed in [ 45] for computer vision applications using NVIDIA
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 5 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 5
+Jetson. Whenever a new object class is detected, a new neural network model will be started from the weights of
+the previous models. Model training is performed in the fog and then passed to the application edge device.
+Therefore, after an extensive literature review, it is possible to notice that initiatives to apply unsupervised
+TinyML algorithms are rare (Table 1). The possibility of integrating TinyML techniques directly into microcon-
+trollers allows local training and model generation in the IoT device itself. This can improve the accuracy of the
+model and enable the implementation of online techniques capable of responding satisfactorily to data streams,
+including critical applications.
+Table 1. Related literature on Machine Learning and TinyML. The presented ML-related techniques are: KNN (k-nearest
+Neighbors), ANN (Artificial Neural Network), RNN (Recurrent Neural Network), DNN (Deep Neural Network), SVM (Support
+Vector Machine), SHNN (Shallow Neural Network), RF (Random Forests), SOM (Self-Organizing Maps) and DSOM (Dynamic
+SOM).
+Year TinyML pruning Learning Base technique Work
+2021 quantization supervised CNN [48]
+2020 quantization supervised ANN [68]
+2020 quantization supervised ANN [24]
+2019 quantization supervised CNN [29]
+2019 quantization supervised ANN [44]
+2020 quantization supervised ANN [51]
+2021 quantization supervised RNN [15]
+2020 quantization supervised RNN [18]
+2020 quantization supervised ANN, SVM, RF [74]
+2019 quantization supervised ANN [77]
+2016 quantization supervised DNN [35]
+2020 quantization supervised ANN [46]
+2021 quantization supervised ANN [10]
+2020 co-processing both CNN, SOM, DSOM [50]
+2021 co-processing both Autoencoder + ANN [59]
+2022 co-processing supervised DNN [20]
+2020 co-processing unsupervised SVM and KNN [25]
+2020 co-processing supervised SHNN and DNN [9]
+2019 co-processing supervised DNN [45]
+2022 online learning unsupervised AutoCloud + TEDA proposed
+3 TEDA AND AUTOCLOUD ALGORITHMS
+This section explores the TEDA and AutoCloud algorithms, both used as a basis for the new proposal. TEDA is a
+streaming algorithm proposed by Angelov in 2014 [ 5], while AutoCloud is an evolutionary clustering algorithm
+based on TEDA concepts developed in [12].
+In [5], Angelov presents an anomaly detection algorithm for data streams called TEDA, which exploits the
+typicality and eccentricity concepts to achieve its results. Typicality is the similarity of a sample to the rest of the
+set based on distances between samples. Eccentricity is the opposite, indicating how diferent a sample is from
+the rest of the collected data. A sample with high eccentricity indicates that it could be an outlier.
+TEDA has advantages over traditional statistical methods for detecting anomalies. Since there is no need for
+prior knowledge of the data, it is widely used for data streams and time series, having the ability to detect changes
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 6 ---
+
+6 • Andrade et al.
+and the evolution of concepts. In order to use the algorithm, it is not necessary to know the mathematical model
+or the data distribution, which is an important advantage for real-world problems [ 75]. TEDA measures the
+typicality and eccentricity of each sample through geometric distances (Euclidean, cosine, or Mahalanobis), thus
+the computational efort is low and fast.
+In addition to the related works previously mentioned, we could cite other relevant research eforts that have
+presented improvements to the TEDA algorithm. First, by expanding and generalizing the scope of the algorithm,
+we have the works in [ 12], [43] and [42]. Moreover, considering applications to real problems, we have [ 71] for
+data compression, [4] for detection of road anomalies, [ 75] for weather data, and [ 13] for industrial processes.
+These works are good indications of the recent interest in the TEDA algorithm, highlighting its relevance in
+many practical scenarios.
+The AutoCloud algorithm is like TEDA where its data processing is recursive and it does not require large
+memory space, as it performs using batch processing tasks or sliding windows. Therefore, it is a fast algorithm
+that requires low computational efort, being a good solution for resource-constrained devices and real-time
+problems, such as in TinyML applications. Furthermore, it is a completely unsupervised algorithm and it also
+does not need oline training or prior data knowledge. In [ 12], it is highlighted that this algorithm is able to deal
+with two typical data stream problems: concept drift and concept evolution.
+The most signiicant contribution of AutoCloud is the use of DataClouds, which are granular structures
+similar to traditional clusters. However, unlike traditional clusters, DataClouds are grouped according to common
+statistical properties. Thus, a DataCloud is modeled by three properties: the number of samples ( ??
+?
+), as well as
+both the mean ( ??
+? ) and the variance ([ ? 2] ?
+?
+) of the samples that have been associated with that cloud ?? at the
+time instant ?. Finally, DataClouds have no speciic form or boundaries. It is noteworthy that the input data does
+not need to be stored in memory, but is only used to update the cloud to which it belongs.
+For each new input data, AutoCloud calculates the normalized eccentricity for each cloud ( [ ??( ??)] ) where ??
+is the new data, as deined in Eq. 1.
+??( ??) = 1
+2[ ??
+?] +
+( ??
+?− ??) ?( ??
+?− ??)
+2[ ??
+?][ ? 2] ?
+?
+(1)
+If the eccentricity is highly relative to a cloud, the new data is irrelevant to that cloud. However, if the normalized
+eccentricity is low and satisies the condition in Eq. 2, with ? representing the algorithm’s sensitivity, the input
+sample is similar to the previous samples that were associated with that DataCloud and therefore the data also
+belongs to the cloud ?.
+??( ??)≤ ? 2+ 1
+2??
+?
+(2)
+As previously mentioned, the DataCloud is a concept within the AutoCloud algorithm that deines the input
+data stream to be considered, which is deined by granular structures grouped according to common statistical
+properties. Its variables are recursively updated as expressed in Eq. 3, Eq. 4, and Eq. 5.
+[ ??
+?] = ??
+?− 1+ 1 (3)
+[ ??
+?] =
+[ ??
+?]− 1
+[ ??
+?] ??
+?− 1+ 1
+[ ??
+?] ?? (4)
+[[ ? 2] ?
+?] =
+[ ??
+?]− 1
+[ ??
+?] [ ? 2] ?
+?+ 1
+[ ??
+?]
+/bardblex
+/bardblex ??−[ ??
+?]
+/bardblex
+/bardblex 2 (5)
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 7 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 7
+The same input data can belong to more than one DataCloud, just as in a fuzzy set. And if the eccentricity
+of the data in relation to all other clouds is too high, a new DataCloud will be created. To avoid the disorderly
+creation of new DataClouds, the algorithm merges two clouds when the number of samples belonging to the two
+clouds is considerably high. For the automatic merging of cloud
+?and cloud ?, at least one of the conditions in Eq.
+6 and Eq. 7 must be met (with ???∩ ??
+? as the number of intersecting samples at the time instant ?).
+???∩ ??
+? > ??
+?− ???∩ ??
+? (6)
+???∩ ??
+? > ? ?
+?− ???∩ ??
+? (7)
+The algorithm merges automatically and non-parametrically. When there is a merge of two DataClouds, the
+properties of the resulting cloud are deined by Eq. 8, Eq. 9, and Eq. 10.
+??
+? = ??
+?+ ? ?
+?− ???∩ ??
+? (8)
+??
+? =
+??
+? ??+ ? ?
+? ??
+??
+?+ ? ?
+?
+(9)
+[ ? 2] ?
+? =
+( ??
+?− 1)[ ? 2] ?+( ? ?
+?− 1)[ ? 2] ?
+??
+?+ ? ?
+?− 2
+(10)
+After describing the main characteristics of both algorithms, we can deine a new technique to improve the
+achieved results, as will be presented in the next section.
+4 THE PROPOSED TEDA REGRESSOR ALGORITHM
+The following subsections will present the development steps and the coniguration parameters of the proposed
+algorithm.
+4.1 Defining regression rules
+Before starting the development of the proposed algorithm, it is important to highlight some considerations.
+Regression is a statistical technique for predicting a continuous variable based on one or more predictor variables
+[6]. Several research ields have employed regression models, such as Engineering [ 14, 21], Economics [ 33], and
+Biology [61]. Time series prediction is a speciic type of regression that is used to predict future values of a
+variable based on its past values [ 64]. Time series data are often characterized by temporal dependencies, meaning
+that the value of a variable at a given time is inluenced by its previous values as it requires accounting for the
+dependencies between observations. [ 65]. In summary, the proposed technique is a time series prediction method
+that its within the concept of regression.
+According to [37], the most widely used regression technique is linear regression. Its main advantages are its
+simplicity, due to its linearity, and it is an oline algorithm well known in the literature. Until this moment, it is
+still the predominant empirical tool in Economics.
+A linear model assumes that the regression function is linear in terms of the inputs. In this sense, there are
+diferent approaches to calculating the parameters of the line, such as the least squares (LS) method, as well as
+many diferent modiications of the linear regression algorithm. However, although its popularity, it has some
+disadvantages such as the fact it is too simplistic, and also presents some inability to deal with large volumes of
+past data.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 8 ---
+
+8 • Andrade et al.
+In this article, we propose the TEDA Regressor, an algorithm aimed at resource-constrained devices. Like
+AutoCloud, its main advantages are its simplicity and low computational requirements. TEDA Regressor is an
+online algorithm and does not need oline training or prior data knowledge, being a possible solution for the data
+stream and TinyML applications. Figure 1 illustrates where the developed technique its into an IoT application:
+running on a resource-constrained device, physically close to the data source.
+Fig. 1. Conceptual positioning of the proposed technique within an IoT applications scenario.
+4.2 Mathematical formulations
+As aforementioned, each DataCloud can be modeled by three properties: number of samples ( ??
+?
+), mean ( ??
+? ) and
+variance ([ ? 2] ?
+?
+) of the samples that have been associated with that cloud ?? at the time instant ?. Therefore, the
+main diference between the TEDA Regressor and the clustering algorithm (AutoCloud) is the insertion of a
+fourth object: an adaptive Recursive Least Square (RLS) ilter, as depicted in Figure 2. In this article, it will be
+referred as łRLS ilterž and we will adopt the notation ??
+? for the DataCloud ?at time ?. Table 2 summarizes the
+diferences between the proposed TEDA Regressor and the existing AutoCloud solution.
+Fig. 2. TEDA Regressor representation - inclusion of the fourth object (RLS filter).
+According to [67], the RLS ilter is described as a polynomial equation that relates weights and inputs to predict
+the iltered output or signal, as expressed in Eq. 11.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 9 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 9
+Table 2. Diferences between AutoCloud and TEDA Regressor.
+Characteristic AutoCloud TEDA Regressor
+Type Classiication/Clustering Regression
+DataCloud properties
+number of samples ( ??
+? )
+number of samples ( ??
+? )
+mean (??
+? ) mean (??
+? )
+variance ([ ? 2] ?
+? )
+variance ([ ? 2] ?
+? )
+- RLS ilter ( ??
+? )
+??
+? = ? ?
+1· ??
+?− 1+···+ ? ?
+?· ??
+?− ? (11)
+where ?? is the model output, ? ?
+? is the weight of cloud ?with ? varying in the range[ 1, ?] where ? is the order
+of the RLS ilter.
+Finally, ??
+?− 1 is the respective entry at the time instant ?− 1. Therefore, the irst parameter deined in TEDA
+Regressor will be the number of previously used samples (window) and it will be denoted by ? . The window
+size ? is equal to the order ? of the ilter.
+Continuing the development of the RLS method for the proposed algorithm, we can rewrite Eq. 11 in vector
+form, achieving the new Eq. 12.
+??
+? = ??
+? ? ? (12)
+where ??
+? denotes the transpose of the input vector.
+Thus, the weight matrix must be updated, achieving the Eq. 13.
+? ?+ 1 = ? ?+ Δ? ? (13)
+The weight update increment ( Δ? ? ) is given by Δ? ? = ?????? , where ?? is the error given by the diference
+between the desired output ( ?? ) and the model output ( ?? ). The value of ?? can be computed as ?? = ??− ?? .
+Finally, ?? is the inverse of the autocorrelation matrix, which is expressed by Eq. 14.
+?? = 1
+?( ??− 1−
+??− 1????
+? ??− 1
+?+ ??
+? ??− 1??
+) (14)
+where ? is the aging factor, which will be the second parameter conigured in the deinition of the algorithm.
+The aging factor ?, given in the range from 0 to 1, aims to value the most recent samples more highly than the
+oldest ones. According to [ 67], this parameter has this name because past data is exponentially weighted less
+than the more recent data. When ? is equal to 1, we have the growing memory case, since, as the length of the
+data grows, the efect of the oldest data is not attenuated. In contrast, the exponentially decaying memory case
+(? < 1) is more suitable for time-varying applications (time series). Some details about this parameter will be
+discussed in Section 5.
+The initial value of the autocorrelation matrix should be set to ? 0 = 1
+? ?, where ? is a small positive constant
+and ? is the identity matrix of order ?. To implement the RLS ilter in the algorithm, it was adopted an open
+source library, Padasip1 (Python Adaptive Signal Processing ), developed for adaptive signal processing.
+As with AutoCloud, the proposed TEDA Regressor prevents the uncontrolled creation of DataClouds by
+merging the conditions deined in Eq. 6 or Eq. 7. DataCloud’s characterizing properties (number of samples,
+mean, and variance) are also updated according to Eq. 8, Eq. 9, and Eq. 10.
+1Padasip library: https://matousc89.github.io/padasip/
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 10 ---
+
+10 • Andrade et al.
+The third introduced parameter is the sensitivity of the method, which acts as a threshold to determine whether
+or not a sample ?? belongs to DataCloud ??. The ?? -threshold method is a well-known model used to detect
+outliers in a Gaussian distributed data set. In a dataset with a large number of samples and any data distribution,
+it is possible to use the Chebyshev Inequality, as demonstrated in [ 19]. This inequality states that no more than
+1/ ? 2 of the distribution’s values can be ? or more standard deviations away from the mean, considering ? ≥ 1.
+We have adapted formulas of [ 11] to be the normalized eccentricity used in this work, and inequality in eq 2,
+achieving the rewritten eq 15.
+??( ??)≤ ? 2+ 1
+2??
+?
+(15)
+Therefore, the value of ? represents the threshold of sensitivity of the method . The larger the value of ? ,
+the less sensitive the algorithm will be.
+The fourth object, the RLS ilter, will be merged assigning more weights to the ilters of the two DataClouds
+that will be merged. The resulting DataCloud weight update will be given by Eq. 16.
+? ?
+? = ? ?
+? + Δ? ?
+? (16)
+where
+Δ? ?
+? = ?Δ? ?
+?+( 1− ?) Δ? ?
+? (17)
+where ? is the gain related to the merging of the ilters.
+The value ? is a parameter related to the number of samples of each DataCloud, which may be expressed as
+? =
+? ?
+?
+? ?
+?+ ? ?
+?
+, considering that cloud ?? has more samples than cloud ??, hence ??
+?≥ ? ?
+?
+. This gain was inserted to
+give greater weight to a DataCloud with more samples and, consequently, more signiicance.
+In the Deep Learning literature, there are several techniques for initializing the weights of neural networks
+in order to substantially improve convergence [ 32]. The works by [ 38] and [ 31] present weight initialization
+techniques that lead to faster convergence and that reduce the error of the implemented models. Such techniques
+were brought and adapted for our algorithm to initialize the RLS ilters weights and will be named in the article
+according to the computational or mathematical function they represent. The initialization of [ 38] uses an
+adaptation of the Rectiied Linear Unit (" relu") while [ 31] uses variations of the hyperbolic tangent function
+("tanh1" and " tanh2"). The initial weights of the RLS ilters are given by the following Eq. 18:
+? 0 = ????( ?− 1, ?)× ? ????? (18)
+where ???? represents a function that generates a vector of length equal to the order of the ilter, whose elements
+vary between ?− 1 and ? (size of previous sample window). Table 3 presents the multiplicative factor (? ?????) that
+was made available from the previously mentioned functions (" relu", "tanh1" and " tanh2") and with the inclusion
+of the " zero" option that resets all the weights of the RLS ilters. The four weight initialization conigurations
+were compared in Section 5.
+After all deined mathematical formulations, Figure 3 and Algorithms 1-3, summarize the proposed TEDA
+Regressor algorithm.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 11 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 11
+Table 3. Weight initialization.
+Weight
+initialization (?) Function factor Based on
+0 łzerož 0 -
+1 łreluž
+︃
+2
+?− 1 [38]
+2 łtanh1ž
+︃
+1
+?− 1 [31]
+3 łtanh2ž
+︃
+2
+2?− 1 [31]
+Fig. 3. TEDA Regressor: Input, output, and hyperparameters.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 12 ---
+
+12 • Andrade et al.
+Algorithm 1: TEDA Regressor
+Data: ? ={ ?1, ?2, ?3, ...}
+while ??← new input do
+if ? = 1 then
+// 1st DataCloud:
+? 1
+1← 1
+?1
+1← ?1
+[ ? 2] 1
+1← 0
+?1
+1 ← ? 0
+? ← 1
+end
+else if ? = 2 then
+// Add ?2 to DataCloud
+? 1
+2← 2
+?1
+2←( ?1
+1+ ?2)/ 2
+[ ? 2] 1
+2←
+/bardblex
+/bardblex ?2−[ ? 2] 1
+1
+/bardblex
+/bardblex / 2
+?1
+2 ← ? 0
+end
+else
+forall ?? do
+calculate ? ?
+? , ? ?
+? and[ ? 2] ?
+? // Eqs: 3, 4, 5.
+calculate ??( ??) // Eq: 1
+if Eq. 1 is true then
+// Add ?? to DataCloud ??
+? ?
+?←[ ?′] ?
+?
+??
+?←[ ?′] ?
+?
+[ ? 2] ?
+?←[[ ? 2] ′] ?
+?
+??
+? ←[ ?′] ?
+?
+end
+else
+? ?
+?← ? ?
+?− 1
+??
+?← ??
+?− 1
+[ ? 2] ?
+?←[ ? 2] ?
+?− 1
+??
+? ← ??
+?− 1
+end
+if ?? ∉,∀? then
+CreateDataCloud (?? )
+end
+forall pair( ??, ??) do
+verifyMerge(??, ??)
+end
+Calculate ??
+? // Estimated value as Eq. 11
+end
+end
+end
+Algorithm 2: Procedure to create a new DataCloud
+procedure CreateDataCloud (?? )
+// create new DataCloud j
+? ?
+?← 1
+??
+?← 1
+[ ? 2] ?
+?← 0
+?← 1
+return
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 13 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 13
+Algorithm 3: Procedure to merge DataClouds
+procedure verifyMerge (??, ??)
+if ???∩ ??
+? > ??
+?− ???∩ ??
+? or ???∩ ??
+? > ? ?
+?− ???∩ ??
+? then
+// merge data clouds i and j to data cloud l
+calculate ??
+? , ??
+? ,[ ? 2] ?
+? and ?? by Eqs. 8-10
+end
+return
+The coniguration of the parameters is given as follows:
+• ? : Size of the previous sample window;
+• ?: Aging factor, a positive scalar that is less than or equal to one (usually 0 ≪ ?≤ 1);
+• ? : Sensitivity threshold of the method;
+• ?: Weight initialization (Table 3).
+As input, the model uses the vector of previous samples ( ? ? ), and the output of the model is the predicted
+value (??+ 1).
+In summary, the article proposes a method that boasts minimal storage requirements, as it necessitates only
+four instances for each DataCloud (an integer for the number of samples, a loat for the mean value, a loat for the
+variance value, and a vector of loats for the RLS ilter weights). This recursive technique involves the updating of
+these variables at each iteration and does not rely on complex mathematical models. In contrast, as demonstrated,
+the algorithm possesses a relatively simple algebraic structure, particularly when compared to techniques such as
+Deep Learning models ( e.g Convolution Neural Networks). The article codes are stored in a Github repository 2.
+5 RESULTS AND DISCUSSIONS
+In this section, the dataset used to evaluate the newly proposed technique will be presented. Then, the TEDA
+Regressor will be compared with the traditional Recursive Least Squares (RLS) method and with Convolution
+Neural Networks (CNN). The relevance and inluence of the algorithm parameters will be also discussed. Finally,
+it will be analyzed the variation of the model parameters and how the results will be afected. The following
+results were run on an Intel i5 notebook, 256GB SSD, and 4GB RAM.
+5.1 Considered dataset
+For the evaluation of the proposed algorithm and proper discussions about its coniguration parameters, a dataset
+comprising a vehicle’s data in the form of time series was considered. The fuel consumption measurements
+that constitute this dataset were acquired from a single car provided by a volunteer. This dataset presents 7230
+samples of the vehicle’s instantaneous consumption in a 2-hour trip, with the summing of all samples being equal
+to the total volume of fuel consumed in this trip.
+In order to create this dataset, data acquisition was performed using an OBD-II reader, as performed by
+recent works in this area [ 4, 52, 73]. Actually, most vehicles already have an OBD-II interface to provide a lot
+of information about its operation, which can be freely accessed by a proper reader/scanner hardware. Such
+information can not only give important clues for maintenance purposes, but it can also indicate how eiciently
+the vehicle’s engine has operated along the time.
+Figure 4 depicts variations in fuel consumption over time, as informed by the vehicle through its OBD-II
+interface.
+2https://github.com/pedrohmeiraa/TEDA-Regressor
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 14 ---
+
+14 • Andrade et al.
+0 1000 2000 3000 4000 5000 6000 7000
+Time (s)
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+0.006Fuel consumption (L)
+Fig. 4. Dataset comprising the informed fuel consumption.
+Table 4 presents the following statistical data from the considered dataset: maximum, minimum, mean, standard
+deviation, and coeicient of variation (or variability). The coeicient of variation (CV) is a standard measure of
+dispersion. Unlike other standard measures of dispersion (for example, variance or standard deviation), the CV is
+dimensionless: its numerical value does not depend on the units used to measure the variable in question [ 54].
+The data presented in this study has measurements with a mean of 0.002 L/s or 2 mL/s. As a result, the mean
+squared error is of the order of 10− 8. However, it is worth noting that the algorithm is applicable to any dataset,
+regardless of its mean value.
+Table 4. Statistical parameters and dataset characteristics.
+Characteristics
+Sample size 7230
+Maximum value 0.006 L
+Minimum value 0.000 L
+Mean 0.002 L
+Standard deviation 0.001 L
+Coeicient of variation 50.00 %
+After establishing the dataset, it will be determined the form of comparison for the evaluation of the results.
+The metric for the comparison adopted in this work will be the mean squared error, corresponding to the expected
+value of the squared (quadratic) error or loss. The mean squared error (MSE) is given by Eq. 19:
+???( ?,ˆ?) = 1
+????????
+? ??????? − 1︁
+?=0
+( ??− ˆ??) 2 (19)
+where ˆ? is the predicted value of the i-th sample, and ?? is the corresponding true value, divided by the number
+of samples (???????? ).
+In addition to the MSE, another metric will be considered to evaluate the performance of the algorithms:
+Energy Consumed ( ?? ), given in Watts (W), calculated through the CodeCarbon platform. To assess energy
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 15 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 15
+consumption, the CodeCarbon 3 tool was utilized. Code Carbon is a tool that easily integrates into a Python
+codebase, it calculates Energy RAM, Energy CPU, Energy Consumed, and the carbon dioxide ( ?? 2) emissions
+caused by the cloud or personal computing resources used to run the code. This enabled us to determine the
+optimal hyperparameter settings for each model, in terms of Mean Squared Error (MSE), ?? 2 Emission, Energy
+RAM, Energy CPU, and Energy Consumed. For models that use Deep Learning, the use of a Graphics Processing
+Unit (GPU) is a possibility to make processing more eicient. Convolutional Neural Networks (CNN) often require
+GPU in object detection and classiication applications. Due to their low computational efort, TEDA Regressor
+and RLS do not require a GPU. It is worth noting that a GPU was not utilized in this analysis to facilitate the
+comparison between the algorithms. The Code Carbon still measures the GPU Energy, however, the GPU was
+not used in these model evaluations, equaling 0.
+For a unique trade-of evaluation between MSE and Energy Consumed (EC), we have developed a new metric
+based on the ?? score, which is a standard statistical measure for evaluating models used in traditional probability
+theory [30]. The user-speciied parameter ? controls the importance of the rates in the calculation, based on the
+harmonic mean formula [ 36]. When both rates are given equal weight ( ? = 1), the ?1 score becomes a standard
+harmonic mean of the two values [ 71]. Therefore, the harmonic mean ( ?? ) considering the mean squared error
+(??? ) and the Energy Consumed ( ?? ) is given by:
+?? =( 1+ ?2)× ??? × ??
+?2× ??? + ?? (20)
+The harmonic mean is a type of average measure often used as fusion data [ 80]. For our case, the ?? is a
+numerical combination of the two metrics that we are most interested in analyzing for each technique: MSE
+and Energy Consumed. Therefore, the lower the values found, the better the performance of the technique. We
+considered three values of ? to evaluate the results: 0.5, 1, and 2. For ? = 0. 5, there is a greater weight for the
+Consumed Energy metric. For ? = 1, the weights are equal. Finally, ? = 2, the greatest weight is on the MSE
+metric.
+5.2 Performance Evaluation
+To evaluate the proposed technique, the TEDA Regressor algorithm was compared with traditional solutions
+found in the literature: the Recursive Least Squares (RLS) algorithm and Convolution Neural Networks (CNN).
+The RLS technique was chosen because our proposed algorithm is based on RLS ilters and it is a technique that
+can be used online without the need for previous training. The CNN technique was chosen for comparison, as it
+has been widely used by other works in the literature, as highlighted in Section 2. It is important to highlight that
+the TEDA Regressor and RLS techniques do not need previous training like the CNN model. Thus, to perform a
+proper comparison, the dataset explained in the previous subsection was divided into 84% for network training
+and 16% for testing. TEDA Regressor and RLS were only applied to the same 16% of test data. Therefore, for the
+results of this Subsection, approximately 1200 measurements of fuel consumption were considered.
+Another important consideration is that the TEDA Regressor maps the samples according to the typicality
+in relation to each of the DataCloud. And for each of them, there is a respective RLS ilter. Therefore, when a
+new data stream sample is associated with a DataCloud, the respective ilter is used for the regression. In the
+traditional RLS algorithm, on the other hand, there is no such diferentiation of samples, that is, all input samples
+are used to update the ilter weights, regardless of the similarity between them.
+To compare the three techniques, we used the "Weight and Biases" 4, a machine learning platform to evaluate
+the performance of each algorithm according to a set of parameters. We conigured the WandB platform to run
+3https://codecarbon.io/
+4Weights and Biases (WandB) platform: https://wandb.ai/site
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 16 ---
+
+16 • Andrade et al.
+combinations of all predeined parameters (Table 5) and display the respective MSE, as shown in Figures 5-7.
+The best parameter setup, i.e., that presented the lowest MSE is shown in Table 6. For comparison between the
+techniques, the common parameters for TEDA Regressor and RLS (? - window size and ? - aging factor) presented
+the same options. However, as the TEDA Regressor algorithm has more parameters, there was variation in these,
+as shown in Table 5. For the CNN models, we vary window size, just like in TEDA Regressor and RLS, and we
+vary the activation function (ł reluž and ł linearž) and the optimization function (ł adamž, ł sgdž, and ł rmspropž). In
+total, 700 (5× 7× 5× 4) parameter combinations were run for the TEDA Regressor, 35 (5 × 7) combinations for
+the RLS, and 30 (5× 2× 3) combinations for the CNN model.
+For better visualization of the results, Figure 8 presents the true dataset and the forecast curves of each
+implemented technique. The results for the lowest MSE values are presented in Table 7, which also shows the
+?? 2 emissions values and the Energy Consumed (EC) which is the sum of the Energy CPU and the Energy
+RAM. Table 8 presents the ratios between the results (MSE, ?? 2 emission, and energy consumption) in the tested
+algorithms in relation to that proposed in this article. The RLS mean squared error (MSE) was 4.68 times greater
+than TEDA Regressor MSE and the CNN MSE was 12.02 times greater than TEDA Regressor. With regard to
+energy consumption, the RLS algorithm consumed 0.24 times the energy consumed by the TEDA Regressor in
+Energy RAM memory. Meanwhile, the CNN algorithm consumed 1739.46 times more energy than the TEDA
+Regressor in Energy RAM memory. RLS presents less computational efort than TEDA Regressor, but TEDA
+Regressor presented a smaller error. Furthermore, TEDA Regressor is based on TEDA which is a classiication
+algorithm. In future work, we intend to classify outliers and correct them using the same technique, unlike RLS,
+which only has the regression scope.
+Fig. 5. TEDA Regressor algorithm sweep: hyperparameter tuning to look for the smallest MSE.
+Considering the harmonic mean deined in Eq. 20, for the ? values (0.5, 1, and 2), ????? of the TEDA Regressor
+was lower than the means of the RLS algorithm and the CNN model, as can be seen in Table 9. When the ? = 2,
+there is a greater weight for the Energy Consumed ( ?? ) metric in that RLS performed better. However, even so,
+TEDA Regressor presented a lower harmonic mean.
+5.3 Analyzing the configuration window parameter
+From this subsection on, the entire dataset will be considered for the presentation of results and discussions,
+since TEDA Regressor does not need training. The main premises of an algorithm in the context of TinyML
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 17 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 17
+Fig. 6. RLS algorithm sweep: hyperparameter tuning to look for the smallest MSE.
+Fig. 7. CNN algorithm sweep: hyperparameter tuning to look for the smallest MSE.
+applications are low computational efort and limited memory resources. Hence, we chose a reduced-size input
+window to save memory space. As previously mentioned, the size of the window will indicate the number of
+previous values in the dataset that will be considered. In the performed tests, we chose the window parameter
+(? ) values from 2 to 6 previous samples. The resulting mean squared errors are shown in Figure 9.
+The best performance for the studied dataset was for ? = 2 since as the value of ? increases, the MSE also
+increases. Therefore, we could notice that the considered dataset presents high data dispersion. Our hypothesis is
+that the algorithm will perform better with windows longer than 3 for datasets with smaller dispersions (low
+CV). This hypothesis will be tested in future works.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 18 ---
+
+18 • Andrade et al.
+Fig. 8. Comparison of true values with values provided by TEDA Regressor, RLS, and CNN algorithms.
+Table 5. Parameters sweep: variables and ranges to sweep over.
+Parameter TEDA
+Regressor RLS CNN
+? [2, 3, 4, 5, 6] [2, 3, 4, 5, 6] [2, 3, 4, 5, 6]
+? [0.000001, 0.1, 0.25,
+0.5, 0.75, 0.9, 1]
+[0.000001, 0.1, 0.25,
+0.5, 0.75, 0.9, 1] -
+? [1.5, 1.8, 2, 2.3, 3] - -
+? ["relu", "tanh1",
+"tanh2", "zero"] - -
+??????? - - ["relu", "linear"]
+??????? - - ["adam", "sgd",
+"rmsprop"]
+Number of runs 700 35 30
+5.4 The aging factor parameter
+The function of the aging factor ( ?) is to modulate the relevance of the most recent samples compared to the
+oldest ones. This parameter should be chosen in the range from 0 to 1. However, it is important to note that the
+value of ? cannot be exactly equal to 0, as there would be a division by 0 in Eq. 14. Therefore, in the tested values,
+the ? tending to 0 will be included instead.
+Figure 10 presents the eight values of tested aging factors and the results of the metric. The best performance
+of the algorithm was when ? = 0. 9, presenting the lowest mean squared error.
+Through Figure 10, it is possible to see that the largest error occurs with ? tending to 0, but it decreases with
+an increase of ?. If the aging factor ( ?) equals 1 ( growing memory case ), there is no attenuation of previous data.
+For these results, there was no great diference in relation to ? equals 0.9, although for data with more signiicant
+lengths, the value of the aging factor will further afect the performance of the algorithm.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 19 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 19
+Table 6. Best parameter setup for each algorithm.
+Parameter TEDA
+Regressor RLS CNN
+? 2 2 2
+? 0.9 0.75 -
+? 2 - -
+? "tanh2" - -
+??????? - - "relu"
+??????? - - "adam"
+MSE 0.29× 10− 7 1.35× 10− 7 3.48× 10− 7
+Energy
+Consumed (W) 1.76× 10− 6 0.42× 10− 6 3.05× 10− 3
+Table 7. Best performance (minor MSE) for each algorithm and the respective memory variables.
+Algorithm MSE
+?? 2
+Emission
+(g)
+Energy
+CPU
+Energy
+RAM
+Energy
+Consumed
+TEDA Regressor 0.29× 10− 7 7.95× 10− 7 1.58× 10− 6 0.17× 10− 6 1.76× 10− 6
+RLS 1.35× 10− 7 1.23× 10− 7 0.38× 10− 6 0.04× 10− 6 0.42× 10− 6
+CNN 3.48× 10− 7 1.63× 10− 3 2.75× 10− 3 0.3× 10− 3 3.05× 10− 3
+Table 8. Ratio between the error metrics, ?? 2 emissions, and consumed energy, using the TEDA Regressor value as the
+baseline.
+Algorithm Ratio
+MSE
+Ratio
+?? 2 Emission
+Ratio
+Energy Consumed
+TEDARegressor 1 1 1
+RLS 4.68 0.15 0.24
+CNN 12.02 2047.46 1739.46
+Table 9. Harmonic mean between the MSE and Energy Consumed (EC) metrics considering ? equal to 0.5, 1, and 2.
+Algorithm ?0. 5 ?1 ?2
+TEDA Regressor 0.36× 10− 7 0.57× 10− 7 1.35× 10− 7
+RLS 1.56× 10− 7 2.06× 10− 7 2.99× 10− 7
+CNN 4.35× 10− 7 6.95× 10− 7 17.39× 10− 7
+5.5 The threshold of sensitivity parameter
+The value for the threshold of sensitivity ( ? ) is related to the sensitivity of the TEDA Regressor algorithm. In
+fact, this is a parameter chosen by the user which is very important for the developed algorithm, as it works as a
+condition threshold to add new samples to the already existing DataClouds. And if the normalized typicality
+(??( ??) ) of the sample is greater than the threshold, the sample will not belong to that DataCloud, according to
+the inequality in Eq. 2.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 20 ---
+
+20 • Andrade et al.
+2 3 4 5 6
+W indow size
+0
+1
+2
+3
+4
+5
+6
+Mean squar ed er r or
+1e−7
+3.66e -08
+2.61e-07
+3.71e-07
+4.77e-07
+5.80e-07
+Fig. 9. Comparison of window size ( ? ) for the fuel consumption dataset.
+0.0 0.2 0.4 0.6 0.8 1.0
+Aging factor
+0
+1
+2
+3
+4
+5
+Mean squar ed er r or
+1e−7
+4.89e -07
+3.68e-07
+2.414e-07
+1.01e-07
+2.65e-08
+9.54e-09
+4.73e-08
+Fig. 10. Comparison of aging factor ( ?) for fuel consumption dataset.
+Therefore, the value of the sensitivity threshold (? ) will inluence the creation of DataClouds and, consequently,
+the RLS ilters. Table 11 shows the ive chosen values of ? for testing: 1.5, 1.75, 2, 2.25, and 3.
+Table 10 presents the data considering an input window with 2 (two) previous samples to predict the next one.
+Figures 12 and 14 represent the fuel values at the instant of times ( ?[ ?− 2] and ?[ ?− 1] ) that will be input to the
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 21 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 21
+Table 10. Head of the instantaneous fuel consumption dataset (L/s).
+?[ ?− 2] (x-axis) ?[ ?− 1] (y-axis) ?[ ?]
+0 2.5956× 10− 4 3.5290× 10− 4
+2.5956× 10− 4 3.5290× 10− 4 3.6931× 10− 4
+3.5290× 10− 4 3.6931× 10− 4 5.6914× 10− 4
+RLS ilters for predicting the fuel value at an instant time ( ?[ ?] ). Remember that each DataCloud is represented
+by 4 (four) instances: the number of samples, an average of all samples, variance, and the RLS ilter. To further
+aid understanding, we have also included the mean of each DataCloud in order to illustrate the distribution of
+each one in relation to the time series samples of the instantaneous fuel consumption.
+Table 11. MSE and final number of DataClouds for varying values of the threshold ? .
+Threshold (? ) 1.50 1.75 2.00 2.25 3.00
+MSE 2.61× 10− 8 2.61× 10− 8 1.90× 10− 8 1.12× 10− 8 0.954× 10− 8
+Final number
+of DataClouds 8 4 3 2 1
+For each value of ? , the MSE and the number of generated DataClouds were calculated. From Table 11 and
+Figure 11, it is possible to see that as the threshold increases, the number of DataClouds decreases. In fact, this
+number decreases because with an increase in ? in the Chebyshev Inequality, the probability of a sample having
+typicality greater than the threshold also decreases. The smallest error found was for ? = 1. 5, when the algorithm
+ended up with eight DataClouds.
+1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0
+Thr eshold value
+1.00
+1.25
+1.50
+1.75
+2.00
+2.25
+2.50
+Mean squar ed er r or
+1e−8
+2.61e -08 2.61e-08
+1.9e-08
+1.12e-08
+9.54e-09
+Fig. 11. Comparison of threshold sensitivity ( ? ).
+Figure 12 shows the creation and merging processes over time, using ? = 1. 5. The inal number of DataClouds
+was eight. Moreover, with a low threshold, the algorithm becomes very sensitive.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 22 ---
+
+22 • Andrade et al.
+0 1000 2000 3000 4000 5000 6000 7000
+Time (s)
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+0.006Fuel consumption (L)
+Fuel consumption (L)
+#DataCloud
+2
+4
+6
+8
+10
+12
+14
+#DataCloud
+Fig. 12. Creation and Merging of DataClouds with threshold ? = 1. 5.
+Figure 13 shows the input data distribution in the I R2 plane, indicating the means of each of the eight resulting
+DataClouds at the end of the execution of the TEDA Regressor.
+0.000 0.001 0.002 0.003 0.004 0.005
+T ime [t-2] (s)
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+T ime [t-1] (s)
+Samples
+DataCloud mean
+Fig. 13. Distribution of samples over time and indication of DataClouds means, for the threshold ? = 1. 5.
+The threshold value of ? = 3 was also considered (Figure 14). In this case, the algorithm was less sensitive to
+data variation, and thus there was no creation of new DataClouds: from the beginning of the data to the end, the
+algorithm considered all samples as belonging to the same DataCloud, as illustrated in Figure 15.
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 23 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 23
+0 1000 2000 3000 4000 5000 6000 7000
+Time (s)
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+0.006Fuel consumption (L)
+Fuel consumption (L)
+#DataCloud
+0.96
+0.98
+1.00
+1.02
+1.04
+#DataCloud
+Fig. 14. Creation and merging of DataClouds with threshold ? = 3.
+0.000 0.001 0.002 0.003 0.004 0.005
+T ime [t-2] (s)
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+T ime [t-1] (s)
+Samples
+DataCloud mean
+Fig. 15. Distribution of samples over time and indication of DataClouds means, for the threshold ? = 3.
+5.6 Weight initialization parameter
+The function for initializing the weights was deined in Eq. 18. The options for the initialization factor are shown
+in Table 3 and were applied to the considered dataset. The mean squared error for the range and for each Weight
+Initialization type is shown in Figure 16. To calculate the error in this case, we used only the initial data from the
+dataset. In the sample of index 117 of the dataset, there was a convergence of all types of Weight initialization, so
+we set the study ranges from 0 to 120. In this range, it is possible to see the behavior of each type of initialization
+up to the moment it enters into the regime (Figure 17).
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 24 ---
+
+24 • Andrade et al.
+0 - zero 1 - relu 2 - tanh1 3 - tanh2
+W eight Initialization
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+Mean squared error
+1e −7
+2.61e -07
+1.64e-07
+2.84e-08
+1.17e-08
+Fig. 16. Comparison of Weight Initialization ( ?).
+0 20 40 60 80 100 120
+T ime (seconds)
+0.0000
+0.0005
+0.0010
+0.0015
+0.0020
+0.0025
+F uel consumption (L)
+T rue
+zero
+relu
+tanh1
+tanh2
+Fig. 17. Initial fuel dataset data for Weight Initialization ( ?) comparison.
+Figure 16 presents the results for each type of weight initialization. The smallest error was ??? = 1. 17× 10− 8,
+using initialization type 3 (łtanh2ž). With the vector of initial weights equal to zero (type 0 - ł zerož), the value
+was ??? = 26. 11× 10− 8, i.e., more than 22 (twenty-two) times greater.
+6 CONCLUSIONS
+We have presented an unsupervised ML regression algorithm that is responsive to evolution and changes in
+concepts, being useful to process data streams while requiring low computational efort and low memory
+allocation. These advantages are positive for IoT solutions when the processing devices are conceptually at the
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 25 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 25
+łendž of the applications. When there is a device with resource constraints on the edge, such as a microcontroller
+running a machine learning algorithm, it is deined as a TinyML application and this is where our work is inserted
+into.
+The proposed technique, named TEDA Regressor, is a regression algorithm that combines the eccentricity and
+typicality of the TEDA algorithm with the unsupervised clustering and classiication of the AutoCloud algorithm.
+Speciically, TEDA Regressor creates DataClouds using an unsupervised approach, and for each Cloud, it employs
+an adaptive RLS ilter to estimate the next value in the time series data based on previous inputs. This makes
+TEDA Regressor an evolving algorithm that adapts to the changing relationships in the data.
+Overall, the TEDA Regressor does not need large memory space, as it only stores, for each DataCloud, the
+values of the number of samples, average, and variation. Additionally, it is also stored in the RLS ilter which is
+given by the weights and will depend on the number of previous samples, a number chosen by the user. Therefore,
+it is an eicient solution, performed through recursive calculations, proving useful for IoT applications that rely
+on the processing of data streams.
+In the AutoCloud technique, there is a procedure for creating and merging DataClouds, which is also used in
+the TEDA Regressor. The diference is that with the insertion of the RLS ilter for each DataCloud, the two ilters
+in question must also be merged. Two ilter merging approaches were proposed. The irst option considered
+the proportion of the number of samples of each DataCloud. In the second approach, the user can choose the
+relevance of each DataCloud. Altogether, these are important contributions to this area, opening many research
+opportunities.
+The proposed algorithm was compared with the RLS algorithm and with Convolutional Neural Networks
+(CNN) which presented mean squared errors 4.68 and 12.02 times higher, respectively, than our technique. In
+addition to MSE comparisons, energy metrics and computational efort were also evaluated, including through a
+harmonic mean correlating Energy Consumed and MSE. In these scenarios, TEDA Regressor performed more
+signiicantly than RLS and CNN.
+Finally, for the performed evaluation steps, we intended to show the eiciency of the proposed algorithm
+over traditional solutions in this area. After execution, we could conclude that the TEDA Regressor is more
+eicient than previous approaches, being suitable for TinyML applications. Moreover, for the particular issue
+of fuel consumption, the achieved results by the TEDA Regressor when estimating actual consumption were
+very close to the reference measurements taken from the vehicle. Therefore, the proposed algorithm presents
+itself as an important contribution not only to the development of unsupervised TinyML algorithms but also to
+multi-purpose analyses of vehicular data.
+In future works, it is expected the proposal of new approaches for ilter merging. Additionally, new tests on
+new datasets will be considered, providing new results to be compared. Finally, the implementation of the TEDA
+Regressor algorithm in a microcontroller will be performed, allowing the development of a real application for a
+whole new set of vehicle-centric experiments.
+ACKNOWLEDGMENTS
+This study was inanced in part by the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior-Brasil
+(CAPES), Finance Code 001, and we thank the Brazilian fostering agency CNPq (National Council for Scientiic
+and Technological Development), Process No. 405531/2022-2.
+This work was also supported by INEGI-LAETA (FCT project UIDB/50022/2020).
+REFERENCES
+[1] Adam Ibrahim Abdi, Fathy Elbouraey Eassa, Kamal Jambi, Khalid Almarhabi, and Abdullah Saad AL-Malaise AL-Ghamdi. 2020.
+Blockchain Platforms and Access Control Classiication for IoT Systems. Symmetry 12, 10 (2020). https://doi.org/10.3390/sym12101663
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 26 ---
+
+26 • Andrade et al.
+[2] T.S. Ajani, A.L. Imoize, and A.A. Atayero. 2021. An overview of machine learning within embedded and mobile devices-optimizations
+and applications. Sensors 21, 13 (2021). https://doi.org/10.3390/s21134412
+[3] Shadi Al-Sarawi, Mohammed Anbar, Rosni Abdullah, and Ahmad B. Al Hawari. 2020. Internet of Things Market Analysis Forecasts,
+2020ś2030. In 2020 Fourth World Conference on Smart Trends in Systems, Security and Sustainability (WorldS4) . 449ś453. https:
+//doi.org/10.1109/WorldS450073.2020.9210375
+[4] Pedro Andrade, Ivanovitch Silva, Gabriel Signoretti, Marianne Silva, João Dias, Lucas Marques, and Daniel G. Costa. 2021. An
+Unsupervised TinyML Approach Applied for Pavement Anomalies Detection Under the Internet of Intelligent Vehicles. In 2021 IEEE
+International Workshop on Metrology for Industry 4.0 IoT (MetroInd4.0 IoT) . 642ś647. https://doi.org/10.1109/MetroInd4.0IoT51437.2021.
+9488546
+[5] Plamen Angelov. 2014. Anomaly detection based on eccentricity analysis. 1ś8. https://doi.org/10.1109/EALS.2014.7009497
+[6]
+Plamen Parvanov Angelov and Xiaowei Gu. 2019. Empirical Approach to Machine Learning . Springer International Publishing.
+https://doi.org/10.1007/978-3-030-02384-3
+[7] Giorgos Armeniakos, Georgios Zervakis, Dimitrios Soudris, and Jörg Henkel. 2022. Hardware Approximate Techniques for Deep Neural
+Network Accelerators: A Survey. Comput. Surveys 55, 4 (nov 2022), 1ś36. https://doi.org/10.1145/3527156
+[8] Giorgos Armeniakos, Georgios Zervakis, Dimitrios Soudris, Mehdi B. Tahoori, and Jörg Henkel. 2022. Cross-Layer Approximation for
+Printed Machine Learning Circuits. In Proceedings of the 2022 Conference Exhibition on Design, Automation & Test in Europe (Antwerp,
+Belgium) (DATE ’22). European Design and Automation Association, Leuven, BEL, 190ś195.
+[9] Mohammad Farhadi Bajestani, Mehdi Ghasemi, Sarma Vrudhula, and Yezhou Yang. 2020. Enabling Incremental Knowledge Transfer for
+Object Detection at the Edge. arXiv:2004.05746 [cs.CV]
+[10] Colby Banbury, Chuteng Zhou, Igor Fedorov, Ramon Matas Navarro, Urmish Thakker, Dibakar Gope, Vijay Janapa Reddi, Matthew
+Mattina, and Paul N. Whatmough. 2021. MicroNets: Neural Network Architectures for Deploying TinyML Applications on Commodity
+Microcontrollers. arXiv:2010.11267 [cs.LG]
+[11] A. Bernieri, G. Betta, and C. Liguori. 1996. On-line fault detection and diagnosis obtained by implementing neural algorithms on a
+digital signal processor. IEEE Transactions on Instrumentation and Measurement 45, 5 (1996), 894ś899. https://doi.org/10.1109/19.536707
+[12] Clauber Bezerra, Bruno Costa, Luiz Afonso Guedes, and Plamen Angelov. 2020. An Evolving Approach to Data Streams Clustering
+Based on Typicality and Eccentricity Data Analytics. Information Sciences 518 (05 2020). https://doi.org/10.1016/j.ins.2019.12.022
+[13] Clauber Gomes Bezerra, Bruno Sielly Jales Costa, Luiz Afonso Guedes, and Plamen Parvanov Angelov. 2016. An evolving approach
+to unsupervised and Real-Time fault detection in industrial processes. Expert Systems with Applications 63 (2016), 134 ś 144. https:
+//doi.org/10.1016/j.eswa.2016.06.035
+[14] Vincenzo Bianco, Oronzio Manca, and Sergio Nardini. 2009. Electricity consumption forecasting in Italy using linear regression models.
+Energy 34 (07 2009), 1413ś1421. https://doi.org/10.1016/j.energy.2009.06.034
+[15] Peter Blouw, Gurshaant Malik, Benjamin Morcos, Aaron Voelker, and Chris Eliasmith. 2021. Hardware Aware Training for Eicient
+Keyword Spotting on General Purpose and Specialized Hardware. In Research Symposium on Tiny Machine Learning .
+[16] R.A. Campêlo, M.A. Casanova, D.O. Guedes, and A.H.F. Laender. 2020. A brief survey on replica consistency in cloud environments.
+Journal of Internet Services and Applications 11, 1 (2020). https://doi.org/10.1186/s13174-020-0122-y cited By 0.
+[17] Kun Cao, Shiyan Hu, Yang Shi, Armando Walter Colombo, Stamatis Karnouskos, and Xin Li. 2021. A Survey on Edge and Edge-
+Cloud Computing Assisted Cyber-Physical Systems. IEEE Transactions on Industrial Informatics 17, 11 (2021), 7806ś7819. https:
+//doi.org/10.1109/TII.2021.3073066
+[18] G. Cerutti, R. Prasad, A. Brutti, and E. Farella. 2020. Compact recurrent neural networks for acoustic event detection on low-energy
+low-complexity platforms. IEEE Journal of Selected Topics in Signal Processing (2020), 1ś1. https://doi.org/10.1109/JSTSP.2020.2969775
+[19] P. Chebyshev. 1867. Des valeurs moyennes. Liouville’s J. Math. Pures Appl. 12 (1867), 177ś184.
+[20] Anjir Ahmed Chowdhury, Md Abir Hossen, Md Ali Azam, and Md Haizur Rahman. 2022. DeepQGHO: Quantized Greedy Hyperparameter
+Optimization in Deep Neural Networks for on-the-Fly Learning. IEEE Access 10 (2022), 6407ś6416. https://doi.org/10.1109/ACCESS.
+2022.3141781
+[21] M. Compare, P. Baraldi, I. Bani, E. Zio, and D. McDonnell. 2020. Industrial equipment reliability estimation: A Bayesian Weibull regression
+model with covariate selection. Reliability Engineering and System Safety 200 (2020). https://doi.org/10.1016/j.ress.2020.106891
+[22] Daniel G. Costa. 2020. Visual Sensors Hardware Platforms: A Review. IEEE Sensors Journal 20, 8 (2020), 4025ś4033. https://doi.org/10.
+1109/JSEN.2019.2952447
+[23] Daniel G. Costa and Felipe P. de Oliveira. 2020. A prioritization approach for optimization of multiple concurrent sensing applications
+in smart cities. Future Generation Computer Systems 108 (2020), 228ś243. https://doi.org/10.1016/j.future.2020.02.067
+[24] Giulia Crocioni, Danilo Pau, Jean-Michel Delorme, and Giambattista Gruosso. 2020. Li-Ion Batteries Parameter Estimation With Tiny
+Neural Networks Embedded on Intelligent IoT Microcontrollers. IEEE Access 8 (2020), 122135ś122146. https://doi.org/10.1109/ACCESS.
+2020.3007046
+[25] Simone Disabato and Manuel Roveri. 2020. Incremental On-Device Tiny Machine Learning. 7ś13. https://doi.org/10.1145/3417313.3429378
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 27 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 27
+[26] H. Doyu, R. Morabito, and M. Brachmann. 2021. A TinyMLaaS Ecosystem for Machine Learning in IoT: Overview and Research Challenges.
+2021 International Symposium on VLSI Design, Automation and Test, VLSI-DAT 2021 - Proceedings (2021). https://doi.org/10.1109/VLSI-
+DAT52063.2021.9427352
+[27] Lachit Dutta and Swapna Bharali. 2021. TinyML Meets IoT: A Comprehensive Survey. Internet of Things 16 (2021), 100461. https:
+//doi.org/10.1016/j.iot.2021.100461
+[28] Bahar Farahani, Mojtaba Barzegari, Fereidoon Shams Aliee, and Khaja Ahmad Shaik. 2020. Towards collaborative intelligent IoT eHealth:
+From device to fog, and cloud. Microprocessors and Microsystems 72 (2020), 102938. https://doi.org/10.1016/j.micpro.2019.102938
+[29] Igor Fedorov, Ryan P Adams, Matthew Mattina, and Paul Whatmough. 2019. Sparse: Sparse architecture search for cnns on resource-
+constrained microcontrollers. In Advances in Neural Information Processing Systems . 4978ś4990.
+[30] Wirth F. Ferger. 1931. The Nature and Use of the Harmonic Mean. J. Amer. Statist. Assoc. 26, 173 (1931), 36ś40. http://www.jstor.org/
+stable/2278257
+[31] Xavier Glorot and Yoshua Bengio. 2010. Understanding the diiculty of training deep feedforward neural networks. In Proceedings of the
+Thirteenth International Conference on Artiicial Intelligence and Statistics (Proceedings of Machine Learning Research, Vol. 9) , Yee Whye
+Teh and Mike Titterington (Eds.). PMLR, Chia Laguna Resort, Sardinia, Italy, 249ś256. https://proceedings.mlr.press/v9/glorot10a.html
+[32] Ian Goodfellow, Yoshua Bengio, and Aaron Courville. 2016. Deep Learning. MIT Press. http://www.deeplearningbook.org.
+[33] X. Gu, P. P. Angelov, A. M. Ali, W. A. Gruver, and G. Gaydadjiev. 2016. Online evolving fuzzy rule-based prediction model for high
+frequency trading inancial data stream. In 2016 IEEE Conference on Evolving and Adaptive Intelligent Systems (EAIS) . 169ś175.
+[34] Hui Han and Julien Siebert. 2022. TinyML: A Systematic Review and Synthesis of Existing Research. In 2022 International Conference on
+Artiicial Intelligence in Information and Communication (ICAIIC) . 269ś274. https://doi.org/10.1109/ICAIIC54071.2022.9722636
+[35] Song Han, Huizi Mao, and William J. Dally. 2016. Deep Compression: Compressing Deep Neural Networks with Pruning, Trained
+Quantization and Hufman Coding. arXiv:1510.00149 [cs.CV]
+[36] David Hand and Peter Christen. 2018. A Note on Using the F-Measure for Evaluating Record Linkage Algorithms. Statistics and
+Computing 28, 3 (may 2018), 539ś547. https://doi.org/10.1007/s11222-017-9746-6
+[37] Trevor Hastie, Robert Tibshirani, and Jerome Friedman. 2009. The Elements of Statistical Learning . Springer New York. https:
+//doi.org/10.1007/978-0-387-84858-7
+[38] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2015. Delving Deep into Rectiiers: Surpassing Human-Level Performance on
+ImageNet Classiication. IEEE International Conference on Computer Vision (ICCV 2015) 1502 (02 2015). https://doi.org/10.1109/ICCV.
+2015.123
+[39] Cheng-Fu Huang, Ding-Hsiang Huang, and Yi-Kuei Lin. 2020. Network reliability evaluation for a distributed network with edge
+computing. Computers & Industrial Engineering 147 (2020), 106492. https://doi.org/10.1016/j.cie.2020.106492
+[40] Vijay Janapa Reddi, Brian Plancher, Susan Kennedy, Laurence Moroney, Pete Warden, Lara Suzuki, Anant Agarwal, Colby Banbury,
+Massimo Banzi, Matthew Bennett, Benjamin Brown, Sharad Chitlangia, Radhika Ghosal, Sarah Grafman, Rupert Jaeger, Srivatsan
+Krishnan, Maximilian Lam, Daniel Leiker, Cara Mann, Mark Mazumder, Dominic Pajak, Dhilan Ramaprasad, J. Evan Smith, Matthew
+Stewart, and Dustin Tingley. 2022. Widening Access to Applied Machine Learning With TinyML. https://doi.org/10.1162/99608f92.
+762d171a https://hdsr.mitpress.mit.edu/pub/0gbwdele.
+[41] Raj Kamal, Aabha Jain, and Manojkumar Vilasrao Deshpande. 2022. Architectural Design for Inspection of Machine Objects Using
+Small DNNs as TinyML for Machine Vision of Defects and Faults in the Manufacturing Processes. In Smart Systems: Innovations in
+Computing, Arun K. Somani, Ankit Mundra, Robin Doss, and Subhajit Bhattacharya (Eds.). Springer Singapore, Singapore, 377ś387.
+https://doi.org/10.1007/978-981-16-2877-1_34
+[42] Dmitry Kangin and Plamen Parvanov Angelov. 2015. Evolving clustering, classiication and regression with TEDA. In Proceedings of the
+2015 International Joint Conference on Neural Networks (IJCNN) . IEEE, 1ś8. https://doi.org/10.1109/IJCNN.2015.7280528
+[43] Dmitry Kangin, Plamen Angelov, and José Antonio Iglesias. 2016. Autonomously evolving classiier TEDAClass. Information Sciences
+366 (2016), 1 ś 11. https://doi.org/10.1016/j.ins.2016.05.012
+[44] Aditya Kusupati, Manish Singh, Kush Bhatia, Ashish Kumar, Prateek Jain, and Manik Varma. 2018. FastGRNN: A Fast, Accurate, Stable
+and Tiny Kilobyte Sized Gated Recurrent Neural Network. In NeurIPS. 9031ś9042.
+[45] Dawei Li, Serafettin Tasci, Shalini Ghosh, Jingwen Zhu, Junting Zhang, and Larry Heck. 2019. RILOD: Near Real-Time Incremental
+Learning for Object Detection at the Edge. In Proceedings of the 4th ACM/IEEE Symposium on Edge Computing (Arlington, Virginia) (SEC
+’19). Association for Computing Machinery, New York, NY, USA, 113ś126. https://doi.org/10.1145/3318216.3363317
+[46] Ji Lin, Wei-Ming Chen, Yujun Lin, J. Cohn, Chuang Gan, and Song Han. 2020. MCUNet: Tiny Deep Learning on IoT Devices. ArXiv
+abs/2007.10319 (2020).
+[47] S. Maitra, D. Richards, A. Abdelgawad, and K. Yelamarthi. 2019. Performance Evaluation of IoT Encryption Algorithms: Memory, Timing,
+and Energy. In 2019 IEEE Sensors Applications Symposium (SAS) . 1ś6. https://doi.org/10.1109/SAS.2019.8706017
+[48] Puranjay Mohan, Aditya Jyoti Paul, and Abhay Chirania. 2021. A Tiny CNN Architecture for Medical Face Mask Detection for Resource-
+Constrained Endpoints. Innovations in Electrical and Electronic Engineering(2021), 657ś670. https://doi.org/10.1007/978-981-16-0749-3_52
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 28 ---
+
+28 • Andrade et al.
+[49]
+Muhammad Husnain Mubarik, Dennis D. Weller, Nathaniel Bleier, Matthew Tomei, Jasmin Aghassi-Hagmann, Mehdi B. Tahoori, and
+Rakesh Kumar. 2020. Printed Machine Learning Classiiers. In 2020 53rd Annual IEEE/ACM International Symposium on Microarchitecture
+(MICRO). 73ś87. https://doi.org/10.1109/MICRO50266.2020.00019
+[50] Pierre-Emmanuel Novac, Andrea Castagnetti, Adrien Russo, Benoît Miramond, Alain Pegatoquet, Francois Verdier, and Andrea
+Castagnetti. 2020. Toward unsupervised Human Activity Recognition on Microcontroller Units. In 2020 23rd Euromicro Conference on
+Digital System Design (DSD) . 542ś550. https://doi.org/10.1109/DSD51259.2020.00090
+[51] Maria T. Nyamukuru and Koi M. Odame. 2020. Tiny Eats: Eating Detection on a Microcontroller. In 2020 IEEE Second Workshop on
+Machine Learning on Edge in Sensor Systems (SenSys-ML) . 19ś23. https://doi.org/10.1109/SenSysML50931.2020.00011
+[52] Julio Oliveira, Jeferson Lemos, Elton Vieira, Ivanovitch Silva, Joilson Abrantes, Danilo Barros, and Daniel Costa. 2017. CO2 Catcher: A
+Platform for Monitoring of Vehicular Pollution in Smart Cities. 37ś42. https://doi.org/10.1109/S3C.2017.8501380
+[53] Anas Osman, Usman Abid, Luca Gemma, Matteo Perotto, and Davide Brunelli. 2022. TinyML Platforms Benchmarking. In International
+Conference on Applications in Electronics Pervading Industry, Environment and Society . Springer, 139ś148.
+[54] Raydonal Ospina and Fernando Marmolejo-Ramos. 2019. Performance of Some Estimators of Relative Variability. Frontiers in Applied
+Mathematics and Statistics 5 (2019), 43. https://doi.org/10.3389/fams.2019.00043
+[55] Marco Pasetti, Paolo Ferrari, Diego Rodrigo Cabral Silva, Ivanovitch Silva, and Emiliano Sisinni. 2020. On the Use of LoRaW AN for the
+Monitoring and Control of Distributed Energy Resources in a Smart Campus. Applied Sciences 10, 1 (2020). https://doi.org/10.3390/
+app10010320
+[56] G. Premsankar, M. Di Francesco, and T. Taleb. 2018. Edge Computing for the Internet of Things: A Case Study. IEEE Internet of Things
+Journal 5, 2 (April 2018), 1275ś1284. https://doi.org/10.1109/JIOT.2018.2805263
+[57] Leonardo Ravaglia, Manuele Rusci, Davide Nadalini, Alessandro Capotondi, Francesco Conti, and Luca Benini. 2021. A TinyML Platform
+for On-Device Continual Learning With Quantized Latent Replays. IEEE Journal on Emerging and Selected Topics in Circuits and Systems
+11, 4 (2021), 789ś802. https://doi.org/10.1109/JETCAS.2021.3121554
+[58] Partha Pratim Ray. 2021. A review on TinyML: State-of-the-art and prospects. Journal of King Saud University - Computer and Information
+Sciences (2021). https://doi.org/10.1016/j.jksuci.2021.11.019
+[59] Haoyu Ren, Darko Anicic, and Thomas Runkler. 2021. TinyOL: TinyML with Online-Learning on Microcontrollers.
+arXiv:2103.08295 [cs.LG]
+[60] Dimitrios Rimpas, Andreas Papadakis, and Maria Samarakou. 2020. OBD-II sensor diagnostics for monitoring vehicle operation and
+consumption. Energy Reports 6 (2020), 55ś63. https://doi.org/10.1016/j.egyr.2019.10.018 Technologies and Materials for Renewable
+Energy, Environment and Sustainability.
+[61] A. Sabbioni, V. Beretti, P. Superchi, and M. Ablondi. 2020. Body weight estimation from body measures in Cornigliese sheep breed.
+Italian Journal of Animal Science 19, 1 (2020), 25ś30. https://doi.org/10.1080/1828051X.2019.1689189
+[62] R. Sanchez-Iborra. 2021. Lpwan and embedded machine learning as enablers for the next generation of wearable devices. Sensors 21, 15
+(2021). https://doi.org/10.3390/s21155218
+[63] R. Sanchez-Iborra and A.F. Skarmeta. 2020. TinyML-Enabled Frugal Smart Objects: Challenges and Opportunities. IEEE Circuits and
+Systems Magazine 20, 3 (2020), 4ś18. https://doi.org/10.1109/MCAS.2020.3005467 cited By 16.
+[64] Nicholas I. Sapankevych and Ravi Sankar. 2009. Time Series Prediction Using Support Vector Machines: A Survey. IEEE Computational
+Intelligence Magazine 4, 2 (2009), 24ś38. https://doi.org/10.1109/MCI.2009.932254
+[65] Nicholas I. Sapankevych and Ravi Sankar. 2009. Time Series Prediction Using Support Vector Machines: A Survey. IEEE Computational
+Intelligence Magazine 4, 2 (2009), 24ś38. https://doi.org/10.1109/MCI.2009.932254
+[66] M.G. Sarwar Murshed, C. Murphy, D. Hou, N. Khan, G. Ananthanarayanan, and F. Hussain. 2022. Machine Learning at the Network
+Edge: A Survey. Comput. Surveys 54, 8 (2022). https://doi.org/10.1145/3469029
+[67] Ali H. Sayed and Thomas Kailath. 2000. Recursive Least-Squares Adaptive Filters. In The Digital Signal Processing Handbook . CRC Press,
+Chapter 21.
+[68] Zach Shelby, Jan Jongboom, and Kartik Thakore. 2020. Cough Detection with TinyML on Arduino . https://create.arduino.cc/projecthub/
+edge-impulse/cough-detection-with-tinyml-on-arduino-417f37
+[69] Weisong Shi, Jie Cao, Quan Zhang, Youhuizi Li, and Lanyu Xu. 2016. Edge Computing: Vision and Challenges. IEEE Internet of Things
+Journal 3, 5 (2016), 637ś646. https://doi.org/10.1109/JIOT.2016.2579198
+[70] Weisong Shi, Jie Cao, Quan Zhang, Youhuizi Li, and Lanyu Xu. 2016. Edge Computing: Vision and Challenges. IEEE Internet of Things
+Journal 3, 5 (2016), 637ś646. https://doi.org/10.1109/JIOT.2016.2579198
+[71] Gabriel Signoretti, Marianne Silva, Pedro Andrade, Ivanovitch Silva, Emiliano Sisinni, and Paolo Ferrari. 2021. An Evolving TinyML
+Compression Algorithm for IoT Environments Based on Data Eccentricity. Sensors 21, 12 (2021). https://doi.org/10.3390/s21124153
+[72] Gabriel Signoretti, Marianne Silva, Alexandre Dias, Ivanovitch Silva, Diego Silva, and Paolo Ferrari. 2019. Performance Evaluation
+of an Edge OBD-II Device for Industry 4.0. In 2019 II Workshop on Metrology for Industry 4.0 and IoT (MetroInd4.0 IoT) . 432ś437.
+https://doi.org/10.1109/METROI4.2019.8792885
+ACM Trans. Embedd. Comput. Syst.
+
+--- Page 29 ---
+
+Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique • 29
+[73] Marianne Silva, Gabriel Signoretti, Julio Oliveira, Ivanovitch Silva, and Daniel Costa. 2019. A Crowdsensing Platform for Monitoring of
+Vehicular Emissions: A Smart City Perspective. Future Internet 11 (01 2019), 13. https://doi.org/10.3390/i11010013
+[74] Benjamin Sliwa, Nico Piatkowski, and Christian Wietfeld. 2020. LIMITS: Lightweight Machine Learning for IoT Systems with Resource
+Limitations. In ICC 2020 - 2020 IEEE International Conference on Communications (ICC) . 1ś7. https://doi.org/10.1109/ICC40277.2020.
+9149180
+[75] Eduardo Soares, Pyramo Pires da Costa Júnior Costa Jr, Bruno Costa, and Daniel Leite. 2018. Ensemble of Evolving Data Clouds and
+Fuzzy Models for Weather Time Series Prediction. Applied Soft Computing 64 (01 2018). https://doi.org/10.1016/j.asoc.2017.12.032
+[76] H.Y. Teh, A.W. Kempa-Liehr, and K.I.-K. Wang. 2020. Sensor data quality: a systematic review. Journal of Big Data 7, 1 (2020).
+https://doi.org/10.1186/s40537-020-0285-1
+[77] Xiaying Wang, Michele Magno, Lukas Cavigelli, and Luca Benini. 2019. FANN-on-MCU: An Open-Source Toolkit for Energy-Eicient
+Neural Network Inference at the Edge of the Internet of Things. arXiv:1911.03314 [cs.LG]
+[78] Xiaying Wang, Michele Magno, Lukas Cavigelli, and Luca Benini. 2020. FANN-on-MCU: An Open-Source Toolkit for Energy-Eicient
+Neural Network Inference at the Edge of the Internet of Things. IEEE Internet of Things Journal 7, 5 (2020), 4403ś4417. https:
+//doi.org/10.1109/JIOT.2020.2976702
+[79] P. Warden and D. Situnayake. 2020. TinyML: Machine Learning with TensorFlow Lite on Arduino and Ultra-low-power Microcontrollers .
+O’Reilly.
+[80] Zeshui Xu. 2009. Fuzzy Harmonic Mean Operators. Int. J. Intell. Syst. 24 (02 2009), 152ś172. https://doi.org/10.1002/int.20330
+[81] Jing Zhang and Dacheng Tao. 2021. Empowering Things With Intelligence: A Survey of the Progress, Challenges, and Opportunities in
+Artiicial Intelligence of Things. IEEE Internet of Things Journal 8, 10 (2021), 7789ś7817. https://doi.org/10.1109/JIOT.2020.3039359
+ACM Trans. Embedd. Comput. Syst.

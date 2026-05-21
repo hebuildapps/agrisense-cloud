@@ -1,0 +1,1568 @@
+--- Page 1 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+1 
+ 
+Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000. 
+Digital Object Iden tifier 10 .110 9/ACCESS.20 19.Doi Number 
+ 
+Energy-Efficient Edge-Fog-Cloud 
+Architecture for IoT-based Smart 
+Agriculture Environment 
+ 
+Hatem A. Alharbi1 and Mohammad Aldossary2 
+1Department of Computer Engineering, College of Computer Science and Engineering, Taibah University, 12512, Al-Madinah, Saudi Arabia 
+2Department of Computer Science, College of Arts and Science, Prince Sattam bin Abdulaziz University, Al-Kharj, Saudi Arabia 
+Corresponding authors: Hatem A. Alharbi : (e-mail:hmehmadi@taibahu.edu.sa), and Mohammad Aldossary (e-mail:mm.aldossary @psau.edu.sa) 
+ABSTRACT The current agriculture systems compete to take advantage of industry advanced technologi es, 
+including the internet of things (IoT), cloud/fog/e dge computing, artificial intelligence, and agricultural 
+robots to monitor, track, analyze and process various functions and services in real-time. Additionally, these 
+technologies can make the agricultural processes smarter and more cost-efficient by using automated systems 
+and eliminating any human interventions, hence enha ncing agricultural production to meet future 
+expectations. Although the current agriculture systems that adopt the traditional cloud-based architecture 
+have provided powerful computing infrastructure to distributed IoT sensors. However, the cost of energy 
+consumption associated with transferring heterogeneous data over the multiple network tiers to process , 
+analyze and store the sensor's information in the c loud has created a huge load on information and 
+communication infrastructure. Besides, the energy consumed by cloud data centers has an environmental 
+impact associated with using non-clean fuels, which usually release carbon emissions (CO2) to produce 
+electricity. Thus, to tackle these issues, we propose a new integrated edge-fog-cloud architectural paradi gm 
+that promises to enhance the energy-efficient of sm art agriculture systems and corresponding carbon 
+emissions. This architecture allows data collection from several sensors to process and analyze the agriculture 
+data that require real-time operation (e.g., weather temperature, soil moisture, soil acidity, irrigation, etc.) i n 
+several layers (edge, fog, and cloud). Thus, the real-time processing could be held by the edge and fog layers 
+to reduce the load on the cloud layer, which will help to enhance the overall energy consumption and process 
+the agriculture applications/services efficiently. Mathematical modeling is conducted using mixed-integer 
+linear programming (MILP) for a smart agriculture e nvironment, where the proposed architecture i s 
+implemented, and results are analyzed and compared to the traditional implementation. According to the 
+results of thousands of agriculture sensors, the proposed architecture outperforms the traditional cloud-based 
+architecture in terms of reducing the overall energy consumption by 36% and the carbon emissions by 43%. 
+In addition to these achievements, the results show that our proposed architecture can reduce network traffi c 
+by up to 86%, which can reduce network congestion. Finally, we develop a heuristic algorithm to vali date 
+and mimic the presented approach, and it shows comparable results to the MILP model. 
+INDEX TERMS Smart agriculture, edge-fog-cloud computing, internet of things, energy-efficiency, 
+carbon emission.
+I. INTRODUCTION 
+The Internet of Things (IoT) is one of the emergi ng 
+technologies that promise to transform the way on h ow 
+people work and live. The term IoT refers to a netw ork of 
+physical objects “ things” that contain embedded systems 
+with connectivity and computing power to exchange d ata 
+with other devices and systems over the Internet. By 2025, 
+the number of IoT devices connected to the Internet i s 
+projected to be 100 billion, with an economic impact of more 
+than $11 trillion [1]. 
+The recent development of IoT devices presents a new 
+dimension in the agriculture field, where the IoT has become 
+an ideal choice for smart agriculture due to its highly scal abl e 
+and ubiquitous architecture. Moreover, the IoT-based smart 
+agriculture value is estimated to reach $18.45 billion i n 2022, 
+and 75 million IoT devices are used for the agricultural sector 
+in 2020 [2]. Furthermore, smart farms are projected to have 
+12 million IoT points by 2023 [3]. 
+Smart agriculture has started incorporating IoT soluti ons 
+to improve operational efficiency, maximize yield, and 
+minimize wastage through real-time field data colle cti on, 
+
+--- Page 2 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+2 
+ 
+data analysis, and deployment of control mechanisms. Also, 
+the diverse of IoT-based applications such as preci si on 
+farming and smart irrigation is very helpful to the 
+enhancement of agricultural processes. Thus, the Io T is 
+considered as one of the promising solutions for embraci ng 
+connected farms to address agriculture-based issues and 
+increase the quality and quantity of agricultural production. 
+IoT solutions are highly associated with cloud computi ng 
+to process the huge amount of heterogeneous data se nt or 
+received by agriculture sensors/actuators [4]. Although cl oud 
+computing can handle smart agriculture applications, some 
+of the applications and services produce a large amount of 
+data and need to be processed in a real-time manner, whi ch 
+may cause a heavy load on the network, long response ti me, 
+and poor quality of service, due to limited bandwid th [5]. 
+Therefore, using the traditional cloud-based architecture may 
+not be efficient to support these applications, which may al so 
+result in high energy consumption due to the transf er of 
+agriculture data to and from the cloud. The Informati on and 
+Communication Technology (ICT) industry is projected to 
+account for 20% of the global electricity demand by 2025 
+[5]–[8], [9]. Usually, consuming electricity is accompani ed 
+by carbon emissions (CO2). fossil fuel usage is the pri mary 
+source of CO2 [10]. Consequently, this causes the growth of 
+carbon dioxide emissions. According to [11], ICT uses 730 
+Million ton (Mt) CO2 equivalents ( CO2e) or 1.4% of 
+worldwide carbon emissions. 
+To overcome the above shortcomings, edge and fog 
+computing architecture are introduced to process th e real-
+time IoT applications and services at the proximi ty of data 
+sources in an efficient way, which have several benefits (e.g., 
+reduce energy consumption, network traffic and impr ove 
+quality of service) compared to traditional cloud-b ased 
+architecture, that does not exploit the latest paradigms such 
+as fog and edge in the agriculture system [4], [6]. However, 
+edge and fog computing are not a repla cement for cl oud 
+computing, as cloud computing will still be preferabl e and 
+suitable for analyzing and processing heavy tasks, as wel l as 
+storing data in a long term. The collaboration between edge, 
+fog, and cloud computing is the best practice to ac hi eve 
+smart agriculture solutions. 
+Several related works in the literature, (e.g. in [12], [13]), 
+ha ve discussed various architectures, techniques, and 
+methods applied for smart agriculture systems consideri ng 
+different technologies such as IoT, big data analyt ics, and 
+cloud computing. However, none of the existing work s 
+focused on the edge-fog-cloud architecture intendin g to 
+reduce the energy consumption, CO2 emission, and network 
+traffic as considering the three computing layers (edge, fog, 
+and cloud). 
+Therefore, this paper presents a new approach for smart 
+agriculture systems to develop an energy-efficient offl oadi ng 
+of IoT agriculture applications over an edge-fog-cl oud 
+computing architecture, according to the resource 
+requirements of each agriculture task. Also, this a pproach 
+could help to enhance the solutions of many traditi onal 
+agriculture issues by taking the advantage of edge and fog 
+computing, which will improve the overall energy effici ency 
+and reduce CO2 emission, network traffic of smart 
+agriculture systems. The major contributions of thi s paper 
+are summarized as follows: 
+● Develop an energy-efficient architecture based on 
+mathematical modeling and heuristic algorithm to study the 
+offloading of IoT applications from agriculture sen sors to 
+edge, fog, and geo-distributed cloud, while conside ri ng 
+minimization of the overall power consumpti on of 
+networking and processing of the IoT agriculture services. 
+● Optimize the offloading of IoT agriculture 
+applications over an edge-fog-cloud architecture, w hi ch 
+connected to the access network, metro area network , and 
+wide area network, respectively, thus eliminating t he 
+associated power consumption and telecommunicati on 
+network traffic. 
+● Evaluate the usability and the capability of the 
+proposed architecture and its models, using the mix ed-
+integer linear programming (MILP) model, and compared 
+the results to the traditional approach. 
+ The remainder of this paper is organized as follows : 
+Section II introduces the edge-fog-cloud system architecture 
+and its interaction layers. Section III presents the mixed-
+integer linear programming (MILP) model for optimizi ng the 
+offloading of IoT agriculture applications in the e dge-fog-
+cloud architecture. The model's design, scenarios, and the 
+input parameters of the models are presented in Section IV. 
+This is followed by discussing the optimization model resul ts 
+and analysis in Section V. In Section VI, we introduce 
+energy-efficient agriculture IoT applications distr ibuti on 
+heuristic over the edge-fog-cloud architecture (EEA IOT-
+EFC). Finally, Section VII concludes the paper and discusses 
+future work. 
+ 
+II. PROPOSED ARCHITECTURE FOR SMART 
+AGRICULTURE SYSTEM 
+ 
+Today, the traditional cloud-based architecture for 
+agriculture systems is inefficient to satisfy all t he 
+requirements of the current scenarios [4], [5], [7], [8], as i t 
+lacks the essential efficiency prerequisites such a s energy 
+consumption, CO2 emission, network traffic, and so on [6]. 
+Consequently, there is a need to develop an energy-effici ent 
+architecture for a smart agriculture system to fulf ill these 
+requirements. 
+This section provides an outline of the proposed edge-fog-
+cloud architecture and its role in providing dynamici ty and 
+efficiency based on different IoT agriculture appli cati ons. 
+The proposed architecture of the smart agriculture system i s 
+shown in Fig. 1; and it consists of four essential layers, 
+namely, IoT sensor layer, 
+
+--- Page 3 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+3 
+ 
+ 
+FIGURE 1 . An IoT-based edge-fog-cloud architecture for smart 
+agriculture system. 
+edge layer, fog layer, and cloud layer. The descrip ti on of 
+each layer of the proposed architecture is presente d as 
+follow: 
+A. IOT SENSOR LAYER: 
+IoT sensors generate massive heterogeneous data to the 
+gateways by using various sensors deployed in diffe rent 
+areas of the agriculture field. Also, this layer ca n recei ve 
+decisions from to control actuators (e.g., turning on/off 
+irrigation system) [14]. In smart agriculture, there is a range 
+of IoT sensor nodes used to identify several phenomena over 
+the urban areas including but not limited to soil p H, soil 
+temperature, soil moisture, soil electrical conductivi ty, and 
+ambient temperature [15]. 
+In the IoT agriculture system, low power wide area 
+(LPWA) technologies have paved the way due to their l ow 
+power consumption and wide area coverage. Long rang e 
+(LoRa) is proved its efficiency, as a transmission protocol for 
+IoT sensors. Besides its low power consumption, it ensures 
+an extent of 10 kilometers coverage or more. In additi on to 
+LoRa, multiple wireless technologies can be used for smart 
+agriculture urban areas such as narrowband (NB)-IoT, WiFi , 
+Zigbee, and the 5G. The Zigbee technology has been 
+successfully used in the field of agriculture at a low power 
+cost. However, the limited distance coverage for wi reless 
+data transferring (about 20 meters) is reducing its effici ency. 
+A comprehensive comparison of different IoT wireles s 
+network technologies (Zigbee, LoRa, NB-IoT, and 5G), is 
+presented in Table I. 
+B. EDGE LAYER: 
+Edge computing refers to a new computing model that 
+implements the computation of sensors/actuators data at the 
+edge of the network. With this concept, some applic ati ons 
+and services that do not require a lot of computing resources 
+can be processed in the edge layer (close to the data source) 
+and no longer need to traverse the network to be processed 
+by the fog or the cloud. Thus, edge computing can improve 
+data transmission performance, ensure real-time processi ng, 
+and reduce the computational load as well as the amount of 
+data transmitted to and from the fog or cloud data centers [8]. 
+However, in case of unavailability/unsuitability of the 
+resources in the edge layer, the sensors will autom atical l y 
+request to process their data in the fog or the cloud, and thi s 
+will be done hierarchically. 
+ 
+C. FOG LAYER: 
+The fog computing concept was initially proposed by Ci sco 
+in 2014 to expand the resources of cloud computing to the 
+edge of the telecommunications network. In this context, the 
+fog layer has the responsibility to process and anal yze data 
+sent from IoT sensors, which helps to minimize the latency 
+for agriculture applications and services. Also, the fog layer 
+has the ability to process and analyze complex data more 
+than the edge layer. 
+Both fog and edge can provide computation, networking, 
+and storage services in between the sensor layer an d the 
+cloud layer. It means that instead of executing all processi ng 
+at the cloud layer, the fog and edge layers can pro cess and 
+analyze agricultural data locally and close to the sensor l ayer 
+(based on their ability) to reduce latency and cost [5], [7]. 
+D. CLOUD LAYER: 
+At the same level of importance as edge and fog, cl oud 
+computing is a vital enabler for the growth of IoT agriculture 
+applications. It offers on-demand computing resources and 
+services (e.g., storage, networking, and processing ) in a 
+TABLE I 
+IOT WIRELESS NETWORK TECHNOLOGIES COMPARISON 
+IoT Wireless 
+Technology 
+Data rate 
+[5] 
+Range [5] Number of devices Power consumption 
+(gateway/base-station) 
+Power consumption 
+(sensor) 
+Zigbee 250 Kbps 20 M 240 [36] 1 Watt [36] 0.1 Watts [37] 
+LoRa 50 Kbps 10 KM 10,000 devices [38] 30 Watts [20] 0.44 Watts [21] 
+NB-IoT 200 Kbps 15 KM 55k [39] 6877 Watts [40] 0.55 Watts [41] 
+5G 20 Gbps 28 KM 1 million per 1 KM [42] 11500 Watts [40] 0.4 Watts [43] 
+ 
+
+--- Page 4 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+4 
+ 
+scalable way. The cloud layer handles the agricultu re data 
+received from the sensor layer or the fog layer to process, 
+analyze and store them into the cloud. Cloud computi ng can 
+process and analyze heavy data, that requires more compl ex 
+operations (e.g., big data processing and predictive analysi s 
+like weather forecasting, fire warning, and soil droughting), 
+which exceeds the fog computing capability [6]. Als o, it 
+could provide a large-scale secure platform and cheap data 
+storage services for the IoT agriculture applications [5], [8]. 
+E. TELECOMMUNICATION NETWORKS: 
+The traditional telecommunication network architect ure 
+consists of three layers [16]: the core layer, the metro layer, 
+and the access network layer. The wide area network (WAN) 
+is the key network infrastructure that provi des 
+interconnection between different regions and citie s. The 
+Internet protocol (IP) over wavelength division multiplexi ng 
+(WDM) is widely implemented in the core network as i t can 
+provide high scalability, large capacity, and fast 
+communication network transfer speeds. 
+ Based on the reference hierarchy in Fig. 1, every c ore 
+network has a direct connection with a metro area network 
+(MAN), which covers a metropolitan area. Metro Ethernet i s 
+the technology commonly used in the metro network. It 
+offers connectivity between the core network and us ers 
+located in the access network. The local area network (LAN) 
+supports Internet access to numerous user premises. We 
+adopted the passive optical networks (PONs) whi ch 
+considered as the leading networking in the LAN network. 
+ 
+III. MILP MODEL 
+In this section, a new approach is developed based on 
+mathematical mixed-integer linear programming (MILP ) 
+optimization model to study the energy-efficiency o f 
+offloading IoT agriculture applications over an edg e-fog-
+cloud architecture, considering the three telecom n etwork 
+layers: LAN equipped with an edge layer, MAN equi pped 
+with a fog layer and the WAN equipped with a cloud layer. 
+In the following, we introduce the parameters and vari abl es 
+of our proposed architecture. The architecture consists of the 
+IoT sensor, edge, fog, and cloud layers. Then, we provide the 
+mathematical model to find the optimum distribution of IoT 
+agriculture applications to serve the offloaded requests from 
+the IoT sensor layer based on their energy consumption over 
+an edge-fog-cloud architecture. 
+A. IOT SENSOR LAYER: 
+The parameters and variables that represent the IoT sensor 
+layer, are shown in Tables II and III. 
+TABLE II 
+IOT PARAMETERS 
+ 
+TABLE III 
+IOT VARIABLES 
+ 
+IoT sensor layer power consumption (IoT) is composed 
+of: 
+ (∑ 𝐈𝐨𝐓s
+(𝐧𝐮𝐦𝐛𝐞𝐫) 𝐈𝐨𝐓(𝐩𝐨𝐰𝐞𝐫)
+s∈𝕚
+ ) 
++ (∑ 𝐆𝐖𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫) 𝐈𝐨𝐓(𝐩𝐨𝐰𝐞𝐫)
+s∈𝕚
+ ) (1) 
+Equation (1) calculates the total power consumpti on of the 
+IoT sensor layer, including IoT sensors and gateway devices. 
+ 
+B. Edge, Fog, and Cloud Layers: 
+The following parameters and variables (in Tables IV and V) 
+represent the IoT agriculture applications that will be placed 
+in the edge, fog, or cloud layers, as well as the resulted traffi c 
+and power consumption. 
+ 
+TABLE IV 
+CLOUD, FOG, AND EDGE NETWORKING AND PROCESSING PARAMETERS 
+Parameter Description 
+𝐏𝐏𝐛𝐢𝐭𝐬(𝐜𝐥𝐨𝐮𝐝 ) Cloud computing networking power consumption 
+per bit. 
+𝐏𝐏𝐛𝐢𝐭𝐬(𝐟𝐞) Fog/edge computing networking power 
+consumption per bit. 
+𝐂𝐒(𝐩𝐨𝐰𝐞𝐫) Maximum power consumption of a cloud 
+processing node. 
+𝐅𝐒(𝐩𝐨𝐰𝐞𝐫) Maximum power consumption of a fog processing 
+node. 
+𝐄𝐒 (𝐩𝐨𝐰𝐞𝐫) Maximum power consumption of an edge 
+processing node. 
+𝐂𝐒(𝐌𝐈𝐏𝐒) Maximum capability of a cloud processing node 
+(measured in MIPS). 
+𝐅𝐒(𝐌𝐈𝐏𝐒) Maximum capability of a fog processing node 
+(measured in MIPS). 
+𝐄𝐒 (𝐌𝐈𝐏𝐒) Maximum capability of an edge processing node 
+(measured in MIPS). 
+𝐏𝐏𝐌𝐈𝐏𝐒(𝐜𝐥𝐨𝐮𝐝 ) Power per MIPS of cloud processing node, where 
+ 𝐂𝐒 (𝐩𝐞𝐫)= 
+𝐂𝐒(𝐩𝐨𝐰𝐞𝐫 )
+𝐂𝐒(𝐌𝐈𝐏𝐒)
+. 
+𝐏𝐏𝐌𝐈𝐏𝐒(𝐟𝐨𝐠) Power per MIPS of fog processing node, where 
+ F𝐒(per)= 
+𝐅𝐒(𝐩𝐨𝐰 𝐞𝐫)
+𝐅𝐒(𝐌𝐈𝐏𝐒)
+. 
+Parameter Description 
+𝐈𝐨𝐓𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫 ) Number of IoT sensors in a single farm s. 
+𝐈𝐨𝐓 (𝐩𝐨𝐰𝐞𝐫) Power consumption of a single IoT sensor using 
+LoRa module. 
+𝐆𝐖(𝐩𝐨𝐰𝐞𝐫) Power consumption of lora gateway. 
+𝐆𝐖(𝐮𝐬𝐞𝐫𝐬) Maximum number of connected sensors per single 
+gateway. 
+Variables Description 
+𝐆𝐖𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫 ) Number of used LoRa gateway in farm s. 
+
+--- Page 5 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+5 
+ 
+𝐏𝐏𝐌𝐈𝐏𝐒(𝐞𝐝𝐠𝐞) Power per MIPS of edge processing node, where 
+ E𝐒 (per)= 
+𝐄𝐒(𝐩𝐨𝐰𝐞𝐫 )
+𝐄𝐒(𝐌𝐈𝐏𝐒)
+. 
+𝐏𝐔𝐄(𝐜𝐥𝐨𝐮𝐝 ) Power usage effectiveness of a cloud computing 
+node. 
+𝐏𝐔𝐄(𝐟𝐨𝐠) Power usage effectiveness of a fog computing 
+node. 
+𝐏𝐔𝐄(𝐞𝐝𝐠𝐞) Power usage effectiveness of an edge computing 
+node. 
+𝐍 Set of nodes in edge/fog/cloud architecture. 
+𝕔 Set of nodes in cloud layer. 
+𝕗 Set of nodes in fog layer. 
+𝕖 Set of nodes in edge layer. 
+ⅈ Set of nodes in IoT layer. 
+𝐬 𝐚𝐧𝐝 𝐝 Source and destination indices of the 
+edge/cloud/fog nodes in the proposed architecture. 
+𝕀 Set of IoT applications. 
+𝐒𝐢 Number of sensors connected to IoT application i. 
+𝐔𝐢 Sensors upload rate of IoT application i. 
+𝐏𝐢 Processing requirements of IoT application i in 
+MIPS. 
+ 
+TABLE III 
+CLOUD, FOG AND EDGE NETWORKING AND PROCESSING VARIABLES 
+Variable Description 
+Ө𝐝 {= 1 if processing on node d ∈ N is activated
+= 0, if not 
+Ѱ𝐢,𝐝 
+{
+= 1 if an IoT application i ∈ 𝕀 is running on a 
+processing node d ∈ N 
+= 0, if not 
+ 
+𝐌𝐈𝐏𝐒𝐢,𝐬
+𝐢𝐨𝐭 MIPS of IoT application i hosted in edge/fog/cloud s. 
+𝐌𝐈𝐏𝐒𝐬
+𝐢𝐨𝐭 Total MIPS of edge/fog/cloud hosted in node s. 
+𝐓𝐢,𝐬,𝐝
+𝐢𝐨𝐭 Traffic uploaded from sensors in node d to IoT 
+application i hosted in cloud/fog/edge s. 
+𝐓𝐔𝐬,𝐝 Traffic uploaded from sensors in node d to 
+edge/fog/cloud in node s. 
+ 
+The power consumption of cloud/fog/edge nodes consist of: 
+1) Cloud layer power consumption (Cloud): 
+PUE(cloud) (∑ MIPSi,𝐬
+iot PPMIPS(cloud)
+s ∈N
++ ∑PPbits(cloud) TU𝐬,𝐝 
+s∈N
+) 
+ ∀ s = 𝕔 (2) 
+ 
+2) Power consumption of fog layer (Fog): 
+PUE(fog)(∑ MIPSi,𝐬
+iot PPMIPS(fog)
+s ∈N
++ ∑PPbits(fog) TU𝐬,𝐝 
+s∈N
+) 
+ ∀ s = 𝕗 (3) 
+ 
+3) Power consumption of edge layer (Edge): 
+ PUE(edge)(∑ MIPSi,𝐬
+iot PPMIPS(edge)
+s ∈N
++ ∑PPbits(edge) TU𝐬,𝐝 
+s∈N
+) 
+ ∀ s = 𝕖 (4) 
+Equations (2, 3, and 4) calculate cloud, fog, and e dge 
+computing layers total power consumption, includi ng 
+processing, and networking devices, taking into 
+consideration the power usage effectiveness (PUE) of cl oud, 
+fog, and edge layers, respectively. 
+ 
+C. COMMUNICATION NETWORKS: 
+As described in Section II-E, a typical telecom network i s 
+considered including WAN, MAN, and LAN networks. The 
+traffic traverse through these layers as well as th e 
+corresponding power consumption are represented by the 
+parameters and variables described below. 
+1) LOCAL AREA NETWORK (LAN): 
+The parameters and variables that define the LAN network 
+are shown in Tables VI and VII. 
+ 
+TABLE VI 
+LAN NETWORK PARAMETERS 
+Parameter Description 
+𝐔𝐢,𝐬,𝐝 Number of sensors in node d uploading traffic IoT 
+application i hosted in node s. 
+𝐎𝐋𝐓(𝐩𝐨𝐰𝐞𝐫) Power consumption of OLT. 
+𝐎𝐍𝐔 (𝐩𝐨𝐰𝐞𝐫) Power consumption of an ONU. 
+𝑼𝑰𝒊,𝒔,𝒅 Uploaded traffic from IoT application i in node 𝑑 to 
+cloud/fog/edge in node s given as: 
+UIi ,s,𝐝 = 𝐔i,s,𝐝 Ui 
+𝐎𝐋𝐓(𝐛𝐢𝐭𝐫𝐚𝐭𝐞) Bit rate of OLT. 
+𝐎𝐍𝐔(𝐛𝐢𝐭𝐫𝐚𝐭𝐞) Bit rate of ONU. 
+𝐏𝐔𝐄(𝐧𝐞𝐭𝐰𝐨𝐫𝐤) Network power usage effectiveness. 
+𝛚 Large number. 
+ 
+TABLE VII 
+LAN NETWORK VARIABLES 
+Variable Description 
+𝐎𝐍𝐔𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓) Number of ONU terminals. 
+𝐎𝐋𝐓𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓) Total power consumption of OLT. 
+ 
+Local area networks power consumption (LAN) consists of: 
+1) Total power consumption of LAN network: 
+
+--- Page 6 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+6 
+ 
+PUE(network)(∑ ONU𝐬
+(𝑛𝑢𝑚𝑏𝑒𝑟)
+s∈N
+ 𝐎𝐍𝐔(𝐩𝐨𝐰𝐞𝐫)) 
++ (∑OLT 𝐬
+(𝑛𝑢𝑚𝑏𝑒𝑟)
+s∈N
+ 𝐎𝐋𝐓 (𝐩𝐨𝐰𝐞𝐫) ) (5) 
+Equation (5) calculates the total power consumption of the 
+LAN network, including Optical Network Units (ONU) and 
+Optical Line Terminals (OLTs) devices, taking into 
+consideration the network PUE. 
+ 
+2) METRO AREA NETWORK (MAN): 
+The parameters and variables introduced to define the MAN 
+are shown in Tables VIII and IX. 
+ 
+TABLE VIII 
+MAN PARAMETERS 
+Parameter Description 
+𝐌𝐑(𝐩𝐨𝐰𝐞𝐫) Maximum power consumption of MAN routers. 
+𝐌𝐒(𝐩𝐨𝐰𝐞𝐫) Maximum power consumption of MAN switches. 
+𝐌𝐑(𝐛𝐢𝐭𝐫𝐚𝐭𝐞 ) Bit rate of MAN routers. 
+𝐌𝐒(𝐛𝐢𝐭𝐫𝐚𝐭𝐞) Bit rate of MAN switches. 
+ 
+TABLE IX 
+MAN VARIABLES 
+Variable Description 
+𝐌𝐑𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓) Number of MAN network used routers in node 𝑠. 
+𝐌𝐒𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓) Number of MAN network used switches in node 𝑠. 
+ 
+The metro area network power consumption (MAN) consi sts 
+of: 
+𝑃𝑈𝐸(𝑛𝑒𝑡𝑤𝑜𝑟𝑘) ((𝑀𝑅𝒔
+(𝑛𝑢𝑚𝑏𝑒𝑟) 𝑀𝑅𝒔
+(𝑝𝑜𝑤𝑒𝑟))
++ (𝑀𝑆𝒔
+(𝑛𝑢𝑚𝑏𝑒𝑟) 𝑀𝑆𝒔
+(𝑝𝑜𝑤𝑒𝑟)) ) 
+ ∀ 𝑠 = 𝑁 (6) 
+Equation (6) calculates the total power consumption of the 
+MAN network, including router ports and switch devi ces, 
+taking into consideration the network PUE. 
+3) WIDE AREA NETWORK (WAN): 
+The parameters and variables introduced to define W AN 
+network are shown in Tables X and XI. 
+ 
+TABLE X 
+WAN NETWORK PARAMETERS 
+Parameter Description 
+𝒎 𝒂𝒏𝒅 𝒏 Indices of the source and destination nodes s, m ∈ N of 
+edge/fog/cloud network architecture. 
+𝐍𝐦 Set of neighbors of node m in edge/fog/cloud 
+architecture. 
+𝕣(𝐩𝐨𝐰𝐞𝐫) Power consumption of WAN network router port. 
+𝕥(𝐩𝐨𝐰𝐞𝐫) Power consumption of a transponder. 
+𝔼(𝐩𝐨𝐰𝐞𝐫) Power consumption of an amplifier. 
+𝓢𝐝
+(𝐩𝐨𝐰𝐞𝐫) Power consumption of an optical switch in node d ∈
+𝕔. 
+𝔹 Bandwidth of each wavelength. 
+𝕊 Maximum allowed gap between two EDFAs 
+(measured in kms). 
+𝔻𝐦,𝐧 Distance (in kms) between node pair of WAN network 
+(m, n)∈ 𝕔. 
+𝔸𝐦,𝐧 Amplifiers count between node pair (m,n) ∈ 𝕔. 𝔸m,n= 
+⌊
+𝔻m,n
+S − 1 ⌋ where 𝕊 is the maximum distance each 
+EDFA can reach. 
+ 
+TABLE XI 
+WAN NETWORK VARIABLES 
+Variable Description 
+𝕣𝐝 Router ports count in node d ∈ 𝕔 , which forwards the 
+traffic from IoT sensors to clouds. 
+𝐓𝐝 Total traffic in each node d ∈ N. 
+𝔽𝐦,𝐧 Number of fibers on link (m, n)∈ 𝕔. 
+𝕃𝐦,𝐧
+𝐬,𝐝 Traffic between node pair (s,d)∈ 𝕔 transmitting the 
+physical link (m, n)∈ 𝕔. 
+г𝐦,𝐧
+𝐬,𝐝 
+{
+= 1 if IoT offload traffic (s, d)∈ 𝕔 flow 
+through the physical link (m, n) ∈ 𝕔 
+= 0, if not
+ 
+ 
+The wide area network (𝑊𝐴𝑁) [17] power consumpti on 
+consists of: 
+𝐏𝐔𝐄(𝐧𝐞𝐭𝐰𝐨𝐫𝐤)(∑ 𝕣(power) 𝕣d 
+d∈N
++ ∑ ∑ ∑ ∑ г m,n
+s,d
+d∈N:s≠d s∈N
+𝕥(power) 
+n∈Nmm:n≠m m∈N
++ ∑ ∑ 𝔼 (powe r) 𝔽𝐦,𝐧 𝔸m,n
+n∈Nmm:n≠m m∈N
++ ∑ 𝒮𝐝
+(power)
+d∈N
+) (7) 
+Equation (7) calculates the total power consumption of the 
+WAN network, including core router ports, transpond ers, 
+am plifiers, and switch devices, taking into considerati on the 
+network PUE. 
+ 
+The MILP model, considering the equations from (1-7 ), 
+represented by the following: 
+The objective: Minimize total power consumption: 
+WAN+ MAN + LAN+ IoT+ Cloud + Fog + Edge (8) 
+Expression (8) calculates the power consumption of our 
+proposed architecture as the sum of the power consumpti on 
+of the WAN network, the MAN network, the LAN network, 
+
+--- Page 7 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+7 
+ 
+IoT, cloud, fog, and edge. 
+Subject to the following constraints: 
+IoT offloading constraints: 
+∑ UIi,𝐬,𝐝
+s,d∈N
+= ∑ T i,s,d
+iot
+s,d∈N
+ ∀ i ∈ 𝕀 (9) 
+Constraint (9) guarantees that all the IoT offloaded traffi c 
+is processed at a cloud, fog, or edge destination node. 
+ 
+IoT application in edge/fog/cloud constraints: 
+∑ Ti,s,d
+iot
+s∈N
+≥ Ѱi,d ∀ d ∈ N ,i ∈ 𝕀 (10) 
+∑ Ti,s,d
+iot
+s∈N
+≤ ω Ѱi,d ∀ d ∈ N , i ∈ 𝕀 (11) 
+Constraints (10) and (11) make sure that the bi nary 
+variable Ѱ𝐢,𝐝 = 𝟏 if processing node d ∈ N is powered on to 
+place the IoT application i ∈ 𝕀, otherwise Ѱ𝐢,𝐝 = 𝟎. 
+Physical link-activated: 
+𝕃m,n
+s,d ≥ гm,n
+s,d ∀ s,d, m, n ∈ N (12) 
+𝕃m,n
+s,d ≤ гm,n
+s,d ∀ s,d, m,n ∈ N (13) 
+Constraints (12) and (13) ensure that the physical link m,n ∈
+𝕔 is activated if there is a traffic flow between th e nodes 
+s, d ∈ 𝕔 transmitting through the physical links m, n ∈ 𝕔. 
+ 
+Edge, fog, and cloud processing requirements: 
+MIPSi,𝐝
+iot = Ѱi,d MIPSi,𝐝
+iot ∀ d ∈ N ,i ∈ 𝕀 (14) 
+MIPS𝐝
+iot = ∑ MIPSi,𝐝
+iot
+i∈𝕀 ∀ d ∈ N (15) 
+Constraints (14) gives the processing requirements of IoT 
+application i ∈ 𝕀 in a cloud, a fog, and an edge layer. 
+Constraint (15) gives the total processing of a cloud, a fog, 
+and an edge layer d ∈ N. 
+ 
+Traffic demand on WAN network: 
+𝐓𝐔𝐬,𝐝 = ∑𝐓𝐢,𝐬,𝐝
+𝐢𝐨𝐭
+i∈𝕀
+ ∀ s,d ∈ 𝕔 (16) 
+Constraint (16) calculates the demand between WAN 
+nodes due to the IoT applications placed in the clouds. 
+ 
+Flow conservation constraint: 
+∑ 𝕃 m,n
+s,d
+m∈N: m≠n
+− ∑ 𝕃 m,n
+s,d
+n∈N:m≠n
+= {
+ Ls,d i = s
+− Ls,d i = d
+ 0 otherwise 
+ 
+∀ s,d ∈ N ∶ s ≠ d (17) 
+Constraint (17) define the flow conservation of WAN 
+network. It ensures that the total inbound / outbound traffi c 
+in all WAN nodes is identical; apart from the sourc e/si nk 
+nodes. 
+ 
+Physical link capacity: 
+∑ ∑ 𝕃 m,n
+s,d
+d∈N:i≠j
+≤ W𝔹Fm,n 
+s∈N
+∀ m,n ∈ N (18) 
+Constraints (18) gives the physical link capacity b y 
+ensuring that the traffic in a link does not exceed the 
+maximum capacity of fibers. 
+ 
+Total number of router ports in a WAN network node: 
+𝕣d ≥
+∑ 𝐓𝐔𝐬,𝐝 s∈𝕔
+ 𝔹
+ ∀ d ∈ 𝕔 (19) 
+Constraint (19) gives the router ports count at every WAN 
+node. 
+ 
+Total number of IoT gateways: 
+𝐆𝐖𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫)≥ 𝐈𝐨𝐓𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫)
+𝐆𝐖(users)
+ ∀ s ∈ 𝕚 (20) 
+ 
+Constraint (20) gives the number of used gateways in each 
+farm. 
+ 
+Total number of ONU terminals: 
+𝐎𝐍𝐔𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓)≥
+∑ ∑ UIi,s,𝐝 d∈N i∈𝕚
+𝐎𝐍𝐔(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)
+ ∀ s ∈ N (21) 
+Constraint (21) gives the number of used ONU termi nal s 
+in each farm. 
+ 
+Total number of OLT: 
+OLT𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓)≥
+∑ ∑ UIi,s,𝐝 d∈N i∈𝕀
+𝐎𝐋𝐓(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)
+ ∀ s ∈ N (22) 
+Constraint (22) gives the number of used OLT in node 𝑠. 
+ 
+Total number of MAN routers: 
+MR 𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓)≥ 2 
+∑ ∑ UIi,s,𝐝 d∈(𝕗∩𝕔)i∈𝕚
+𝐌𝐑(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)
+ ∀ s ∈ N (21) 
+Constraint (21) gives the number of used routers i n each 
+MAN network 𝑠. 
+ 
+Total number of MAN switches: 
+MS𝐬
+(𝒏𝒖𝒎𝒃𝒆𝒓)≥
+∑ ∑ UIi,s,𝐝 d∈(𝕗∩𝕔) i∈𝕚
+𝐌𝐒(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)
+ ∀ s ∈ N (22) 
+Constraint (22) gives the number of used switches in each 
+MAN network 𝑠. 
+ 
+Total Traffic in communication network: 
+𝐓𝐝 = ∑∑ UIi,s,𝐝
+d∈N i∈𝕚
+ ∀ s ∈ N (23) 
+
+--- Page 8 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+8 
+ 
+Constraint (23) gives the total traffic in each node 𝑠. 
+4) CARBON EMISSIONS ( CO2) OF IOT-EDGE-FOG- 
+CLOUD LAYERS: 
+Carbon emissions [18] can be defined as the carbon emissi on 
+intensity per an energy consumption and the unit of carbon 
+emission intensity is kgCO2e / kWh. The research found that 
+using solar, wind or nuclear plants creates a low c arbon 
+footprint compared with fossil fuels [19]. However, there are 
+multiple limitations to the usage of low carbon sou rces 
+including but not limited to the cost of installing these cl ean 
+plants. Thus, in this work, we assume that only the IoT sensor 
+layer and edge layer are powered by low carbon sources (i.e., 
+solar plants panels) to reduce the power consumption of the 
+proposed architecture. 
+ In the following Tables XII and XIII, we define parameters 
+and variables related to carbon emissions. 
+TABLE XII 
+EMISSION PARAMETERS 
+Parameter Description 
+𝐎 CO2 emissions per unit of energy produced by fossil 
+fuel. 
+𝐒 CO2 emissions per unit of energy produced by solar. 
+ 
+TABLE XIII 
+EMISSION VARIABLES 
+Variable Description 
+𝐂𝐎 Total carbon emission. 
+ 
+Total carbon emission (CO) is composed of: 
+(WAN O)+ (MAN O)+ (LAN O) + (IoT S) + (Cloud O)
++ (Fog O) +(Edge S) (22) 
+Considering that IoT sensors, gateway, and edge 
+processing layers are powered by solar energy sourc es. 
+While others are powered by oil energy sources. 
+ 
+IV. MILP MODEL DESIGN 
+In this section we explain the scenarios and the design of the 
+model conducted in order to evaluate the proposed 
+architecture. 
+A) SCENARIOS: 
+As shown in Fig. 1, different scenarios can be implemented 
+with this proposed architecture to show its effectiveness. In 
+this work, the following scenarios are considered i n a 
+hierarchical order based on the edge, fog, and cloud abili ty. 
+Edge/fog layers can be deployed in the proposed architecture 
+according to the resources required by the agriculture tasks. 
+Essentially, all tasks from heterogeneous IoT 
+devices/sensors in the agriculture field, using different IoT 
+wireless network technologies will be offloaded to the 
+network gateways and then directed to edge/fog or c loud 
+layer. Each layer has pros and cons. For example, processi ng 
+the tasks within the edge layer will save the power and traffi c 
+cost of request transmission from/to the fog or cloud layer. 
+However, handling all types of tasks within the edge layer i s 
+not possible, as it has limited capacity. Therefore , fog and 
+cloud layers can be the choice for processing heavy tasks 
+(e.g., resource-intensive applications). 
+In our model, we assume that a scheduler in the gateway 
+of the IoT layer checks if the edge node has avail a bl e 
+resources and can handle the request of IoT applica ti ons 
+(e.g., CPU capability - the number of million instructi ons per 
+second (MIPS)), the tasks will then pass to the edge layer to 
+process them. In case of insufficient/unavailabilit y of 
+processing the tasks in the edge layer, the request will be 
+transferred to the fog layer and check if there is enough 
+capacity. Otherwise, the tasks will be forwarded to the cl oud 
+layer for processing, which supports resource-inten si ve 
+applications. Also, we have assumed that the cloud has 
+enough resources and capability to handle all kinds of tasks. 
+B) INPUT PARAMETERS OF THE MODELS 
+In the MILP model, we have configured four layers i n a 
+smart agriculture system, which is composed of the IoT 
+sensor layer, edge layer, fog layer, and cloud laye r. The 
+configuration of edge, fog, and cloud layers depend on the 
+type of tasks (e.g., number of MIPS) requested by each IoT 
+sensor/device at the IoT sensor layer. The model in put 
+parameters of different layers (IoT sensor, edge, f og, and 
+cloud layers), in addition to networks and carbon emissi ons 
+parameters, are shown in Tables XIV, XV, XVI, XVII, and 
+XVIII, respectively. 
+In our model, we assume that there are 100,000 sensors 
+distributed in each farm The sensors task requirements are 
+divided into three types (sensing 60%, processing 3 0%, 
+heavy processing 10%). The sensing processing task is 
+usually limited to handling offloaded reading data sent by the 
+sensors (e.g., temperature reading or send control commands 
+for the irrigation system). The processing task is the 
+requirement of light processing (e.g., soil analytics and event 
+detection). The heavy processing task is the requis ite of 
+higher processing power and resources (e.g., weathe r 
+prediction and analysis). 
+TABLE XIV 
+IOT SENSOR LAYER INPUT PARAMETERS 
+Parameter Value 
+Number of sensors in a single farm 
+(𝐈𝐨𝐓𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫)) 
+100,000 sensors in each 
+farm (sensing 60%, 
+processing 30%, Heavy 
+workload 10% 
+Number of lora gateway in a single 
+farm (𝐆𝐖𝐬
+(𝐧𝐮𝐦𝐛𝐞𝐫)) 
+3 in each farm. 
+Power consumption of lora gateway 
+(𝐆𝐖(𝐩𝐨𝐰𝐞𝐫)). 
+30 Watts [20] 
+Power consumption of IoT sensor 
+using lora module (𝐈𝐨𝐓 (𝐩𝐨𝐰𝐞𝐫)). 
+0.44 Watts [21] 
+ 
+ 
+ 
+
+--- Page 9 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+9 
+ 
+TABLE XV 
+CLOUD, FOG, AND EDGE INPUT PARAMETERS 
+Parameter Value 
+Processing requirements of 
+each IoT application (𝐏𝐢). 
+ 
+* 500 MIPS for Sensing (e.g., 
+temperature sensor) or Actuating 
+(e.g., send control commands for 
+irrigation system). 
+* 2000 MIPS for Processing 
+(e.g., soil analytics, event 
+detection). 
+* 5000 MIPS Heavy processing 
+(e.g., predict the weather) [22]. 
+Traffic requirements of each 
+IoT application (𝐔𝐢). 
+* 0.5 Mbps for Sensing or 
+Actuating. 
+* 0.9 Mbps for Processing. 
+* 1 Mbps for Heavy processing 
+[23]. 
+Cloud server power 
+consumption (𝐂𝐒 (𝐩𝐨𝐰𝐞𝐫)). 
+4916 Watts [24] 
+Fog server power 
+consumption (𝐅𝐒 (𝐩𝐨𝐰𝐞𝐫)). 
+262 Watts [24] 
+Edge server power 
+consumption (𝐄𝐒 (𝐩𝐨𝐰𝐞𝐫)). 
+63 Watts [24] 
+Maximum capability of a 
+cloud processing node 
+(𝐂𝐒 (𝐌𝐈𝐏𝐒)). 
+10640 MIPS [24] 
+Maximum capability of a fog 
+processing node (𝐅𝐒(𝐌𝐈𝐏𝐒)). 
+4000 MIPS [24] 
+Maximum capability of an 
+edge processing node 
+(𝐄𝐒 (𝐌𝐈𝐏𝐒)). 
+1800 MIPS [24] 
+Cloud computing networking 
+power consumption per bit 
+(𝐏𝐏𝐛𝐢𝐭𝐬(𝐜𝐥𝐨𝐮𝐝 )). 
+2.48 Watts/Gbps [25] [26] 
+Fog computing networking 
+power consumption per bit 
+(𝐏𝐏𝐛𝐢𝐭𝐬(𝐜𝐥𝐨𝐮𝐝 )). 
+2.57 Watts/Gbps [25] [26] 
+Edge computing networking 
+power consumption per bit 
+(𝐏𝐏𝐛𝐢𝐭𝐬(𝐜𝐥𝐨𝐮𝐝 )). 
+2.70 Watts/Gbps [25] [26] 
+Cloud power usage 
+effectiveness (𝐏𝐔𝐄(𝐜𝐥𝐨𝐮𝐝 )) 
+1.3 [27] 
+Fog power usage effectiveness 
+(𝐏𝐔𝐄 (𝐟𝐨𝐠)) 
+1.4 [27] 
+Edge power usage 
+effectiveness (𝐏𝐔𝐄(𝐞𝐝𝐠𝐞)) 
+1.5 [27] 
+ 
+TABLE XVI 
+LAN, MAN, WAN NETWORK INPUT PARAMETERS 
+Parameter Value 
+WAN router port power consumption 
+(𝕣(𝐩𝐨𝐰𝐞𝐫)) 
+638 Watts [28] 
+Transponder power consumption (𝕥(𝐩𝐨𝐰𝐞𝐫)) 129 Watts [29] 
+WAN switch power consumption 
+(𝓢𝐝
+(𝐩𝐨𝐰𝐞𝐫)) 
+85 Watts [30] 
+EDFA power consumption (𝔼(𝐩𝐨𝐰𝐞𝐫)) 11 Watts [31] 
+Maximum gap two EDFAs (𝕊) 80 KM [31] 
+Power usage effectiveness of network 
+equipment (𝐏𝐔𝐄(𝐧𝐞𝐭𝐰𝐨𝐫𝐤)) 
+1.5 [33] 
+MAN router port power consumption 
+(𝐌𝐑(𝐩𝐨𝐰𝐞𝐫)) 
+30 Watts [26] 
+MAN switch power consumption 
+(𝐌𝐒 (𝐩𝐨𝐰𝐞𝐫)) 
+470 Watts [25] 
+MAN router port bitrate (𝐌𝐑(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)) 40 Gbps [26] 
+MAN switch bitrate (𝐌𝐒(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)) 600 Gbps [25] 
+Agriculture farm size (in km2) 10 
+Power consumption of ONU device 
+(𝐎𝐍𝐔 (𝐏𝐨𝐰𝐞𝐫)) 
+5 Watts [33] 
+ONU Capacity (𝐎𝐍𝐔(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)) 2.4 Gbps [33] 
+OLT Capacity (𝐎𝐍𝐔(𝐛𝐢𝐭𝐫𝐚𝐭𝐞)) 1280 Gbps [33] 
+OLT Power consumption (𝐎𝐋𝐓(𝐏𝐨𝐰𝐞𝐫)) 1842 Watts [33] 
+ 
+TABLE XVII 
+CARBON EMISSION INPUTS FOR EACH FUEL TYPE [17], [22] 
+Parameter Carbon 
+emission 
+Carbon emission factors for Oil (O) 0.935 kg 
+CO2e/kWh 
+Carbon emission factors for Solar (S) 0.048 kg 
+CO2e/kWh 
+ 
+V. RESULTS AND DISCUSSION 
+In this section, we discuss the proposed energy-eff ici ent 
+edge-fog-cloud architecture. In addition to its ene rgy 
+efficiency, we evaluate our model to find the conse quence 
+CO2 emission, and network traffic compared to the 
+traditional cloud-based architecture. 
+ We have evaluated the proposed architecture and model s 
+using MILP optimizer based on the AT&T network 
+topology, as shown in Fig. 2. To solve the MILP model , we 
+use the CPLEX solver over a laptop with an Intel Core i 7–
+7660U CPU, running at 2.50 GHz, with 16 GB RAM. 
+ 
+FIGURE 2 . AT&T WAN network topology. 
+ As shown in Table I, we have categorized all IoT wirel ess 
+network technologies used in this work based on thei r data 
+rate, range, number of devices, power consumption of both 
+gateway/base-station, and sensors. This work has 
+identified that the power consumption of different IoT 
+wireless network technologies almost the same, as shown 
+in Fig. 3. The Zigbee technology delivers connectivity wi th 
+low power consumption compared to other technologi es. 
+However, using Zigbee in the urban area is not the best 
+choice as it only covers 20 meters, thus, hundreds or 
+thousands of gateways are required to cover a large area. 
+
+--- Page 10 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+10 
+ 
+ 
+FIGURE 3 . Comparison of different IoT wireless network technologies 
+based on their energy consumption. 
+ Since we aim to use a technology that covers a large area 
+with the least amount of energy consumption. Theref ore, 
+LoRa has been chosen as an IoT wireless communicati on 
+technology between the IoT sensors and the gateway, that 
+covers long-distance communication, with low power 
+consumption, and considers one of the most suitabl e 
+technology for IoT agriculture applications, as shown in Fig. 
+3. 
+A. ENERGY CONSUMPTION 
+Fig. 4 illustrates the power consumptions of different tasks 
+in the proposed edge-fog-cloud architecture versus the 
+traditional cloud-based architecture. Also, it show s the 
+placement location of each task/application in edge -fog-
+cloud architecture, as well as the power consumption val ues 
+of each task individually. 
+ The results showed that the sensing tasks are offloaded to 
+the edge layer, as it has enough capacity (i.e., se nsi ng 
+requires 500 MIPS, and the edge layer has the capabili ty to 
+process up to 1800 MIPS). The normal processing tasks are 
+offloaded to the fog respectively, as the fog layer has 
+sufficient resources (i.e., 4000 MIPS) to process t he tasks 
+(i.e., 2000 MIPS). All remaining requests are offlo aded to 
+the cloud layer as there is no capacity in edge nei ther fog 
+layers to accommodate heavy processing tasks. 
+ 
+ 
+FIGURE 4 . The energy consumption of the proposed architecture vs. the 
+traditional cloud-based architecture, considering the IoT LoRa 
+technology. 
+ 
+ 
+FIGURE 5 . The energy saving of the proposed architecture vs. the 
+traditional cloud-based architecture, using different IoT wireless 
+technologies. 
+ Fig. 5 shows the power consumption of our proposed 
+architecture compared to the traditional cloud-base d 
+architecture, considering different IoT wireless technologi es. 
+Also, the figure displays power saving achieved by the 
+proposed architecture. It is clearly shown that our proposed 
+architecture outperforms the traditional cloud-base d 
+architecture by up to 36% of the total power consumpti on. 
+However, the power savings have slightly ranged between 
+33.6% and 35.6% based on the different IoT wireless 
+technologies. The Zigbee shows a higher power saving as i t 
+capable of offloading sensor data with lower power 
+consumption. 
+B. CO2 EMISSION 
+Fig. 6 illustrates the total carbon emissions of the proposed 
+edge-fog-cloud architecture versus the traditional cloud-
+based architecture, considering powering the IoT se nsor 
+layer and edge layer by a solar power source. 
+ 
+ 
+FIGURE 6 . The total carbon footprint emission of the proposed 
+architecture vs. the traditional cloud-based architecture. 
+ It shows that our proposed architecture can reduce up to 
+42% of CO2 emission, for real-time IoT applications i n 
+agriculture systems. The results also show a compar abl e 
+carbon emission using different IoT wireless technologi es. 
+The power consumption of these technologies has bee n 
+eliminated, as all IoT sensors and gateways are power by a 
+solar plant, that emits very low carbon footprints (sol ar pl ants 
+emit only 0.048 kgCO2/kWh). 
+0
+10000
+20000
+30000
+40000
+50000
+60000
+70000
+LORA NB-IOT 5G Zigbee
+Total Power Consumption (W)
+0
+100 000
+200 000
+300 000
+400 000
+500 000
+600 000
+700 000
+Edge
+60% Sensing
+Fog
+30% Processing
+Cloud
+10% H eavy
+Proce ssing
+Traditional-Cloud
+100 % Sensing+
+Proce ssing+Heavy
+Proce ssing
+Power Consumption (W)
+Network Power Consumption Cloud/ Fog/Edge Power Consumption
+32.5
+33
+33.5
+34
+34.5
+35
+35.5
+36
+0
+100000
+200000
+300000
+400000
+500000
+600000
+700000
+800000
+900000
+1000000
+LO RA NB-IoT 5G Zigbee
+(%) Power Saving 
+Total Power Consumption 
+(W)
+Edge/Fog/Cloud Traditional-Cloud Saving
+42.2
+42.25
+42.3
+42.35
+42.4
+42.45
+0
+100
+200
+300
+400
+500
+600
+700
+800
+LORA 4G NB-IoT 5G Zigbee
+Emissions Saving (%) 
+Total Carbon Emissions 
+(kgCO2/kWh)
+Edge/Fog/Cloud Traditional-Cloud Saving
+
+--- Page 11 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+11 
+ 
+C. NETWORK TRAFFIC 
+Fig. 7 shows the total traffic in each network tier in our 
+proposed architecture versus the traditional cloud- based 
+architecture. The results showed that our proposed 
+architecture is capable to reduce the total traffic by 14% and 
+86% in MAN and WAN tiers, respectively, compared to a 
+cloud-based approach. 
+ In the traditional cloud-based architecture, the process of 
+sending/retrieving the data to/from the cloud in re al-ti me 
+requires high-capacity bandwidth, which may cause a burden 
+on the three network tiers. Thus, employing edge an d fog 
+computing has allowed processing most requests locall y i n 
+edge or fog layers, which significantly decreases the fl ow of 
+data traverse to the cloud and reduces network traf fic, as 
+shown in Fig. 7. 
+ 
+ 
+FIGURE 7 . The network traffic of the proposed architecture vs. the 
+traditional cloud-based architecture. 
+ 
+VI. ENERGY EFFICIENT AGRICULTURE IOT 
+EDGE/FOG/CLOUD ARCHITECTURE HEURISTIC 
+The problem over energy-efficient offloading of IoT 
+applications in edge-fog-cloud architecture for sma rt 
+agriculture environment is a non-deterministic polynomi al 
+(NP)-hard problem. For instance, if 𝑖 is IoT applicati ons 
+count and 𝑛 is the count of locations in edge-fog-cl oud 
+architecture, then we will have (∑ 𝑛!
+(𝑛−𝑧)!
+𝑛
+𝑧=1 ) combinati ons 
+of possible applications locations to find the opti mum 
+locations that result in optimal power consumption. Thus, 
+applying MILP to large-size problems is not feasibl e. 
+Therefore, heuristic provides a simple and fast rea l-ti me 
+implementation. Also, the optimal solution provided by the 
+heuristic can provide validation to results obtaine d from 
+MILP. To provide that, a heuristic algorithm was devel oped, 
+referred to as energy-efficient agriculture IoT app licati ons 
+distribution heuristic over the edge-fog-cloud arch itecture 
+(EEAIOT-EFC). 
+FIGURE 8 . Flowchart of EEAIOT-EFC heuristic. 
+In the EEAIOT-EFC heuristic, IoT applications 𝑖 are 
+checked based on their total MIPS processing requirements. 
+Firstly, the algorithm tries to place and run the application on 
+the edge layer. If there is not enough MIPS capacity at the 
+edge layer, then, agriculture IoT application is placed i n the 
+fog layer, if it has enough capacity. In case of unavailabil i ty 
+resources in both edge and fog layers, the cloud la yer will 
+host the IoT application, as it has enough processi ng 
+capability to handle all types IoT applications. Af ter 
+distributing all IoT applications, the power consumpti on of 
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+0
+500
+1000
+1500
+2000
+2500
+3000
+3500
+LAN MAN WAN
+Traffic Saving (%) 
+Total Traffic (Gbps)
+Proposed Traditional-Cloud Saving
+
+--- Page 12 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+12 
+ 
+EEAIOT-EFC is determined. The heuristic flowchart 
+process is shown in Fig. 8. 
+The heuristic is assessed using a PC with an Intel Core 
+i7–7660U CPU, running at 2.50 GHz, with 16 GB RAM. 
+Similar to MILP, the AT&T network is considered a WAN 
+network example. The heuristic took 5 seconds to eval uate 
+the EEAIOT-EFC, and the MILP and EEAIOT-EFC show a 
+comparable result, as shown in Fig. 9. The gaps bet ween 
+them are limited to 0.7% and 4.7% of the total powe r 
+consumption under the proposed and the traditional cloud-
+based, respectively. 
+ 
+ 
+FIGURE 9 . Difference between the MILP model vs. EEAIOT-EFC 
+heuristic. 
+VII. CONCLUSION AND FUTURE WORKS 
+In this paper, the concept of an edge-fog-cloud architecture 
+is introduced in the smart agriculture system, which sol ved 
+existing real-time processing issues in terms of re duci ng 
+energy consumption, CO2 emission, and network traffi c, 
+compared to the traditional cloud-based architectur e. The 
+proposed architecture employed the edge and fog lay ers, 
+which are placed close to the agriculture fields to collect 
+heterogeneous data from various kinds of IoT agricu lture 
+sensors and process them at these layers. Although the 
+proposed architecture was significantly reduced the 
+computational load and the amount of transmitted data to and 
+from the cloud due to the use of edge and fog layer s, 
+however, the cloud layer is inevitably used to proc ess the 
+heavy and complex data/task requested by IoT agricu lture 
+devices/sensors. Most of the processing tasks are compl eted 
+on the edge and fog layers, while few tasks are offloaded to 
+the cloud layer for processing. 
+In the paper, different metrics have been taken int o 
+consideration, including energy consumption, CO2 emissi on, 
+and network traffic to study the performance and th e 
+outcomes of the proposed architecture. Using mathemati cal 
+modeling, the proposed architecture is compared wit h the 
+traditional cloud-based architecture. The model res ul ts 
+showed that our proposed architecture can reduce the overal l 
+power consumption, carbon footprints, and network traffi c 
+by up to 43%, 36%, 86%, respectively. 
+Moreover, we developed energy-efficient agriculture IoT 
+applications distribution heuristic over the edge-f og-cl oud 
+architecture (EEAIOT-EFC) algorithm, which showed 
+comparable results to the MILP model. 
+Though this proposed solution is based on the idea of smart 
+agriculture, it also can be suitable for other IoT applicati ons 
+and sectors, such as e-healthcare, smart city, and smart home. 
+In the future, we intend to extend the proposed approach i n a 
+distributed real agricultural environment, consider ing 
+machine-learning and decision-making algorithms to further 
+understand the capability of the proposed work. 
+ 
+ACKNOWLEDGMENT 
+The authors would like to acknowledge the Deanshi p of 
+Scientific Research, Taibah University, Al-Madinah, Saudi 
+Arabia, for providing research resources and equipment. 
+In addition, the authors would like to thank the Deanshi p 
+of Scientific Research, Prince Sattam bin Abdul azi z 
+University, Al-Kharj, Saudi Arabia, for supporting this work. 
+REFERENCES 
+[1] Arun Majumdar, Optical Wireless Communications for 
+Broadband Global Internet Connectivity - 1st Edition. 2018. 
+[2] R. Buyya and A. V. Dastjerdi, Internet of Things: Principles and 
+Paradigms. Elsevier Inc., 2016. 
+[3] B. Insider, “Smart Farming 2021 - IoT in Agriculture: Sensors & 
+Robotics.” [Online]. Available: 
+https://www.businessinsider.com/smart-farming-iot-agriculture. 
+[Accessed: 02-Jun-2021]. 
+[4] N. Ahmed, D. De, and I. Hussain, “Internet of Things (IoT) for 
+Smart Precision Agriculture and Farming in Rural Areas,” IEEE 
+Internet Things J., vol. 5, no. 6, pp. 4890–4899, Dec. 2018. 
+[5] O. Friha, M. A. Ferrag, L. Shu, L. Maglaras, and X. Wang, 
+“Internet of Things for the Future of Smart Agriculture: A 
+Comprehensive Survey of Emerging Technologies,” IEEE/CAA 
+Journal of Automatica Sinica, vol. 8, no. 4. Institute of Electrical 
+and Electronics Engineers Inc., pp. 718–752, 01-Apr-2021. 
+[6] J. Lin, W. Yu, N. Zhang, X. Yang, H. Zhang, and W. Zhao, “A 
+Survey on Internet of Things: Architecture, Enabling 
+Technologies, Security and Privacy, and Applications,” IEEE 
+Internet Things J., vol. 4, no. 5, pp. 1125–1142, Oct. 2017. 
+[7] E. Guardo, A. Di Stefano, A. La Corte, M. Sapienza, and M. 
+Scatà, “A fog computing -based IoT framework for precision 
+agriculture,” J. Internet Technol. , vol. 19, no. 5, pp. 1401 –1411, 
+Sep. 2018. 
+[8] X. Shi et al. , “State -of-the-art internet of things in protected 
+agriculture,” Sensors (Switzerland), vol. 19, no. 8. MDPI AG, p. 
+1833, 02-Apr-2019. 
+[9] Climate Change News, “‘Tsunami of data’ could consume one 
+fifth of global electricity by 2025.” [Online]. Available: 
+https://www.climatechangenews.com/2017/12/11/tsunami-data-
+consume-one-fifth-global-electricity-2025/. [Accessed: 13-Aug-
+2019]. 
+[10] “Global Greenhouse Gas Emissions Data | Greenhouse Gas 
+(GHG) Emissions | US EPA.” [Online]. Available: 
+https://www.epa.gov/ghgemissions/global-greenhouse-gas-
+emissions-data. [Accessed: 11-Jun-2021]. 
+[11] “The future carbon footprint of the ICT and E&M se ctors - 
+Ericsson.” [Online]. Available: 
+https://www.ericsson.com/en/reports-and-papers/research-
+papers/the-future-carbon-footprint-of-the-ict-and-em-sectors. 
+[Accessed: 02-Jun-2021]. 
+[12] D. Davcev, K. Mitreski, S. Trajkovic, V. Nikolovski, and N . 
+Koteli, “IoT agriculture system based on LoRaWAN,” in IEEE 
+International Workshop on Factory Communication Systems - 
+Proceedings, WFCS, 2018, vol. 2018-June, pp. 1–4. 
+0
+1
+2
+3
+4
+5
+0
+200000
+400000
+600000
+800000
+1000000
+EE-AIOT-EFC Traditional-Cloud
+Gap (%) 
+Power Consumption (W)
+MILP Heuristic Gap
+
+--- Page 13 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+13 
+ 
+[13] “The Connected Farm - A Smart Agriculture Market Assessment 
+- Industry insights in Huawei.” [Online]. Available: 
+https://www.huawei.com/en/technology-insights/industry-
+insights/outlook/mobile-broadband/xlabs/insights-
+whitepapers/smart agriculture. [Accessed: 02-Jun-2021]. 
+[14] T. Nguyen Gia, L. Qingqing, J. Pena Queralta, Z. Zou, H . 
+Tenhunen, and T. Westerlund, “Edge AI in Smart Farming IoT: 
+CNNs at the Edge and Fog Computing with LoRa,” in IEEE 
+AFRICON Conference, 2019, vol. 2019-September. 
+[15] L. Huawei Technologies Co., “The Connected Farm,” 2017. 
+[16] Y. Zhang, P. Chowdhury, M. Tornatore, and B. Mukherjee, 
+“Energy Efficiency in Telecom Optical Networks,” IEEE 
+Commun. Surv. TUTORIALS, vol. 12, no. 4, pp. 441–458, 2010. 
+[17] G. Shen and R. S. Tucker, “Energy-Minimized Design for IP Over 
+WDM Networks,” J. Opt. Commun. Netw. , vol. 1, no. 1, p. 176 , 
+2009. 
+[18] B. W. Ang and B. Su, “Carbon emission intensity in electricity 
+production: A global analysis,” Energy Policy, vol. 94, pp. 56–63, 
+2016. 
+[19] M. Pehl, A. Arvesen, F. Humpenöder, A. Popp, E. G. Hertwic h , 
+and G. Luderer, “Understanding future emi ssions from low-
+carbon power systems by integration of life-cycle assessment and 
+integrated energy modelling,” Nat. Energy , vol. 2, no. 12, pp. 
+939–945, Dec. 2017. 
+[20] “Cisco Wireless Gateway for LoRaWAN Data Sheet - Cisco.” 
+[Online]. Available: 
+https://www.cisco.com/c/en/us/products/collateral/se/internet-of-
+things/datasheet-c78-737307.html. [Accessed: 29-May-2021]. 
+[21] T. Bouguera, J. F. Diouris, J. J. Chaillout, R. Jaouadi, and G . 
+Andrieux, “Energy consumption model for sensor nodes based on 
+LoRa and L oRaWAN,” Sensors (Switzerland) , vol. 18, no. 7, p. 
+2104, Jul. 2018. 
+[22] J. Sahoo and K. Barrett, “Internet of Things (IoT) Application 
+Model for Smart Farming,” in Conference Proceedings - IEEE 
+SOUTHEASTCON, 2021, vol. 2021-March. 
+[23] A. Brogi, S. Forti, and A. Ibrahim, “Deploying Fog Applications: 
+How Much Does It Cost, By the Way?” 
+[24] S. Tuli, S. Ilager, K. Ramamohanarao, and R. Buyya, “Dynamic 
+Scheduling for Stochastic Edge-Cloud Computing Environments 
+using A3C learning and Residual Recurrent Neural Networks,” 
+IEEE Trans. Mob. Comput., pp. 1–1, Aug. 2020. 
+[25] C. C. Scale et al., “Cisco Nexus 9300-EX and 9300-FX Platform 
+Switches,” vol. 28, no. Figure 1, pp. 1–11, 2017. 
+[26] Cisco, “Cisco Network Convergence System 5500 Series Data 
+Sheet,” pp. 1–11, 2019. 
+[27] A. Shehabi et al. , “United States Data Center Energy Usage 
+Report,” 2016. 
+[28] Cisco System, “Cisco CRS-1 4-Slot Single-Shelf System,” 2014. 
+[29] Cisco System, “Cisco ONS 15454 40 Gbps CP -DQPSK Full C-
+Band Tuneable Transponder Card.” 
+[30] “Intelligent Optical System 600,” Glimmerglass, 2013. [Online]. 
+Available: http://www.glimmerglass.com/ products/intelligent-
+optical-systems/. [Accessed: 16-Mar-2017]. 
+[31] Cisco Systems, “Cisco ONS 15501 Erbium Doped Fiber 
+Amplifier.” [Online]. Avail able: 
+http://www.lyme.com/sw/swchannel/images/ProductCatalog/Pro
+ductPage/File/ons15_ds.pdf. 
+[32] A. Q. Lawey, T. E. H. El-Gorashi, and J. M. H. Elmirgha ni, 
+“Distributed energy efficient clouds over core networks,” J. Light. 
+Technol., vol. 32, no. 7, pp. 1261–1281, 2014. 
+[33] ZTE CORPORATION, “ZXA10 C300 Hardware Description,” 
+2013. [Online]. Available: 
+http://enterprise.zte.com.cn/en/products/network_lnfrastructure/b
+roadband_access/xpon_onu/201312/t20131209_414454.html. 
+[Accessed: 15-Mar-2017]. 
+[34] S. Schlomer et al. , “Annex III: Technology -Specific Cost and 
+Performance Parameters,” Clim. Chang. 2014 Mitig. Clim . 
+Chang. Contrib. Work. Gr. III to Fifth Assess. Rep. Intergov. 
+Panel Clim. Chang. , pp. 1329–1356, 2014. 
+[35] National Grid, “Carbon Intensity Forecast Methodology,” 2019. 
+[Online]. Available: http://carbonintensity.org.uk/. [Accessed: 
+12-Aug-2018]. 
+[36] “Zigbee - Zigbee Alliance.” [Online]. Available: 
+https://zigbeealliance.org/solution/zigbee/. [Accessed: 29-May-
+2021]. 
+[37] A. Y. Mulla, J. J. Baviskar, F. S. Kazi, and S. R. W agh, 
+“Implementation of ZigBee/802.15.4 in Smart Grid 
+communication and analysis of power consumption: A case 
+study,” in 11th IEEE India Conference: Emerging Trends and 
+Innovation in Technology, INDICON 2014, 2015. 
+[38] “LoRa and LoRaWAN: Technical overview | DEVELOPER 
+PORTAL.” [Online]. Available: https://lora -
+developers.semtech.com/library/tech-papers-and-guides/lora-
+and-lorawan. [Accessed: 29-May-2021]. 
+[39] R. S. Sinha, Y. Wei, and S. H. Hwang, “A survey on LPWA 
+technology: LoRa and NB- IoT,” ICT Express , vol. 3, no. 1. 
+Korean Institute of Communications Information Sciences, pp. 
+14–21, 01-Mar-2017. 
+[40] “5G base stations use a lot more energy than 4G base stations: 
+MTN | FierceWireless.” [Online]. Available: 
+https://www.fiercewireless.com/tech/5g-base-stations-use-a-lot-
+more-energy-than-4g-base-stations-says-mtn. [Accessed: 29-
+May-2021]. 
+[41] S. Duhovnikov, A. Baltaci, D. Gera, and D. A. Schupke, “Power 
+Consumption Analysis of NB-IoT Technology for Low-Power 
+Aircraft Applications,” in IEEE 5th World Forum on Internet of 
+Things, WF-IoT 2019 - Conference Proceedings, 2019, pp. 719 –
+723. 
+[42] “5G vs 4G: what’s the difference? | Thales Group.” [Online]. 
+Available: https://www.thalesgroup.com/en/worldwide-digital-
+identity-and-security/mobile/magazine/5g-vs-4g-whats-
+difference. [Accessed: 29-May-2021]. 
+[43] “4g Gprs Wall Mounted Temperature And Humidity Transmitter 
+.” [Online]. Available: https://www.alibaba.com/product -
+detail/4g-GPRS-wall-mounted-temperature-
+and_60822619801.html. [Accessed: 29-May-2021]. 
+ 
+ 
+Hatem A. Alharbi received the B.Sc. degree in 
+Computer Engineering (Hons.) from Umm Alqura 
+University, Makkah, Saudi Arabia in 2012, the 
+M.Sc. degree in Digital communication networks 
+(with distinction) in 2015, and the PhD degree in 
+communication networks in 2020, from the 
+University of Leeds, Leeds, UK. Dr. Alharbi is 
+currently an assistant professor in Computer 
+Engineering Department in the School of 
+Computer Science and Engineering, University of 
+Taibah, Saudi Arabia. His research interests are in 
+energy efficient fog and cloud networks and network economics. 
+ 
+ 
+MOHAMMAD ALDOSSARY received his B.Sc . 
+degree in Computer Science from King Saud 
+University, Riyadh, Saudi Arabia in 2009 and the 
+M.S. degree in Computer Science from Southern 
+Polytechnic State University, Georgia, USA in 
+2013. He was awarded a Ph.D. degree in Computer 
+Science from the University of Leeds, UK, in 2019. 
+His main research areas focus on Distributed 
+Systems, including Cloud Computing, Fog 
+Computing, Edge Computing, Internet of Things, 
+System Architectures, Resource Management, and 
+Energy Efficiency. Dr Aldossary is currently an 
+assistant professor in the Computer Science department at Prince Sattam bin 
+Abdulaziz University, Saudi Arabia.

@@ -1,0 +1,380 @@
+--- Page 1 ---
+
+ International Journal of Engineering Applied Sciences and Technology, 2020 
+ Vol. 4, Issue 12, ISSN No. 2455-2143, Pages 24-27 
+ Published Online April 2020 in IJEAST (http://www.ijeast.com) 
+ 
+24 
+ 
+MACHINE LEARNING APPLICATIONS IN IOT 
+BASED AGRICULTURE AND SMART 
+FARMING: A REVIEW
+ 
+ M.W.P Maduranga Ruvan Abeysekera 
+ IIC University of Technology IIC University of Technology 
+ No 650, NR2, Phnom Penh, Cambodia No 650, NR2, Phnom Penh, Cambodia 
+ 
+Abstract— the Internet of Things (IoT) technology has 
+revolutionized every aspect of everyday life by making 
+everything smarter. Among the vast range of IoT 
+applications, IoT based smart agriculture has fascinated 
+many researchers and has used Machine Learning(M L) 
+and IoT technologies to conduct innovative researches. IoT 
+based data-driven farm management techniques can help 
+increase agricultural yields by planning input costs, 
+reducing losses, and using resources more efficiently. The 
+IoT generates big amount da ta with different 
+characteristics based on location and time. To improve 
+productivity of agriculture through intelligent farm 
+management, the data analyzing must be well analyzed 
+and processed. High-performance computing capability in 
+ML opens up new oppor tunities for data -intensive science 
+as the amount of data collected increases; ML algorithms 
+could be applied to further enhance application 
+intelligence and functionality. In this article we review 
+existing approaches have been made to the smart 
+agriculture and farming based on IoT and ML separately. 
+Also we propose novel concepts that how can ML -IoT can 
+be blended in such applications. 
+Keywords— Internet of Things (IoT), Machine Learning (ML), 
+Machine Learning in IoT(MLIoT), Smart Agriculture, Smart 
+Farming. 
+I. INTRODUCTION 
+The Internet of Things focuses on automating processes by 
+reducing human-human interaction. In the automation process, 
+the IoT uses electronic sensors to collect data, the controller 
+processes the data, and the actuators complete the auto mation 
+process. The focus of the IoT in agriculture is to automate all 
+aspects of agriculture and agricultural methods to make the 
+process quite efficient. Traditional methods of yield 
+management, livestock management, weed management, soil 
+management, wat er management, plant management and 
+animal tracking are not fully automated and inefficient, 
+including increased human interaction, increased labor costs 
+and increased power consumption. Many researchers have 
+focused on intelligent systems that monitor and control 
+agricultural parameters by increasing productivity and 
+efficiency. Intelligent systems collect data for measurements 
+and get accurate results which can take the appropriate action. 
+Current uses of smart farming systems include collecting data 
+on e nvironmental parameters such as soil moisture level, 
+humidity, temperature, and pH levels. ML is a new way of 
+computing intelligence using machines. A vast range of ML 
+applications are also exist on smart agriculture and farming. 
+Yield prediction, water ma nagement ,live stock management 
+are the few example for application of ML in this field. Its 
+observed that there are various researches have been done for 
+smart agriculture in IoT and ML individually. In this research 
+we review those solutions and propose how ML and IoT blend 
+for better and precision agriculture [1] [2] [3]. 
+II. AGRICULTURAL IOT 
+Structures for IoT based agriculture have been introduced in 
+several research papers [4] [5]. In generally, in an IoT 
+solution, each sensor mote includes a microcontroller, multiple 
+types of sensors (from simple temperature sensors to cameras), 
+actuators, and wireless interfaces. These wireless interfaces 
+could be WiFi, LoRaWAN, Zigbee etc. A local WSN gateway 
+sends data through an Internet gateway and forms the network 
+layer. To understand the data collected by the service tier, you 
+need to perform data processing such as data visualization, 
+data analysis, data storage, and protection. Ultimately, the 
+application layer is the most important part here, allowing end 
+users to control and monitor various processes in the farm and 
+make important decisions based on forecasts, market trends. 
+IoT-based agriculture has resulted in a variety of data 
+generated from various sources on and around agricultural 
+farms, in the form of vo ltage values to images, actuator states 
+to robot positions. Quality data leads to quality and accurate 
+information. Without having quality information, you won’t 
+be able to create predictive models using ML algorithms. 
+Applying ML algorithms to these improved datasets allows for 
+better analysis and accurate predictions. The IoT can easily 
+collect and manage large amounts of data collected from 
+sensors and integrate cloud computing services such as 
+agricultural maps and cloud storage. Real -time data access 
+from anywhere, anytime, enabling real -time monitoring and 
+end-to-end connectivity between all parties [6] 
+
+--- Page 2 ---
+
+ International Journal of Engineering Applied Sciences and Technology, 2020 
+ Vol. 4, Issue 12, ISSN No. 2455-2143, Pages 24-27 
+ Published Online April 2020 in IJEAST (http://www.ijeast.com) 
+ 
+25 
+ 
+III. MACHINE LEARNING APPLICATIONS IN IOT 
+BASED AGRICULTURE 
+Machine learning (ML) could be consider as a novel way for 
+machines to simulate humans le arning activities, gain new 
+knowledge, continually improve performance, and ac hieve 
+unique maturity. In past few years, ML has been very 
+successful in algorithms, theories, and applications, combined 
+with other agricultural techniques to minimize crop cost s and 
+maximize yield. ML applications on agricultural farms can be 
+widely used in areas such as disease detection, crop detection, 
+irrigation planning, soil conditions, weed detection, crop 
+quality, and weather forecasting. ML for analyzing the 
+freshness of produce can be found after harvest (Freshness of 
+fruits and vegetables), Shelf life, Product quality, Market 
+analysis etc. ML application in IoT based agriculture could be 
+based on main ML algorithms such as support vector machine 
+(SVM), naive Bayes, di scriminant analysis, K -nearest 
+neighbor, , K -means clustering, fuzzy clustering, Gaussian 
+mixture models, artificial neural networks (ANN), decision 
+making and deep learning [7],[8],[9].[10]. 
+ 
+A. Plant Management 
+Hybrid of ML and the IoT provides appropriate and 
+controllable environment for growing crops through 
+greenhouse technology. However, the spatio -temporal 
+variability of crop growth environmental parameters and their 
+mutual effects in protected agriculture make it difficult for 
+traditional agriculture and environmental regulations to adapt 
+to the growth of different types of plants at different stages of 
+growth. Therefore, higher accuracy is needed from a 
+monitoring and control perspective. Many works existing on 
+designing and testing types of monitoring and control systems 
+for adjusting temperature and humidity, brightness, CO2 
+concentration and other environmental parameters for the 
+Internet of Things, technical an d economic results. It is 
+proposed that controlling the environment conditions for a 
+specific type of plant can be controlled through IoT, sensors 
+and actuators. Here the rules of controlling condition can done 
+according to a Artificial Neural Network(ANN) setup at IoT 
+cloud. [11] [12] [13] 
+ 
+B. Crop and Yield Management 
+ML based y ield mapping could apply in farms based on 
+collected data over IoT network through yield monitoring 
+connected through GPS. The collected date which reveals the 
+yield details will be mapped based on the types of farm land. 
+Apart from that, ML systems together with IoT c an use to 
+predict and improve the yields in agriculture. Farmers rely 
+mainly on agricultural experts to make decisions. Farmers and 
+others use these systems without any knowledge of computer 
+use. ML system can be used for crop production. This is a 
+knowledge building system that generates information using 
+existing knowledge. This enables farmers to make 
+economically sound crop management decisions. Various such 
+systems have been developed in view of the success of expert 
+systems. The Internet of Things pla ys an important role in 
+agriculture. Related works shows that ML systems can be built 
+on the IoT and can make recommendations on the use of input 
+data collected in real time [14] [15] 
+ 
+C. Soil Management 
+Several ML -based approaches can be applied to soil 
+management. Soil data can be collected from wireless sensor 
+nodes deployed on site. The n, collected data can be fed into 
+ML algorithms to predict and analyze soil properties or 
+classify the types of soil using supervised ML algorithms. 
+Moreover most commonl y used ML algorithms, K-nearest 
+neighbor, support vector regression (SVR), Naive Bayes, etc. 
+can be use to predict soil dryness based on precipitation and 
+evaporative hydrology data [16] [17] [18] 
+ 
+D. Diseases Management 
+Blended ML and IoT can be used to id entify and manage 
+diseases in agricultural fields. ML methods further stimulate 
+appropriate pesticides to protect crops from these infections 
+and reduce labor. Such system assists producers by obtaining 
+statistics and planning fertilizers, pesticides and i rrigation 
+accordingly. By accurately identifying the disease and 
+providing accurate pesticide application and irrigation 
+schemes, grape visibility and volume have been increased and 
+extreme pesticide use reduced. Furthermore, architecture with 
+deep learning methods for identifying and classifying speech 
+steps of various plants. The audio steps at these factories are 
+based on real -time captured visual information and travel 
+through different areas of the farm via IoT -based camera 
+sensor nodes deployed in crop field [19] [20]. 
+ 
+E. Weed Management 
+Weed management is essentials for any farming. Weed 
+mapping through ML has been investigated [21] [22]. To 
+optimize this, we propose unmanned flying machine to take 
+images and map weed in a field. Where flying machine can be 
+control through an IoT network. Advanced IoT technologies 
+such as NB -IoT can use to handle and manipulate large 
+amount of data. 
+ 
+F. Water Management 
+Several systems have been implement on controlling water 
+supply for a agriculture field as well as ana lyzing the water 
+quality using ML [23] [24]. It can be develop intelligent 
+systems that detect ground parameters such as soil moisture, 
+soil temperature, and environmental con ditions using IoT 
+sensors. Then, use the same data to predict outdoor relative 
+humidity. In addition, we can use hybrid machine learning and 
+
+--- Page 3 ---
+
+ International Journal of Engineering Applied Sciences and Technology, 2020 
+ Vol. 4, Issue 12, ISSN No. 2455-2143, Pages 24-27 
+ Published Online April 2020 in IJEAST (http://www.ijeast.com) 
+ 
+26 
+ 
+IoT systems to control water temperature and adjust to 
+ambient temperature in intelligent way. 
+ 
+G. Animal Tracking 
+Animal tracking of an agriculture field is really important. 
+Several researches have been made on tracking animals using 
+IoT based sensors, and separate researches are carried on 
+animal type classification [25] [26]. Together IoT and ML 
+solution could solve this problem efficiency. Sensing the 
+presence of an animal can be detected thro ugh IoT sensors. 
+Traced animal can be classified and or else can study their 
+living patterns, movements using ML techniques 
+IV. SUMMERY 
+IoT-ML based agriculture is the next evolutional thing in 
+smart agricultural and smart farming. Applying ML 
+algorithms to data generated from various inputs from farms 
+with the help of the agricultural IoT can make the system 
+smarter and provide definitive information and make 
+predictions. In this study, we analyze existing ML applications 
+in agriculture, from process to re sults, each with its own 
+strengths and weaknesses. Later, because most ML 
+applications needed real -time data to train predictive 
+algorithms, suggestions were made to implement new 
+applications on the IoT. Farm management systems are 
+evolving into reality b y applying machine learning to sensor 
+data Artificial intelligence (AI) system that provides richer 
+suggestions and insights for subsequent work decisions and 
+actions with a range of final production improvements. In the 
+future, this range will be expect and enable wider use of ML models. 
+V. REFERENCES 
+[1] M. Popa, O. Prostean ,and A.S. Popa, (2019) Machine 
+Learning Approach for Agricultural IoT In Proc. 
+International Journal of Recent Technology and 
+Engineering (IJRTE),(pp 22-29) 
+[2] Medela, et al. (2013 ) IoT Multipl atform networking to 
+monitor and control wineries and vineyards. In: Future 
+Network and Mobile Summit,” IEEE,( pp. 1–10) 
+[3] Mohammad Saeid Mahdavinejad, et al (2018) Machine 
+learning for internet of t hings data analysis: a survey in 
+proc. Digital Communicatio ns and Network, (pp, 161 –
+175) 
+[4] Andreas Kamilaris, et al.(2016) Agri-IoT: A Semantic 
+Framework for Internet of Things-enabled Smart Farming 
+Applications,” European Union. 
+[5] Prem Prakash Jayaraman, et al., (2018) Internet of Things 
+Platform for Smart Farming: E xperiences and Lessons 
+Learnt,in proc Sensors, (pp 16, 1884) 
+[6] Castelli, Mauro, et al., (2018) Supervised Learning: 
+Classification, Ref erence Module in Life Sciences,in 
+proc. Elsevier. 
+[7] R. L. F. Cunha, B. Silva and M. A. S. Netto, (2018) A 
+Scalable Machine Lea rning System for Pre -Season 
+Agriculture Yield Forecast," 2018 IEEE 14th 
+International Conference on e -Science (e -Science), 
+Amsterdam, 2018, (pp. 423-430). 
+[8] S. Dimitriadis and C. Goumopoulos, (2008)"Applying 
+Machine Learning to Extract New Knowledge in 
+Precision Agriculture Applications," 2008 Panhellenic 
+Conference on Informatics, Samos, 2008, (pp. 100-104). 
+[9] T. Siddique, D. Barua, Z. Ferdous and A. Chakrabarty, 
+"Automated farming prediction,( 2017 ) Intelligent 
+Systems Conference (IntelliSys), London, 2017, (pp. 757-
+763). 
+[10] M. T. Shakoor, K. Rahman, S. N. Rayta and A. 
+Chakrabarty, 2017 Agricultural production output 
+prediction using Supervise d Machine Learning 
+techniques, 1st International Conference on Next 
+Generation Computing Applications (NextComp ), 
+Mauritius, ( pp. 182-187). 
+[11] M. V. Ramesh et al. (2017), "Water quality monitoring 
+and waste management using IoT," 2017 IEEE Global 
+Humanitarian Technology Conference (GHTC), San Jose, 
+CA, (pp. 1-7) 
+[12] C. J. G. Aliac and E. Maravillas, (2018) "IOT 
+Hydroponics Managemen t System," 2018 IEEE 10th 
+International Conference on Humanoid, Nanotechnology, 
+Information Technology,Communication and Control, 
+Environment and Management (HNICEM) , Baguio City, 
+Philippines, (pp. 1-5). 
+[13] R. N. Rao and B. Sridhar, (2018) "IoT based smart cr op-
+field monitoring and automation irrigation system," 2018 
+2nd International Conference on Inventive Systems and 
+Control (ICISC), Coimbatore, 2018, pp. 478-483. 
+[14] A. A. Araby et al., "Smart IoT Monitoring System for 
+Agriculture with Predictive Analysis," 20 19 8th 
+International Conference on Modern Circuits and Systems 
+Technologies (MOCAST), Thessaloniki, Greece, 2019 ,( 
+pp. 1-4) 
+[15] S. Dimitriadis and C. Goumopoulos, (2008 ) Applying 
+Machine Learning to Extract New Knowledge in 
+Precision Agriculture Applications," 2008 Panhellenic 
+Conference on Informatics, Samos, ( pp. 100-104) 
+[16] O. Pandithurai, S. Aishwarya, B. Aparna and K. 
+Kavitha,(2017) "Agro-tech: A digital model for 
+monitoring soil and crops using internet of things (IOT)," 
+In proc. 2017 Third International Co nference on Science 
+Technology Engineering & Manage ment (ICONSTEM), 
+Chennai, (pp. 342-346) 
+[17] N. Ananthi, J. Divya, M. Divya and V. Janani, (2017) IoT 
+based smart soil monitoring system for agricultural 
+production," 2017 IEEE Technological Innovations in 
+ICT f or Agriculture and Rural De velopment (TIAR), 
+Chennai, ( pp. 209-214) 
+
+--- Page 4 ---
+
+ International Journal of Engineering Applied Sciences and Technology, 2020 
+ Vol. 4, Issue 12, ISSN No. 2455-2143, Pages 24-27 
+ Published Online April 2020 in IJEAST (http://www.ijeast.com) 
+ 
+27 
+ 
+[18] S. Athani, C. H. Tejeshwar, M. M. Pa til, P. Patil and R. 
+Kulkarni, (2017) Soil moisture monitoring using IoT 
+enabled arduino sensors with neural networks for 
+improving soil management for farmers and predict 
+seasonal rainfall for planning future harvest in North 
+Karnataka — India," 2017 International Conference on I -
+SMAC (IoT in Social, Mobile, Analytics and Cloud) (I-
+SMAC), Palladam, ( pp. 43-48) 
+[19] A. Adedoja, P. A. Owolawi and T. Mapayi, (2019) Deep 
+Learning Based on NASNet for Plant Disease 
+Recognition Using Leave Images," 2019 International 
+Conference on Advances in Big Data, Computing and 
+Data Communication Systems (icABCD) , Winterton, 
+South Africa, ( pp. 1-5). 
+[20] N. Materne and M. Inoue, (2018) IoT Monitoring System 
+for Early Detection of Agricultural Pests and Diseases," 
+2018 12th South East Asian Technical University 
+Consortium (SEATUC), Yogyakarta, Indonesia, (pp. 1-5). 
+[21] M. Pérez -Ortiz, P. A. Gutiérrez, J. M. Peña, J. Torres -
+Sánchez, F. Ló pez-Granados and C. Hervás -Martínez, 
+"Machine learning paradigms for weed mapping via 
+unmanned aerial vehicles," 2016 IEEE Symposium Series 
+on Computational Intelligence (SSCI), Athens, 2016, pp. 
+1-8.. 
+[22] [22] S. T., S. T., S. G. G.S., S. S. and R. Kumaraswam y, 
+"Performance Comparison of Weed Detection 
+Algorithms," 2019 International Conference on 
+Communication and Signal Processing (ICCSP), Chennai, 
+India, 2019, pp. 0843-0847. 
+[23] [23] Y. Khan and C. S. See, "Predicting and analyzing 
+water quality using Machine L earning: A comprehensive 
+model," 2016 IEEE Long Island Systems, Applications 
+and Technology Conference (LISAT), Farmingdale, NY, 
+2016, pp. 1-6. 
+[24] [24] M. R. Machado, T. R. Júnior, M. R. Silva and J. B. 
+Martins, "Smart Water Management System using the 
+Microcontroller ZR16S08 as IoT Solution," 2019 IEEE 
+10th Latin American Symposium on Circuits & Systems 
+(LASCAS), Armenia, Colombia, 2019, pp. 169-172. 
+[25] [25] L. Nóbrega, A. Tavares, A. Cardoso and P. 
+Gonçalves, "Animal monitoring based on IoT 
+technologies," 2018 IoT Vertical and Topical Summit on 
+Agriculture - Tuscany (IOT Tuscany), Tuscany, 2018, pp. 
+1-5. 
+[26] [26] H. Yousif, J. Yuan, R. Kays and Z. He, "Fast human -
+animal detection from highly cluttered camera -trap 
+images using joint background modeling and deep 
+learning classification," 2017 IEEE International 
+Symposium on Circuits and Systems (ISCAS), Baltimore, 
+MD, 2017, pp. 1-4

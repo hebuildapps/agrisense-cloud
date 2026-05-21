@@ -1,0 +1,7 @@
+{
+  "/Producer": "PyPDF2",
+  "/Title": "Machine learning applications in iot based agriculture and smart farming: a review",
+  "/Author": "M.W.P. Maduranga, Ruvan Abeysekera",
+  "/Subject": "the Internet of Things (IoT) technology has revolutionized every aspect of everyday life by making everything smarter. Among the vast range of IoT applications, IoT based smart agriculture has fascinated many researchers and has used Machine Learning(ML) and IoT technologies to conduct innovative researches. IoT based data-driven farm management techniques can help increase agricultural yields by planning input costs, reducing losses, and using resources more efficiently. The IoT generates big amount data with different characteristics based on location and time. To improve productivity of agriculture through intelligent farm management, the data analyzing must be well analyzed and processed. High-performance computing capability in ML opens up new opportunities for data-intensive science as the amount of data collected increases; ML algorithms could be applied to further enhance application intelligence and functionality. In this article we review existing approaches have been made to the smart agriculture and farming based on IoT and ML separately. Also we propose novel concepts that how can ML-IoT can be blended in such applications. Keywords— Internet of Things (IoT), Machine Learning (ML), Machine Learning in IoT(MLIoT), Smart Agriculture, Smart Farming.",
+  "/Keywords": "10 May 2020"
+}

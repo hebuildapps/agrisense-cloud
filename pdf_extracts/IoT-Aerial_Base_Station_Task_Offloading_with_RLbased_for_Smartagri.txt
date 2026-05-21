@@ -1,0 +1,1477 @@
+--- Page 1 ---
+
+arXiv:2209.07382v1 [cs.NI] 15 Sep 2022
+1
+IoT-Aerial Base Station Task Ofﬂoading with
+Risk-Sensitive Reinforcement Learning for Smart
+Agriculture
+Turgay Pamuklu†, Member , IEEE, Anne Catherine Nguyen †, Aisha Syed ‡,
+W. Sean Kennedy ‡, Melike Erol-Kantarci †, Senior Member , IEEE
+†School of Electrical Engineering and Computer Science, Uni versity of Ottawa , Ottawa, Canada
+‡Artiﬁcial Intelligence Research Lab, Nokia Bell Labs, Murr ay Hill, NJ, USA
+Emails:{turgay.pamuklu, anguy087, melike.erolkantarci }@uottawa.ca,
+{aisha.syed, william.kennedy }@nokia-bell-labs.com
+Abstract—Aerial base stations (ABSs) allow smart farms to
+ofﬂoad processing responsibility of complex tasks from int ernet
+of things (IoT) devices to ABSs. IoT devices have limited ene rgy
+and computing resources, thus it is required to provide an
+advanced solution for a system that requires the support of A BSs.
+This paper introduces a novel multi-actor-based risk-sens itive
+reinforcement learning approach for ABS task scheduling fo r
+smart agriculture. The problem is deﬁned as task ofﬂoading
+with a strict condition on completing the IoT tasks before
+their deadlines. Moreover , the algorithm must also conside r the
+limited energy capacity of the ABSs. The results show that ou r
+proposed approach outperforms several heuristics and the c lassic
+Q-Learning approach. Furthermore, we provide a mixed integ er
+linear programming solution to determine a lower bound on
+the performance, and clarify the gap between our risk-sensi tive
+solution and the optimal solution, as well. The comparison p roves
+our extensive simulation results demonstrate that our meth od is
+a promising approach for providing a guaranteed task proces sing
+services for the IoT tasks in a smart farm, while increasing t he
+hovering time of the ABSs in this farm.
+Index Terms —Energy Efﬁcient Computation Ofﬂoad, Un-
+manned aerial vehicle (UA V), Aerial base station (ABS), Sma rt
+farm, Risk-Sensitive Reinforcement Learning, Internet of Things
+(IoT).
+I. I NTRODUCTION
+Agriculture is sensitive to environmental changes and even
+slight changes can alter the outcome of the crops or livestoc k.
+Smart farms use Internet of Things (IoT) sensors, such as
+cameras, to monitor such environmental changes. The sensor s
+can capture images to monitor the status of hundreds of acres
+of land. We can then use the captured images and image
+recognition techniques to extract valuable information ab out
+the status of the farm such as, the presence of ﬁre, the presen ce
+of pests, and the growth rate of the crops and livestock. Jhur ia
+et al. trained neural networks to recognize certain disease s
+on crops during the growing process [1]. Dhumale et al.
+introduced a robot that captures images of crops, and use
+image processing techniques to detect pests and diseases on
+the crops, and spray the appropriate crops with pesticide [2 ].
+IoT cameras have become essential wireless sensors for smar t
+agriculture and precision farming because they provide rea l-
+time information on the status of the farm and they relay that
+information to a central location. With IoT sensors, farmer s
+now have the capability to monitor multiple acres of land fro m
+one location and provide precise care to their farm.
+Image processing is an intensive task and the central pro-
+cessing units on the IoT sensors may not have the capacity
+to perform such intensive tasks. In addition, some image
+processing tasks can be time-sensitive such as ﬁre detectio n.
+In such circumstances, we can make use of aerial base
+stations (ABS) that can connect the sensors to much more
+powerful computational resources. The ABSs equipped with
+computational units can perform the tasks themselves, or re lay
+the tasks to a nearby multi-access edge computing (MEC)
+device. This enables the task to be done before the deadline.
+Because the ABSs are hovering above large remote farm-
+lands, they must be battery operated. As previously mention ed,
+image processing tasks are computationaly intensive and wi ll
+require large amounts of power. If the ABS does too many
+tasks, it can shorten the longevity of the ABS’ operation
+time. On the other hand, without the ABS, the IoT sensors
+cannot send their tasks and the sensor network is no longer
+operational. Therefore, we aim to extend the longevity of th e
+battery life of the ABSs. However, if the ABS does not perform
+any tasks in order to conserve its energy, the MEC device
+would have to do all of the tasks, then the tasks may not
+be able to meet their deadline. This may lead to detrimental
+consequences such as signiﬁcant loss of farmland due to a
+slow ﬁre detection. Therefore the network needs to have a
+decision making process that considers both the time-criti cal
+nature of the image processing tasks, as well as controlling the
+energy consumption of the ABSs in order to maximize their
+longevity.
+Every decision comes with tradeoffs, especially in a system
+with multiple objectives. The network’s decision making al go-
+rithm must decide which resources will process the task base d
+on several factors such as the ABS’ current energy level, and
+the deadline of the task. It must also prioritize between the two
+objectives, the ABS network’s longevity, or the potential c osts
+of not meeting the deadline. But, missing the image processi ng
+tasks’ deadlines potentially can have damaging consequenc es,
+therefore the decision making process must also evaluate th e
+risk of each possible outcome and select the optimal decisio ns
+that will minimize the risk.
+Accepted Paper. DOI:10.1109/TGCN.2022.3205330. IEEE pol icy provides that authors are free to follow funder public ac cess mandates to post accepted articles in repositories.
+When posting in a repository, the IEEE embargo period is 24 mo nths. However, IEEE recognizes that posting requirements a nd embargo periods vary by funder. IEEE authors
+may comply with requirements to deposit their accepted manu scripts in a repository per funder requirements where the em bargo is less than 24 months.
+
+--- Page 2 ---
+
+2
+Growth
+Tracking
+Fig. 1: Illustration of the proposed smart farm.
+A. Main Contributions
+Machine learning is a promising approach for solving wire-
+less network optimization problems [3]–[5]. In our previou s
+study, we presented a Q-Learning solution for a joint task-
+oriented delay-aware ofﬂoading as well as increased ABS
+hovering time [6]. Following our prior work, in this paper, w e
+propose a risk-sensitive reinforcement learning (RL) appr oach
+to guarantee that deadlines will be met for IoT devices in
+our smart farm network. By using this method, we isolate
+the constraints from the other KPIs, and dynamically change
+the weight of the KPIs while training the model. The results
+reported in this paper prove that our risk-sensitive method
+signiﬁcantly reduces the number of deadline violations and
+constrains it to a speciﬁc threshold. To the best of our
+knowledge, the multi-agent-based risk-sensitive RL metho d is
+proposed for the ﬁrst time for a constrained MDP problem in
+this paper. Our contributions can be summarized as follows:
+1) We solved a constrained MDP problem by modifying the
+training phase of a machine learning (ML) algorithm for
+an aerial base station (ABS)-supported smart farm envi-
+ronment. We created a Q-table that is trained separately
+from the other objectives in the problem. Therefore,
+we could have determined the borders of a risky task-
+oriented constraint and adaptively changed the direction
+of the learning process by considering the threshold of
+this constraint.
+2) We implemented this method with a multi-agent RL
+approach. Thus, this method can address larger networks
+due to the scalability capability of this approach for this
+risk-sensitive-based problem.
+3) We provided an upper-bound analysis with a MILP
+Solver. Therefore, we evaluated our RL approach with
+the different weights for our multi-objective NP-Hard
+problem.
+4) We accomplished several stress tests on the proposed so-
+lution. Thus, we analyzed the robustness of the proposed
+method in cases of unexpected changes in the smart farm
+environments.
+The rest of the article is organized as follows. The related
+work is discussed in Section II. Then, in Section III we
+describe our smart farm model and its problem deﬁnition.
+Section IV details the risk-sensitive RL approach, and Sect ion
+V provides the detailed results of this approach. Finally, i n
+Section VI, we conclude the paper.
+II. R ELATED WORKS
+In one of the recent unmanned aerial vehicle (UA V) based
+studies, Liao et al. decomposed their task ofﬂoading and
+resource allocation problems into two subproblems [7]. The n,
+they solved these two problems separately with an actor-cri tic-
+based learning algorithm and a heuristic algorithm. As a res ult,
+they demonstrated that their proposed method reduces queui ng
+delay more than their referenced solutions. A similar probl em
+is addressed in [8] using the successive convex approximati on
+method. The task-oriented guaranteed delay is a main object ive
+in our paper, and Zhao et al. also focused on this guaranteed
+delay problem [9]. However, they preferred the relaxation
+techniques to solve this hard-constrained problem. Khairy et
+al. also used Lagrangian relaxation for the constraints in t heir
+UA V -based communication problem [10]. Next, they solved
+this dual problem with a deep RL algorithm. Ghdiri et al.
+have a distinctive study that also targets the task deadline and
+the limited UA V battery problems [11]. However, their aim
+was to ﬁnd the optimum cluster heads’ locations and UA V
+trajectory planning. Zhang et al. also aimed at the trajecto ry
+planning problem and addressed it by proposing a Safe-DQN
+solution [12].
+Y ang et al. minimized the total energy consumption of
+UEs and UA Vs in their wireless network [13]. They have
+proposed several heuristics for different subproblems of t heir
+main nonconvex problem. Another heuristic solution for a
+UA V network was suggested by Xu et al., where the authors
+optimized a broad number of critical decisions [14]. As an
+alternative for heuristic approaches, Y ao et al. introduce d a
+game-theoretic solution for resource allocation and the ch annel
+access problem [15]. They provided a promising method in
+terms of reducing the total energy consumption in their pro-
+posed network. Another energy-efﬁcient solution is propos ed
+in [16], where UA Vs process and relay cell-edge users’ tasks .
+Risk-sensitive RL has attracted attention in recent wirele ss
+networks papers due to its promising performance to solve
+constrained problems. Khalifa et al. used this method for
+
+--- Page 3 ---
+
+3
+TABLE I: Summary of the notations.
+Sets Size Description
+t ∈ T T set of time intervals
+j ∈ J J set of ABSs
+⟨j, t⟩ ∈ ⟨J , T ⟩ J, T tuple of tasks
+l ∈ L L set of MEC devices
+j′ ∈ J + J+L set of computational resources
+k ∈ K K set of task types
+Task Param. Range Description
+αB
+⟨j,t⟩
+{0, 1} a task comes to ABS j in time interval t
+αP
+⟨j,t⟩
+R the processing time of this task
+αI
+⟨j,t⟩
+R the transmission delay between IoT &
+ABS for this task
+αD
+⟨j,t⟩
+R the deadline for this task
+∆⟨j,t⟩ R end-to-end delay of this task
+Energy Param. Range Description
+ΥB
+j
+N battery capacity in ABS j
+ΥH
+j
+R hovering energy cons. in ABS j
+ΥA
+j
+R signal trans. energy cons. in ABS j
+ΥI
+j
+R idle energy cons. in ABS j
+ΥC
+j
+R computing energy cons. in ABS j
+ΥR
+j
+R remaining energy in ABS j
+Weight Param. Range Description
+ΥL
+j
+N+ battery reward level
+V L
+j N violation reward level
+W [0, 1] energy consumption weight
+ΘD R scaling factor for deadline violation
+ΘM R scaling factor for mean delay
+Variables Domain Description
+x⟨j,t⟩j′ {0, 1} task ⟨j, t⟩ is processed in resource j′
+pA
+⟨j,t⟩j′t′
+{0, 1} the time intervals ( t′) used to processed
+the corresponding task
+pS
+⟨j,t⟩j′t′
+{0, 1} the starting time interval ( t′) for the
+corresponding task
+pE
+⟨j,t⟩j′t′
+{0, 1} the ending time interval ( t′) for the
+corresponding task
+v⟨j,t⟩ {0, 1} the corresponding task does not ﬁnish
+before its deadline
+targeting strict latency requirements of URLLC trafﬁc [17] .
+Their results showed that they can increase the number of suc -
+cessfully received URLLC packets while keeping the number
+of lost packets lower than a threshold value. The example of
+another wireless network solution was suggested by Alsenwi
+et al., where they used their novel ”conditional value at ris k”
+approach to prevent eMBB users from getting lower data rates
+due to concurrent URLLC trafﬁc in the network [18].
+In their task ofﬂoading problem, Zhou et al. extended the
+available processing resources by adding satellites to the ir
+network [19]. Then, they proposed a centralized deep risk-
+sensitive solution to achieve their energy consumption con -
+straint. Despite the fact that this paper has a related probl em,
+we provide a task-oriented approach to ﬁnish the IoT tasks
+before their deadline. Moreover, our risk-sensitive solut ion
+is a distributed approach in which each ABS has its own
+intelligent local agent to make ofﬂoading decisions. To the best
+of our knowledge, this is the ﬁrst work that proposes a multi-
+agent-based risk-sensitive RL solution for the task ofﬂoad ing
+problem in a UA V/ABS based wireless network.
+III. S YSTEM MODEL AND PROBLEM FORMULATION
+In this section, we brieﬂy describe the scenario, detail the
+energy consumption and delay models, specify the system
+constraints, and ﬁnally formulate the guaranteed deadline
+problem [6]. Table I summarizes the notations we use in the
+remainder of the article.
+A. Scenario
+Figure 1 illustrates the scenario we use in this study. We
+assume a time-interval-based model. In each time interval ( t ∈
+T ), a set of ABS ( j ∈ J ) devices collect the tasks from
+IoT devices scattered accross a smart farm. If ABS j receives
+a task in time interval t, the decision-maker in this ABS is
+informed by the α B
+⟨j,t ⟩ = 1 indicator 1. Then, ABS j decides on
+a computational resource ( j′ ∈ J +) to process the task while
+taking into account the type of task ( k ∈ K ), and the network
+conditions such as the expected transmission delay to ofﬂoa d a
+task to another ABS. Furthermore, the computational resour ce
+set is not limited to just ABS devices, but also contains near by
+MEC devices ( l ∈ L ).
+Given Data:
+• A binary indicator signifying that ABS j received a task
+in time interval t (α B
+⟨j,t ⟩). The task’s processing time
+(α P
+⟨j,t ⟩) and deadline ( α D
+⟨j,t ⟩).
+• Transmission delays between IoTs and ABSs ( α I
+⟨j,t ⟩).
+• Energy consumption of each component in the ABSs
+(ΥH
+j , ΥA
+j , ΥI
+j , ΥC
+j ).
+• Battery capacity of each ABS ( ΥB
+j ).
+Objectives:
+• Increasing the hovering time of ABSs. We aim to maxi-
+mize the operating time before we need to recharge any
+of the ABSs in our smart farm.
+• Reducing the mean end-to-end delay for processing of
+the tasks generated by IoTs.
+• Ensure that the number of deadline violations will not
+exceed a certain amount.
+Decisions:
+• Each ABS j should independently decide the optimum
+resource to process the received task ⟨j, t ⟩. If an ABS
+chooses to process that task locally, it will queue the
+request and begin to process it whenever its processing
+resource is available. Otherwise, the ABS will ofﬂoad the
+task to another ABS or a MEC device in the smart farm.
+B. Energy Consumption and Delay Models
+In the interest of increasing the hovering time, we have
+to ﬁnd the change in the remaining battery energy for each
+ABS ( ΥR
+j′) according to their decision. Eq. 1 calculates
+the remaining battery level where ΥH
+j′ , ΥA
+j′, ΥI
+j′ are the
+hovering, signal transmission, and idle energy consumptio ns
+respectively. We assume these values do not change with
+the ofﬂoading decision, and they are ﬁxed values during our
+evaluation period ( T ). On the other hand, computing energy
+1The length of a time interval is signiﬁcantly small. Therefo re, an ABS
+receives at most one task in a time interval. Hence, we may rep resent a task
+with a tuple “ ⟨j, t⟩” in which j is the received ABS and t is the received
+time interval.
+
+--- Page 4 ---
+
+4
+consumption, ΥC
+j′, is determined by task processing decisions
+(pA
+⟨j,t ⟩j′t′) which equals to one if the resource processes a task.
+ΥR
+j′ =ΥB
+j′ − (ΥH
+j′ + ΥA
+j′ + ΥI
+j′) ∗ T
+−
+∑
+t′∈T
+∑
+⟨j,t ⟩∈⟨J , T ⟩
+(ΥC
+j′ − ΥI
+j′) ∗ pA
+⟨j,t ⟩j′t′ (1)
+Finalizing each task before their deadline is another one
+of our key performance indicators (KPI). Therefore, for eac h
+task, we have to calculate the time difference between the
+task’s generation at the IoT device and the task’s completio n
+at the computational resource. Eq. 2 formulates this in whic h
+(t′) is the start time of the task at the resource. That starting
+time is determined by the binary decision variable pS
+⟨j,t ⟩j′t′,
+which equals to one if resource j′ has started to process that
+task at time interval t′. At any other time, it is equal to zero;
+thus, the summation of the ﬁrst term equals t′. The other terms
+in this equation are t, α I
+⟨j,t ⟩, and α P
+⟨j,t ⟩, which are the received
+time of the task at ABS, the transmission delay between IoT
+and ABS, and the processing delay, respectively. Lastly, we
+calculate the mean delay with Eq. 3, in which we sum the
+end-to-end delays of all tasks and then divide it by the total
+number of tasks.
+∆E
+⟨j,t ⟩ =
+∑
+j′∈J +
+∑
+t′∈T
+pS
+⟨j,t ⟩j′t′ ∗ (t′) − t + α I
+⟨j,t ⟩ + α P
+⟨j,t ⟩ (2)
+δ =
+∑
+⟨j,t ⟩∈⟨J , T ⟩
+∆E
+⟨j,t ⟩ ∗ α B
+⟨j,t ⟩
+∑
+⟨j,t ⟩∈⟨J , T ⟩
+α B
+⟨j,t ⟩
+(3)
+In Eq. 4, α D
+⟨j,t ⟩, ∆E
+⟨j,t ⟩, and v⟨j,t ⟩ are the deadline, end-to-
+end delay, and violation indicator of task ⟨j, t ⟩, respectively.
+In addition, we have an M term which is a signiﬁcantly large
+number. In the case of the deadline violation ( α D
+⟨j,t ⟩ − ∆E
+⟨j,t ⟩ <
+0), the left side of this equation will be lower than zero. Thus ,
+to grant Eq. 4, the right side of this equation is enforced to b e
+lower than zero, which could be achieved by only v⟨j,t ⟩ = 1 .
+Contrastingly, if no deadline violation has occurred, the l eft
+side of this equation will be higher than zero ( α D
+⟨j,t ⟩ − ∆E
+⟨j,t ⟩ ≥
+0). Hence, v⟨j,t ⟩ may equal either to zero or one. Therefore,
+Eq. 5 will model that case. In this equation, if we can ﬁnish
+a task before its deadline ( α D
+⟨j,t ⟩ − ∆E
+⟨j,t ⟩ ≥ 0), the left side
+will be higher than zero. Thus, the right side of this equatio n
+should also be higher than zero, which can only be realized
+by v⟨j,t ⟩ = 0.
+α D
+⟨j,t ⟩ − ∆E
+⟨j,t ⟩ ≥ − M ∗ v⟨j,t ⟩, ∀⟨j, t ⟩ ∈ ⟨J , T ⟩ (4)
+α D
+⟨j,t ⟩ − ∆E
+⟨j,t ⟩ < M ∗ (1 − v⟨j,t ⟩), ∀⟨j, t ⟩ ∈ ⟨J , T ⟩ (5)
+C. System Constraints
+This subsection presents the constraints of our optimizati on
+problem. Eq. 6 denotes that a computational resource ( j′ ∈
+J +) should process at most one task in a time interval ( t′ ∈
+T ). Eq. 7 guarantees that a task is processed by at most one
+resource in a time interval ( t′ ∈ T ).
+∑
+⟨j,t ⟩∈⟨J , T ⟩
+p̟
+⟨j,t ⟩j′t′ ≤ 1,
+∀j′ ∈ J +, ∀t′ ∈ T , ∀̟ ∈ { A, S, E } (6)∑
+j′∈J +
+p̟
+⟨j,t ⟩j′t′ ≤ 1,
+∀⟨j, t ⟩ ∈ ⟨J , T ⟩, ∀t′ ∈ T , ∀̟ ∈ { A, S, E } (7)
+Eq. (8-11) maintain the association between the task pro-
+cessing binary decision indicators. Assume that the resour ce
+j′ is idle in time interval t′, which yields pA
+⟨j,t ⟩j′t′ = 0. Then,
+it starts to process task ⟨j, t ⟩ in the next time interval ( t′+ 1),
+which leads to pA
+⟨j,t ⟩j′(t′+1) = 1 . Hence, the starting time
+indicator in this time interval ( pS
+⟨j,t ⟩j′(t′+1)) also becomes one
+due to Eq. 8. In addition, the ending time indicator in this ti me
+interval ( pE
+⟨j,t ⟩j′(t′+1)) equals zero due to Eq. 9.
+pA
+⟨j,t ⟩j′(t′+1) = pA
+⟨j,t ⟩j′t′ + pS
+⟨j,t ⟩j′(t′+1) − pE
+⟨j,t ⟩j′(t′+1) (8)
+pS
+⟨j,t ⟩j′(t′+1) + pE
+⟨j,t ⟩j′(t′+1) ≤ 1,
+∀⟨j, t ⟩ ∈ ⟨J , T ⟩, ∀j′ ∈ J +, ∀t′ ∈ T (9)
+pA
+⟨j,t ⟩j′(0) = pS
+⟨j,t ⟩j′(0) (10)
+∑
+t′∈T
+p̟
+⟨j,t ⟩j′t′ ≤ 1,
+∀⟨j, t ⟩ ∈ ⟨J , T ⟩, ∀j′ ∈ J +, ∀̟ ∈ { S, E } (11)
+In addition, for a special condition in which a computationa l
+resource starts to process a task at the beginning of the
+simulation ( t′ = 0 ), we need Eq. 10 to indicate the starting
+time ( pS
+⟨j,t ⟩j′(0) = 1). Now assume that in time interval t′, the
+j′ processes the task ⟨j, t ⟩, which yields pA
+⟨j,t ⟩j′t′ = 1 . Then,
+it stops processing that task in the next time interval ( t′ + 1),
+which leads to pA
+⟨j,t ⟩j′(t′+1) = 0 . Therefore, the ending time
+indicator turns to one ( pE
+⟨j,t ⟩j′t′ = 1 ) due to Eq. 8. Lastly,
+Eq. 11 ensures that a task has only one starting and ending
+time.
+T∑
+t′=t
+∑
+j′∈J +
+pA
+⟨j,t ⟩j′t′ ∗ x⟨j,t ⟩j′ = α B
+⟨j,t ⟩ ∗ α P
+⟨j,t ⟩,
+∀⟨j, t ⟩ ∈ ⟨J , T ⟩ (12)
+t− 1∑
+t′=0
+∑
+j′∈J +
+pA
+⟨j,t ⟩j′t′ ∗ x⟨j,t ⟩j′ = 0, ∀⟨j, t ⟩ ∈ ⟨J , T ⟩ (13)
+∑
+j′∈J +
+x⟨j,t ⟩j′ ≤ 1, ∀⟨j, t ⟩ ∈ ⟨J , T ⟩ (14)
+Each received task ( α B
+⟨j,t ⟩ = 1 ) must be processed by
+a resource for a time period equal to its processing time
+(α P
+⟨j,t ⟩). Eq. 12 maintains that if a task is ofﬂoaded to j′,
+the ofﬂoading decision equals one ( x⟨j,t ⟩j′ = 1 ), and that
+equation simpliﬁes as
+T∑
+t′=t
+pA
+⟨j,t ⟩j′t′ = α P
+⟨j,t ⟩. Thus, we have to
+allocate α P
+⟨j,t ⟩ number of time intervals at j′. Eq. 13 ensures
+that a computational resource starts to process a task after
+it has received the task, meaning that task processing time
+
+--- Page 5 ---
+
+5
+intervals ( t′ ∈ T ) should be higher or equal to task received
+time intervals ( t ∈ T ). Lastly, Eq. 14 bounds the number of
+ofﬂoading decisions for each task to prevent a multiple task
+ofﬂoading case.
+D. Problem F ormulation
+We have two problem deﬁnitions, P1 and P2, for the
+smart farm scenario. The main difference between these two
+deﬁnitions originates from their perspective on deadline v io-
+lation. While minimizing the number of deadline violations is
+included in the objective function of P1, the approach on P2
+is to limit the number of deadline violations to a threshold
+(Eq. 17).
+(P1) Maximize:
+(x, v, pS, pA)
+W ∗ min
+j′∈ J
+ΥR
+j′ − 1 − W
+2 ∗ ΘM δ
+− 1 − W
+2 ∗ ΘD
+∑
+⟨j,t ⟩∈⟨J , T ⟩
+v⟨j,t ⟩ (15)
+Subject to: Eqs. (6 − 14)
+Eq. 15 depicts the objective function of the ﬁrst problem, in
+which W , ΘM , and ΘD are the weight of the hover time, mean
+delay, and deadline violation scaling factors, respective ly.
+ΥR
+j′ is the remaining battery energy of ABS j′, which is
+calculated by Eq. 1. Task processing decisions ( pA
+⟨j,t ⟩) play
+a signiﬁcant role on this calculation. δ is the mean delay
+of all received tasks, and v⟨j,t ⟩ is the indicator of deadline
+violation of task ⟨j, t ⟩. Mean delay is calculated by Eq. 3 and
+the deadline violation is determined by Eqs. (4-5). The star ting
+time decision of each task pS
+⟨j,t ⟩ affects these equations. Lastly,
+these two decision variables ( pA
+⟨j,t ⟩, pS
+⟨j,t ⟩) are limited by the
+corresponding task’s ofﬂoading decision ( x⟨j,t ⟩), as shown in
+Eqs. (12-13).
+As we mentioned earlier, the deadline violation KPI is not
+included in the objective function of P2 (Eq. 16). Instead, i t is
+considered as a constraint in Eq. 17, in which V is the upper
+bound of the allowed number of deadline violations.
+(P2) Maximize:
+(x, v, pS, pA)
+W ∗ min
+j′∈ J
+ΥR
+j′ − 1 − W
+ΘM δ (16)
+Subject to:
+∑
+⟨j,t ⟩∈⟨J , T ⟩
+v⟨j,t ⟩ ≤ V (17)
+Eqs. (6 − 14)
+Task ofﬂoading problems are generalized assignment prob-
+lems that are NP-Hard [20]. Therefore, we solve these two
+problems with a MILP solver and we propose machine
+learning-based solutions. The latter is explained explici tly in
+the next section.
+IV. P ROPOSED MACHINE LEARNING -BASED METHODS
+This section details the reinforcement learning algorithm s
+we use to solve the explained smart farm problems. These
+algorithms run independently in each ABS in a distributed
+manner which improves the scalability of the proposed solu-
+tions. In the following subsection, we start to explain a sol ution
+for P1.
+A. Q-Learning Approach
+P1 (Eq. 15) has three KPIs in the objective function, and
+a ﬁnite-horizon MDP can address them with a tuple F =
+{P, A, R, S, Π}. The details of that tuple are:
+• State Transitions: P : S1xAxS2 =⇒ R
+A transition is triggered whenever an ABS receives a new
+task:
+1) First, the agent analyzes its current state S1.
+2) Second, it makes a decision for the action A.
+3) Finally, it observes the environmental changes due
+to its action and determines the new state S2 and
+the immediate reward R.
+Because of the uncertainty of task arrivals and the
+stochastic properties of the wireless channel model, the
+state transitions are not deterministic.
+• Action: A = {ja|ja ∈ J +}
+Delegating the received task to a computational resource
+(ja) is the action that an ABS agent should do in this
+MDP framework. The resource may be at the same ABS,
+another ABS, or a MEC. Therefore the action domain
+includes all of these options ( J +).
+• State: S = {k, {∆j′|j′ ∈ J +}, {ΥL
+j |j ∈ J }}
+Task type ( k) contains two pieces of information (task
+processing time and deadline) for determining the impact
+of an action on the system performance. Second, the
+expected delay ( ∆j′) is crucial for calculating the system
+mean delay and deadline violations. Finally, ABS battery
+levels (ΥL
+j′) should be included in the state space in order
+to improve the hover time KPI.
+• Policy(Π): We choose the epsilon-greedy policy for the
+tradeoff between exploration and exploitation in the learn -
+ing process. Also, we use the value iteration method to
+compute the optimal policy illustrated by Fig. 2a. In this
+ﬁgure, α , γ, and R are the learning rate, discount, and
+immediate reward, respectively. The latter is detailed in
+the following paragraph.
+• Reward:
+R = W ∗ (ΥL
+ja − 1) − 1 − W
+2 ∗ ΘM ∗ ∆ja
++ 1 − W
+2 ∗ ΘD ∗
+[
+(1 − E(vja )) + V L
+ja ∗ E(vja )
+]
+(18)
+ΥL
+ja =
+
+
+
+
+
+2, if E(ΥR
+ja ) − maxj′∈J (E(ΥR
+j′)) ≥ − ǫ
+0, if E(ΥR
+ja ) − maxj′∈J (E(ΥR
+j′)) ≤ − 2 ∗ ǫ
+1, otherwise
+(19)
+V L
+ja =
+
+
+
+
+
+
+
+
+
+P 4, if E(vjm ) = 0
+P 3, if E(vjr ) = 0
+P 2, if ∃j′ ∈ (J / (jr ∪ ja))(E(vj′)) = 0
+P 1, otherwise
+(20)
+The main goal of the MDP model should be compatible
+with the objective function (Eq. 15) in order to obtain
+the maximization problem in P1. However, an MDP
+model may only attain that goal as a summation of the
+immediate rewards, R, which can be found by following
+
+--- Page 6 ---
+
+6
+(a) V alue iteration for Q-Learning method.
+ (b) V alue iteration for risk.
+(c) V alue iteration for immediate reward.
+ (d) A third Q-table with a dynamically changed ζ value.
+Fig. 2: V alue iteration processes in Q-Learning and Risk-se nsitive RL methods for an example scenario with one MEC serve r
+and 4 ABSs (U1 to U4).
+the policy Π in each state-action pair ( SxA). Therefore,
+we transform the objective function into Eq. 18 which
+evaluates the recent action ( A = ja) regarding the KPIs
+in the objective function.
+P1 has three objectives, therefore the immediate reward
+should also consist of these three objectives. The ﬁrst
+objective, increasing hovering time, is described as the
+total operating time before any of the ABSs have to
+recharge their battery, and in the problem deﬁnition
+section, we formulate that KPI as a MaxMin problem.
+We address that KPI with the battery reward levels (Eq.
+19) in the MDP model. That value has three levels [0,1,2]
+according to the expected remaining energy difference
+between the selected ABS E(ΥR
+ja ) and the ABS, which
+has the maximum battery energy maxj′∈J (E(ΥR
+j′)). If
+that energy difference is lower than a certain level ( ǫ),
+the reward function returns positive feedback. Therefore
+we can balance the battery energies between the ABSs.
+Lastly, hysteresis [- ǫ,-2ǫ] is introduced to prevent a ping-
+pong effect.
+The second objective is minimizing mean delay, which is
+calculated for each action separately in the immediate
+reward calculation ( ∆ja ). Therefore, we will get the
+total delay for all actions due to the cumulative reward
+calculation at the end of a simulation.
+The third objective depends on the expected deadline
+violation E(vja ). It is equal to zero if the action ja
+is expected not to cause a deadline violation, and the
+reward function returns one for this objective. Otherwise,
+the reward function returns a negative value which is
+deﬁned in Eq. 20. That value has four severity levels.
+The highest severity level, P 4, occurs when we could
+have avoided the violation if we had chosen a MEC
+as a computational resource ( E(vjm ) = 1 ). This case
+has the highest severity level because MEC devices have
+more powerful resources, and they don’t have to consume
+valuable battery energy in order to process a task. The
+second-highest severity level, P 3, occurs when a local
+resource could have processed that task without causing a
+violation. This case should have a higher penalty because
+ofﬂoading a task caused extra overhead and delay without
+beneﬁting from this action. The third level denotes the
+case if we have another ABS that could have processed
+that task without causing a violation. The ﬁnal and the
+lowest severity level is a case where we expect a deadline
+violation as a result of any action.
+B. Risk-Sensitive Learning Approach
+P2 has a deadline violation constraint (Eq. 17) which can
+be achieved by only choosing an appropriate ofﬂoading actio n
+in each state-action pair. Therefore, that constraint is is olated
+from the other KPIs in order to limit the number of deadline
+violations to be lower than a threshold ( V). This separation can
+be addressed by a ﬁnite-horizon constrained MDP (CMDP)
+[21]. The CMDP is deﬁned by tuple F = {P, A, R, C, S, Π}.
+The details of that tuple are:
+• State Transitions: P : S1xAxS2 =⇒ R
+State transitions are the same as in the Q-Learning
+approach that is explained in Section IV -A.
+• State: S = {k, {∆j′|j′ ∈ J +}, {ΥL
+j |j ∈ J } , j a}
+In addition to the states in the Q-Learning approach,
+the risk-sensitive method includes the recent ofﬂoading
+decision into the state space. Thus, we can split the states
+into two groups regarding risk expectation. Brieﬂy, the
+
+--- Page 7 ---
+
+7
+“risk states set” is a subset of the “states set”, and an
+agent falls into such a state when a deadline violation
+is expected ( Φ = {s | s ⊂ S, and E(vja )}). Here, the
+expected deadline violation (E(vja ) = I(α D
+k ≤ ∆ja )) is
+calculated by Eqs.(4-5).
+• Action: A = {ja|ja ∈ J +}
+The set of available resources ( ja) is the actions for the
+risk-sensitive approach.
+• Reward:
+R = −
+[
+W ∗ (ΥL
+ja − 1) − 1 − W
+ΘM ∗ ∆ja
+]
+(21)
+The main goal of the MDP model should be compatible
+with the objective function (Eq. 16) to obtain the max-
+imization problem in P2. Therefore, we transform this
+objective function into Eq. 21 which evaluates the recent
+action ( A = ja) in terms of the KPIs in the objective
+function. The details of this equation are explained in
+Section IV -A. Another point we want to emphasize is
+that, unlike the Q-Learning approach, we reverse the
+reward function sign because the policy’s exploitation
+phase chooses an action with the minimum q-value
+(arg minja∈J + S1).
+• Cost for Risk:
+C =
+{
+−V L
+ja , if S1 ∈ Φ
+− 1, otherwise (22)
+In order to isolate and then prevent the risk in P2, we
+propose Eq. 22 to calculate the risk of each state-action
+pair. Calculation of the severity level ( V L
+ja ) is detailed in
+Section IV -A.
+• Policy(Π): Since we have a separate cost function to
+evaluate the risk for each state-action pair, we have a
+q-table solely dedicated to the risk estimation. Fig. 2b
+shows the value iteration to calculate the risk in a smart
+farm. Meanwhile, we have another q-table to evaluate the
+other KPIs, shown in Fig. 2c. While these two isolated
+q-tables are used for the cumulative reward and risk
+calculations, we have to choose the same state-action pair
+in each step for these tables. Therefore we have a third
+q-table that picks the action for the corresponding state
+by using the classic epsilon-greedy approach (Fig. 2d).
+A value iteration process does not generate that q-table,
+instead, it is an aggregation of the previous two tables
+with a ζ weighting factor.
+Choosing a decent ζ is essential to improve the convergence
+of the proposed risk-sensitive solution. Deciding on a high er
+ζ prioritizes the risk side of the problem, while choosing a
+lower one may improve the other KPIs. We decide on a proper
+ζ with a dynamic approach shown in Algorithm 1. Given
+parameters ζI , V, λ, N U P, N EP , G are the initial weighting
+value, deadline violation threshold, updating step size, u pdat-
+ing frequency, the number of episodes, and the gap value,
+respectively.
+This algorithm starts with the initialization of episode an d ζ
+values. Then, for each episode, we calculate the three q-tab les
+as they are illustrated in Figs. (2b, 2c, 2d). Line 9 checks th e
+updating frequency, and then Line 10 compares the number
+Algorithm 1 Dynamic update of ζ weighting value between
+the risk and reward
+1: Given: ζI , V, λ, N U P, N EP , G
+2: Output: QD, Q R, Q C
+3: episode = 0, ζ = ζI
+4: while episode < N EP do
+5: QD :: value iteration for risk (Fig. 2b)
+6: QR :: value iteration for reward (Fig. 2c)
+7: QC = ζ ∗ QD + (1 − ζ) ∗ QR (Fig. 2d)
+8: episode = episode + 1
+9: if episode ≡ 0 (mod N U P) then
+10: if ∑
+⟨j,t ⟩∈⟨J , T ⟩
+v⟨j,t ⟩ + G ≤ V then
+11: ζ = min(ζ − λ, 0)
+12: else
+13: ζ = max(ζ + λ, 1)
+14: end if
+15: end if
+16: end while
+of deadline violations with the threshold. In that equation , we
+add an additional gap ( G) due to the uncertainty property of
+the tasks. Therefore, the algorithm guarantees Eq. 17 in som e
+cases where the IoT devices demand to process an extremely
+high number of tasks. Following this comparison, Line 11
+decreases the weight of the risk in the case of where Eq. 17
+is guarenteed. Otherwise, Line 13 increases the weight of th e
+risk to attain that constraint.
+The proposed risk-sensitive method is an episodic model-
+free reinforcement learning algorithm. Jin et al. [22]
+prove that the worst-case complexity of this algorithm is
+˜O(H 2√
+|A||S|N EP ), where H is the number of steps in an
+episode, |A|, and |S| are the action and state space sizes,
+and N EP is the number of episodes. We train our risk-
+sensitive method ofﬂine with a collected dataset from the
+simulation platform. Each of these datasets has a number of
+tasks deﬁning the number of steps ( H) in an episode. Thus,
+our algorithm’s complexity quadratically increases with t he
+number of tasks in each episode. According to Section IV .B.,
+with the increasing number of ABSs ( J), the state space
+(|S|) changes quadratically, and the action space ( |A|) changes
+linearly. Therefore, computation time grows as J
+√
+3 with the
+number of ABSs in the problem. Meanwhile, the number of
+episodes ( N EP ) is determined according to the algorithm’s
+convergence, which is not only related to the size of the give n
+data. The convergence of the algorithm (training phase) is a lso
+affected by the content of the data. Therefore, we empirical ly
+determine the value of N EP .
+V. N UMERICAL RESULTS
+A. Simulation Platform
+We chose Omnet++ [23] as a discrete event simulator to
+simulate the IoT trafﬁc. In addition, we used Simu5G librari es
+[24], which is developed over Omnet++, to simulate a 5G
+channel model between IoT devices, ABSs and MEC platform.
+These libraries implement the TR 36.873 speciﬁcation [25] t o
+calculate the channel fading in new radio numerology ( µ = 0)
+
+--- Page 8 ---
+
+8
+TABLE II: Simulation parameters.
+Task Type (1/λ) αD
+⟨j,t⟩
+αP
+⟨j,t⟩
+(ABS)
+αP
+⟨j,t⟩
+(MEC)
+Fire detection 0.25s 1s 0.1s 0.05s
+Pesticide detection 0.25s 2s 0.2s 0.1s
+Growth monitoring 0.5s 15s 1.5s 0.75s
+TABLE III: Energy consumption parameters.
+ABS No ( j′) ΥB
+j′
+ΥH
+j′
+ΥA
+j′
+ΥI
+j′
+ΥC
+j′
+0 570 211 17 4320 12960
+1 570 211 17 4320 12960
+2 627 211 17 4320 12960
+3 627 211 17 4320 12960
+of a 5G physical layer. Shadow fading standard deviation and
+carrier frequency are chosen at 4dB and 2GHz for line-
+of-sight communication, respectively. Table II presents t he
+parameters used in the simulations. In particular, we looke d
+at a smart farm scenario with four ABSs ( J=4) and one MEC
+(L=1) devices. We focused on three types of image processing
+operations ( K) that have different arrival rates, deadlines and
+processing times. Interarrival times between the tasks are
+exponentially distributed with a mean of (1/λ ). Deadlines and
+processing times are constants. The results are generated a s
+the average of ten runs with different seeds and we set the
+simulation time to be 50 seconds ( T = 50s).
+B. Baselines
+1) Round Robin: Every computational resource located at
+the ABSs and the MEC is utilized in a round robin fashion
+when assigning the tasks.
+2) Lowest Queue Time and Highest Energy First: This
+algorithm considers the destinations’ remaining energy le vel
+and queue time. As stated in [6], queue time is the total time i t
+takes for the resource to compute all of the tasks in its queue .
+Every ABS stores the remaining energy level and queing time
+of every possible ofﬂoading destination. The ABSs regularl y
+update their neighbours with such information. The decisio n
+making algorithm begins by ﬁnding the lowest queue time
+amongst the neighbouring resources. If an ABS’s queue time
+is lower than the current ABS’s queue time by at least 0.5s,
+we will use the this value as the lowest queue time. Else, the
+algorithm will use the current ABS’s queue time as the lowest
+queue time. Next, the algorithm will ﬁnd the neighbour that
+has the highest remaining energy level and the queue time is
+equal or less than the lowest queue time. If such a node exists
+and its energy level is higher than the current ABS’s energy
+level by at least 1%, then the current ABS will ofﬂoad the task
+to that node. If not, then the task will be computed locally.
+3) Energy-Centric Approach: This method prioritizes the
+Max-min fairness over the deadline violation minimization .
+Therefore, it provides a higher hovering time for the smart
+farm. Implementation is based on the proposed risk-sensiti ve
+method. Meanwhile, the size of the difference between the
+highest energy battery and the lowest energy battery is deﬁn ed
+as risk. Thus Algorithm 1 keeps the ζ value at higher levels
+while this gap is larger than a certain threshold.
+TABLE IV: Machine Learning Parameters.
+Parameter
+Notation V alue
+Learning Rate α 0.05
+Discount γ 0.85
+Number of Episodes N EP 100k
+Updating frequency N U P 1k
+Initial weighting value ζ I 0.00
+Step Size λ 0.02
+Max. Deadline Violation V 3
+Gap value G 2
+Weighting value for Q-Learning W 0.5
+Mean delay & deadline violation scalers ΘM , ΘD 1, 1
+Deadline violation severity levels P 4,3,2,1 −{ 4, 3, 2, 1}
+C. Energy Consumption Parameters
+We used the parameters found in Table III and Eq. 1
+in order to model an ABS’s remaining battery energy. By
+considering limited simulation time, idle and busy CPU ener gy
+consumptions are deﬁned as ABSs that would be run for
+ten hours to expose the performance differences between the
+techniques.
+D. Convergence of Machine Learning Approaches
+We use an ofﬂine learning approach for machine learning
+(ML) solutions. First, we generate one hundred different da ta
+sets with Omnet++ for the learning phase. Then, we run Q-
+Learning, Energy-centric and Risk-sensitive methods for 1 00k
+episodes, in which each episode uses another data set to
+prevent an overﬁtting problem. Then, we transfer the genera ted
+tables in this learning phase to the test phase. Finally, in t he
+test phase, we use Omnet++ to simulate a real 5G wireless
+channel model and evaluate the generated tables according t o
+several KPIs. That KPI evaluation is detailed in the followi ng
+subsection. Table IV represents the numerical values used i n
+ML algorithms.
+Fig. 3a illustrates the convergence of the Q-learning basel ine
+method. As seen, this method practices the arg max approach
+to ﬁnd the state-action value. If we turn to the risk-sensiti ve
+method, Fig. 3b and Fig. 3c show the convergence of reward
+and risk tables in the learning phase, respectively. Owing t o
+multi-actor-based approach and use of different datasets i n
+each episode, the variations in the cumulative reward and ri sk
+represent the extreme levels in both tables. On the other han d,
+it is seen that each actor (in other terms, each ABS) learns at
+the same speed and approaches the zero level.
+Fig. 4a shows the trend of convergences in these two tables.
+As mentioned in Algorithm 1, we prioritize the risk table at
+the beginning of the learning phase. Fig. 4a conﬁrms that
+algorithm; while the cumulative reward reduces in the risk
+table 57% (from 140 to 60), it is only 20% (from 14 to 9) in
+the reward table at the same episode. We should note that the
+tradeoff between different KPIs may adaptively change with
+Algorithm 1 for different smart farm scenarios. This can be
+seen easily in Fig. 4b. This ﬁgure shows the learning trend
+of the Energy-centric approach, which prioritizes the MaxM in
+fairness of energy usage in the batteries of ABSs.
+
+--- Page 9 ---
+
+9
+0 20 40 60 80 100
+Episodes (1000)
+
+500
+ 400
+ 300
+ 200
+ 100
+0
+100
+Cumulative Reward in One Episode
+(a) Q-learning convergence.
+0 20 40 60 80 100
+Episodes (1000)
+0
+20
+40
+60
+80
+100Cumulative Reward in One Episode
+(b) Reward convergence in Risk-sensitive.
+0 20 40 60 80 100
+Episodes (1000)
+0
+50
+100
+150
+200
+250
+300Cumulative Risk in One Episode
+(c) Risk convergence in Risk-sensitive.
+Fig. 3: Convergences of Q-learning and Risk-sensitive meth od.
+Risk
+0
+80
+1  
+  
+
+  
+d
+2
+ 
+Episodes
+0
+ 
+4 
+60
+80
+  
+
+
+6
+8
+ 
+C
+
+
+
+
+
+
+
+ 
+!
+"
+#
+$
+%
+&
+(a) Risk-sensitive method.
+M
+'
+(
+)
+*
++
+,
+-
+.
+/
+g
+0
+3 5
+6 7
+8 9
+Dead olation0
+: ;
+<
+= > ?
+Episodes
+0
+@ A
+B D
+60
+80
+E F G
+H I
+J K L
+N O P
+Combined 
+Q
+R
+T able
+(b) Energy-centric method.
+Fig. 4: Dynamically change of convergences between reward a nd risk q-tables.
+E. KPI Evaluations
+Fig. 5 shows the remaining energy levels in the batteries
+of ABSs for different solution methods. As it is explained in
+the problem deﬁnition, we aim to increase the hovering time
+of ABSs. Then, we propose a MaxMin solution in which we
+maximize the energy of the ABS, which has the minimum
+battery. That value is 78% for our proposed risk-sensitive
+method, which is higher than the heuristics but lower than
+the Q-Learning approach. The main reason for that output
+is prioritizing deadline violations in risk-sensitive sol utions.
+Also, the energy-centric baseline performs better than the risk-
+sensitive approach and provides an extensive fairness betw een
+the ABSs. Meanwhile, the risk deﬁnition of that approach
+might be revised for outperforming the classical Q-learnin g
+method.
+Fig. 6 illustrates the mean delay KPI. It is clear that ML
+approaches outperform the heuristics. Meanwhile, there is
+no decisive optimal ML solution in terms of mean delay
+minimization in different computational resources. Q-Lea rning
+has better performance in the ABSs, but it has a dramatically
+higher delay in MEC. This is because the Q-Learning policy
+sends more tasks to MEC. On the other hand, the risk-sensitiv e
+approach provides lower overall delay than all other method s.
+The main performance improvement of the risk-sensitive
+approach can be seen in Fig. 7. This ﬁgure demonstrates the
+deadline violations in different ABSs and MEC. Although
+the Q-Learning and Energy-centric methods outperform the
+heuristics, they can not guarantee that the number of deadli ne
+violations will be lower than a threshold. In contrast, this
+ﬁgure demonstrates that our risk-sensitive solution estab lishes
+risk-free ofﬂine learning for a multi-objective optimizat ion
+problem.
+F . Upper Bound Comparison
+We chose Gurobi Solver to ﬁnd the upper bounds for the
+maximization problems [26]. Owing to the fact that these
+problems are NP-hard, a MILP solver may provide a solution
+for small space problems [27]. Therefore, we had to limit the
+simulation time to four seconds ( T = 4 s), and we ran the
+solver for 48 hours for each case to ﬁnd the optimum solution.
+Furthermore, in order to increase the number of tasks in this
+shorter time duration, we chose interarrival time as 0.125s
+for all task types. Finally, we reduce the deadlines for ﬁre
+detection ( 0. 2s) and pesticide detection tasks ( 0. 6s) to make
+the problem harder than the standard conﬁguration.
+
+--- Page 10 ---
+
+10
+ABS1 ABS2 ABS3 ABS4
+UAVs
+50
+60
+70
+80
+90
+100Energy (%)
+RR: 72
+QHEF: 76
+Q-Learning: 82
+Energy-centric: 79
+Risk: 78
+Fig. 5: Remaining energy levels in different methods.
+ABS1 ABS2 ABS3 ABS4 MEC
+S U VW X
+YZ [\ ]
+^ _`
+a bc
+d ef
+h ij
+k lm
+Mean Delay (s)
+Fig. 6: Mean delay in different methods.
+ABS1 ABS2 ABS3 ABS4 MEC n o pq r
+st uv w
+0
+xy
+z{
+60
+80
+100
+|}~
+
+160
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fig. 7: Number of deadline violations.
+TABLE V: Upper Bound Comparison (P1: Eq. 15, P2: Eq.
+16, M: MILP Solver, R: Risk-Sensitive ML, Q: Q-Learning
+ML)
+Problem
+Method W min
+j′∈ J
+ΥR
+j′
+δ ∑
+j∈J
+t∈T
+vjt
+P1 M 1 98.2% 1.89s 72
+P1 Q 1 98.2% 4.01s 89
+P1 M 0.5 97.0% 0.92s 14
+P1 Q 0.5 97.7% 0.68s 42
+P1 M 0 96.3% 0.84s 9
+P1 Q 0 97.0% 0.44s 26
+P2 M 1 97.3% 0.88s 15
+P2 M 0.5 96.7% 0.89s 15
+P2 M 0 96.3% 0.85s 15
+P2 R N 96.5% 0.45s 13
+The top part of Table V shows the upper bounds of P1
+(Eq.15) with different weight factors ( W ). The ﬁrst row
+(W = 1 ) represents the maximum hovering time for P1. Our
+proposed ML solution for P1 can reach that level (second
+row) if we only add the hovering time maximization in the
+reward function. On the other hand, in a balanced solution
+(W = 0 . 5), it is seen that the ML solution tends to favor
+hovering time. Although we can get higher hovering time by
+ML, the MILP solution outperforms this method in terms of
+mean delay and deadline violation minimization. Lastly, if
+we remove the hovering time KPI from the multi-objective
+function ( W = 0 ), the MILP solver reduces the mean delay
+and the number of violations signiﬁcantly.
+The bottom section of Table V shows the upper bounds
+of P2 (Eq.16). First, we ﬁnd a feasible solution with a
+signiﬁcantly higher deadline violation threshold ( V = 15 )
+than the solution of MILP P1 2. It is undoubtedly seen that
+the risk-sensitive ML surpasses the MILP solution regardin g
+minimizing the number of deadline violations. Moreover, th e
+ML solutions are far better for reducing the mean delay.
+In addition, its hovering time maximization performance is
+almost the same as the MILP solution.
+G. Processing Time and Deadline Alterations
+It has been claimed that training an ML solution with ofﬂine
+data provides an efﬁcient and reliable solution for a wirele ss
+network problem [28], [29]. Therefore, we trained our ML
+solutions with preliminary data and then solve those ﬁnding
+solutions within a simulation platform. In this subsection , we
+provide a kind of stress test for our ML solutions. We generat e
+a one-hundred ofﬂine dataset that has different processing time
+and deadline for pesticide detection (PD) task (Fig 8). The
+results shows that the risk-sensitive solution adapts bett er than
+Q-Learning in most KPIs for the changes of these parameters.
+VI. C ONCLUSION
+This study focused on a smart agriculture scenario that
+uses ABSs to augment the computational resources of IoT
+2P2 has an additional constraint for limiting the number of de adline
+violations. Adding an extra constraint usually increases t he solution space of
+a MILP solution. Therefore it may need more time to ﬁnd a feasi ble solution.
+It has to be reminded that we limit the MILP solutions by 48 hou rs.
+
+--- Page 11 ---
+
+11
+0.1     ¡¢
+0
+£¤
+¥¦
+§¨
+100
+©ª«
+¬­®
+¯
+°
+±
+²
+³
+´
+µ
+¶
+·
+¸
+¹
+º
+»
+(a) 
+0.1 0.2 0.3 0.4 0.5
+0.50
+¼½¾¿
+1.00
+1.25
+1.50
+ÀÁÂÃ
+2.00Mean Delay (s)
+Ä Å Æ
+0.1 0.2 0.3 0.4 0.5
+Ç È É Ê Ë ÌÍ
+ÎÏÐÑ
+ÒÓÔÕ
+Ö×ØÙ
+ÚÛÜÝ
+Þßàá
+âãäå
+æçèé
+MaxMin ABS Energy Level (%)
+(c)
+0.5 1.0 1.5 2.0 2.5
+seconds
+0
+20
+40
+60
+80
+100
+120# of Violations
+(d)
+Fig. 8: Impact of pesticide detection task parameter varia-
+tions. (a), (b), (c): Increasing processing time. (d): Incr easing
+deadline.
+devices that need to process deadline-critical image proce ssing
+tasks. We deﬁned a problem deﬁnition that made sure that
+the tasks are completed before their deadlines and improved
+the hovering time of these ABSs. We addressed this using a
+CMDP , and then proposed a risk-sensitive approach for this
+CMDP that constrained the number of deadline violations.
+The results show that a risk-sensitive approach is feasible
+for guaranteeing a constraint-based KPI while providing an
+energy-efﬁcient solution for the ABSs. As future work, we ar e
+planning to provide a solution for more extensive state-spa ce
+problems.
+ACKNOWLEDGEMENT
+This work is supported by MITACS Canada Accelerate
+program under collaboration with Nokia Bell Labs.
+REFERENCES
+[1] M. Jhuria, A. Kumar, and R. Borse, “Image processing for s mart
+farming: Detection of disease and fruit grading,” in 2013 IEEE 2nd
+International Conference on Image Information Processing , IEEE ICIIP
+2013, pp. 521–526, 2013.
+[2] N. R. Dhumale and P . C. Bhaskar, “Smart agricultural robo t for spraying
+pesticide with image processing based disease classiﬁcati on technique,”
+in 2021 International Conference on Emerging Smart Computing and
+Informatics, ESCI 2021 , pp. 604–609, Institute of Electrical and Elec-
+tronics Engineers Inc., mar 2021.
+[3] M. Akbari, M. R. Abedi, R. Joda, M. Pourghasemian, N. Moka ri,
+and M. Erol-Kantarci, “Age of Information Aware VNF Schedul ing in
+Industrial IoT Using Deep Reinforcement Learning,” IEEE Journal on
+Selected Areas in Communications , vol. 39, pp. 2487–2500, aug 2021.
+[4] F. Khoramnejad, R. Joda, and M. Erol-Kantarci, “Distrib uted Multi-
+Agent Learning for Service Function Chain Partial Ofﬂoadin g at the
+Edge,” in 2021 IEEE International Conference on Communications
+W orkshops (ICC W orkshops), pp. 1–6, IEEE, jun 2021.
+[5] T. Pamuklu, M. Erol-Kantarci, and C. Ersoy, “Reinforcem ent Learn-
+ing Based Dynamic Function Splitting in Disaggregated Gree n Open
+RANs,” in ICC 2021 - IEEE International Conference on Communica-
+tions, pp. 1–6, IEEE, jun 2021.
+[6] A. C. Nguyen, T. Pamuklu, A. Syed, W. S. Kennedy, and M. Ero l-
+Kantarci, “Reinforcement Learning-Based Deadline and Bat tery-Aware
+Ofﬂoading in Smart Farm IoT-UA V Networks,” in ICC - International
+Conference on Communications , IEEE, 2022.
+[7] H. Liao, Z. Zhou, Z. Wang, S. Mumtaz, and M. Guizani, “Lear ning-
+Based Queue-Aware Task Ofﬂoading and Resource Allocation f or Air-
+Ground Integrated PIoT,” in ICC 2021 - IEEE International Conference
+on Communications , pp. 1–6, IEEE, jun 2021.
+[8] K. Xiong, Y . Liu, L. Zhang, B. Gao, J. Cao, P . Fan, and K. B. L etaief,
+“Joint Optimization of Trajectory, Task Ofﬂoading and CPU C ontrol
+in UA V -assisted Wireless Powered Fog Computing Networks,” IEEE
+Transactions on Green Communications and Networking , vol. 2400,
+no. c, pp. 1–13, 2022.
+[9] J. Zhao, Y . Wang, Z. Fei, and X. Wang, “Uav deployment desi gn for
+maximizing effective data with delay constraint in a smart f arm,” in
+2020 IEEE/CIC International Conference on Communications in China
+(ICCC), pp. 424–429, IEEE, 2020.
+[10] S. Khairy, P . Balaprakash, L. X. Cai, and Y . Cheng, “Cons trained
+Deep Reinforcement Learning for Energy Sustainable Multi- UA V Based
+Random Access IoT Networks With NOMA,” IEEE Journal on Selected
+Areas in Communications , vol. 39, pp. 1101–1115, apr 2021.
+[11] O. Ghdiri, W. Jaafar, S. Alfattani, J. B. Abderrazak, an d
+H. Y anikomeroglu, “Energy-Efﬁcient Multi-UA V Data Collec tion
+for IoT Networks with Time Deadlines,” in GLOBECOM 2020 - 2020
+IEEE Global Communications Conference , pp. 1–6, IEEE, dec 2020.
+[12] T. Zhang, J. Lei, Y . Liu, C. Feng, and A. Nallanathan, “Tr ajectory
+optimization for UA V emergency communication with limited user
+equipment energy: A Safe-DQN approach,” IEEE Transactions on Green
+Communications and Networking , vol. 5, no. 3, pp. 1236–1247, 2021.
+[13] Z. Y ang, C. Pan, K. Wang, and M. Shikh-Bahaei, “Energy Ef ﬁcient Re-
+source Allocation in UA V -Enabled Mobile Edge Computing Networks,”
+IEEE Transactions on Wireless Communications , vol. 18, pp. 4576–
+4589, sep 2019.
+[14] Y . Xu, T. Zhang, D. Y ang, and L. Xiao, “UA V -Assisted Rela ying and
+MEC Networks: Resource Allocation and 3D Deployment,” in 2021
+IEEE International Conference on Communications W orkshop s (ICC
+W orkshops), pp. 1–6, IEEE, jun 2021.
+[15] K. Y ao, J. Chen, Y . Zhang, L. Cui, Y . Y ang, and Y . Xu, “Join t
+Computation Ofﬂoading and V ariable-width Channel Access O ptimiza-
+tion in UA V Swarms,” in GLOBECOM 2020 - 2020 IEEE Global
+Communications Conference, pp. 1–6, IEEE, dec 2020.
+[16] T. Wang, Y . Li, and Y . Wu, “Energy-Efﬁcient UA V Assisted Secure
+Relay Transmission via Cooperative Computation Ofﬂoading ,” IEEE
+Transactions on Green Communications and Networking , vol. 5, no. 4,
+pp. 1669–1683, 2021.
+[17] N. B. Khalifa, M. Assaad, and M. Debbah, “Risk-Sensitiv e Reinforce-
+ment Learning for URLLC Trafﬁc in Wireless Networks,” in 2019
+IEEE Wireless Communications and Networking Conference (W CNC),
+vol. 2019-April, pp. 1–7, IEEE, apr 2019.
+[18] M. Alsenwi, N. H. Tran, M. Bennis, A. Kumar Bairagi, and C . S. Hong,
+“eMBB-URLLC Resource Slicing: A Risk-Sensitive Approach, ” IEEE
+Communications Letters , vol. 23, pp. 740–743, apr 2019.
+[19] C. Zhou, W. Wu, H. He, P . Y ang, F. Lyu, N. Cheng, and X. Shen ,
+“Deep Reinforcement Learning for Delay-Oriented IoT Task S cheduling
+in SAGIN,” IEEE Transactions on Wireless Communications , vol. 20,
+pp. 911–925, feb 2021.
+[20] L. Zhang, J. Luo, L. Gao, and F. C. Zheng, “Learning-Base d Compu-
+tation Ofﬂoading for Edge Networks with Heterogeneous Reso urces,”
+IEEE International Conference on Communications , vol. 2020-June,
+2020.
+[21] E. Altman, Constrained Markov Decision Processes . CRC Press, 2004.
+[22] C. Jin, Z. Allen-Zhu, S. Bubeck, and M. I. Jordan, “Is Q-l earning prov-
+ably efﬁcient?,” Advances in Neural Information Processing Systems ,
+vol. 2018-December, no. NeurIPS, pp. 4863–4873, 2018.
+[23] OpenSim Ltd., “What is OMNeT++?,” 2019.
+[24] G. Nardini, D. Sabella, G. Stea, P . Thakkar, and A. Virdi s, “Simu5G–An
+OMNeT++ Library for End-to-End Performance Evaluation of 5 G
+Networks,” IEEE Access , vol. 8, pp. 181176–181191, 2020.
+[25] 3GPP , “Study on 3D channel model for LTE (TR 36.873),” Te ch. Rep.
+Release 12.8.0, 3GPP , 2018.
+[26] L. Gurobi Optimization, “Gurobi Optimizer Reference M anual,” 2021.
+[27] T. Pamuklu and C. Ersoy, “GROVE: A Cost-Efﬁcient Green R adio Over
+Ethernet Architecture for Next Generation Radio Access Net works,”
+IEEE Transactions on Green Communications and Networking , vol. 5,
+pp. 84–93, mar 2021.
+[28] WG2, “AI/ML Workﬂow Description and Requirements — v1. 03,” tech.
+rep., O-RAN, 2021.
+[29] L. Bonati, S. D’Oro, M. Polese, S. Basagni, and T. Melodi a, “In-
+telligence and Learning in O-RAN for Data-Driven NextG Cell ular
+Networks,” IEEE Communications Magazine , vol. 59, pp. 21–27, oct
+2021.

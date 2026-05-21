@@ -1,0 +1,426 @@
+--- Page 1 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+A Pilot Study of Smart Agricultural Irrigation using Unmanned 
+Aerial Vehicles and IoT-Based Cloud System 
+ 
+Mohamed Esmail Karar 1, 2 , Faris Alotaibi 1, Abdullah AL Rasheed 1, Omar Reyad 1, 3 
+1 College of Computing and Information Technology, Shaqra University, Saudi Arabia 
+2 Faculty of Electronic Engineering, Menoufia University, Egypt 
+3 Faculty of Science, Sohag University, Egypt 
+mkarar@su.edu.sa; S437460268@su.edu.sa ; S437460255@su.edu.sa; oreyad@su.edu.sa 
+Abstract—This article introduces a new mobile-based application of modern information and 
+communication technology in agriculture based on Internet of Things (IoT), embedded systems and an 
+unmanned aerial vehicle (UAV). The proposed agricultural monitoring system was designed and 
+implemented using Arduino microcontroller boards, Wi -Fi modules , water pumps and electronic 
+environmental sensors, namely temperature, humidity and soil moisture. The role of UAV in this study 
+is to collect these environmental data from different regions of the farm. Then, the quantity of water 
+irrigation is automatically computed fo r each region in the cloud. Moreover, the developed system can 
+monitor the farm conditions including the water requirements remotely on Android mobile application 
+to guide the farmers. The results of this study demonstrated that our proposed IoT-based embe dded 
+system can be effective to avoid unnecessary and wasted water irrigation within the framework of smart 
+agriculture. 
+Keywords—Internet of things, precision agriculture, embedded systems, cloud computing, smart 
+irrigation, Agricultural drone 
+ 
+1. Introduction 
+Water is one of essential natural resources for agriculture. Most growing population in the word is relying 
+on agriculture and consumes about 56.0 % of the fresh water globally [1]. However, water availability 
+for irrigation is currently limited because of climate change and other environmental facto rs such as 
+decreasing groundwater resources, while increasing industrial and domestics demands [2]. Additionally, 
+a large amount of irrigation water is always wasted and cannot be managed efficiently because of 
+traditional irrigation methods to achieve expected crop productivity. Therefore, design and development 
+of smart water irrigation systems become an attractive topic for many researchers because of its potential 
+outcome to achieve sustainable agriculture [3, 4]. 
+Smart agriculture or precision agriculture provides an application of modern and accurate information 
+and communications technology to automate and optimize difficult agricultural tasks and/or processes 
+[5, 6]. Internet of Things (IoT) presents the core networking technology of smart agriculture and many 
+recent wireless applications ranging from environment monitoring to healthcare and medical applications 
+[7-11]. In smart agriculture, IoT is used to collect data from sensors which measure different parameters 
+such as soil moisture and humidity and monitor them remotely via developed mobile applications to take 
+decisions or to actuate devices, e.g., water pumps [6]. Consequently, the workload of the farmers will be 
+reduced with efficient use of available resources and low-cost appliances . Artificial intelligence (AI) 
+techniques can be also applied to analyze agricultural and environmental data to support the specialists 
+and famers; for example, machine learning including neural networks [12], fuzzy logic controllers [13], 
+and recently deep learning models [14]. However, continuous screening and monitoring of the crops , 
+automated water irrigation, and plant disease detection are still main challenges of smart agriculture, as 
+depicted in Fig. 1 [6, 15]. In this study, we will focus only on proposing two solutions for the challenges 
+of continuous monitoring of th e field and automatic irrigation using IoT and unmanned aerial vehicles 
+(UAVs). 
+
+--- Page 2 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+ 
+Fig.1 Main challenges of smart agriculture 
+ 
+The UAVs or unmanned aircraft system (UASs) are also known as drones. Essentially, a drone is a flying 
+robot that can be remotely controlled. In past years , UAVs were often associated with the military 
+applications, where they were used initially for anti -aircraft target practice, intelligence gathering and 
+used as weapons. Recently, drones are used in a wide range of civilian roles and applications such as 
+rescue, surveillance, traffic monitoring, weather monitoring, and delivery services [16, 17]. 
+Many studies h ighlight the role of digitally controlled farm plants , i.e., UAVs for monitoring and 
+forecasting in agriculture to keep health conditions of the crops [18, 19] . Drones are also capable of 
+accomplishing intelligent irrigation monitoring using thermal or infrared i maging cameras in Cloud of 
+Things (CoT) network [20]. In addition, manual spray of the pesticides in the filed causes dangerous 
+diseases for the farming workers as reported globally by the Food and Agriculture Organization (FAO) 
+and the World Heal th Organization (WHO) [21]. Therefore, the UAVs represent a good solution to 
+automatically spray the pesticides , and to minimize potential environmental and health problems of the 
+farmers [18, 19]. Fig. 2 shows the basic components of UAVs, including the frame, propellers, brush-
+less motors, Electronic Speed Control (ESC) modules, flight control board, RF transmitter and receiver 
+modules, and rechargeable battery [22]. 
+ 
+Fig.2 Basic components of a drone 
+
+--- Page 3 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+1.1 Related Work 
+For smart farming purposes, the application of UAV technology with IoT-based environmental sensor 
+networks have played an important role to enhance the productivity of agricultural crops in the last years 
+[23-25]. This role of UAVs along with IoT-based embedded systems for water irrigation management in 
+smart agriculture has been highlighted in previous studies as follows. Chebrolu et al. [26] proposed a 
+registration method of UAV images to reconstruct a three -dimensional (3D) model of the crop. That 
+allows monitoring of the crop growth parameters based on a plant -level. Similarly, the height of maize 
+and Sorghum plants in the fie ld has been determined based on the UAV images and 3D reconstructed 
+plant model [27]. The results of this study showed that the Root Mean Square Error (RMSE) was 0.33 m 
+for the average single Sorghum height. Also, leaf area index (LAI) in Soybean plants has been extracted 
+using UAV and 3D plant model [28]. A comparative study of using different cameras mounted on the 
+UAV for precision agriculture has been conducted in [29]. The authors verified that UAV -based multi-
+spectral images are instructive and can constitute a great potential for smart agriculture. Based on visible 
+reflectance for evaluating crop biomass , vegetation indices can be extr acted using RGB camera with a 
+drone within an acquisition platform [30, 31] . A case study in Indonesia [32] has been conducted to 
+demonstrate the potential of deploying UAV -based remote sensing to assist precision agriculture 
+mapping. That includes collecting periodic information of the field, such as vegetation monitoring, plant 
+healthy, and stock valuation. 
+Many researchers investigated the feasibility of employing IoT technology systems to control water 
+irrigation and crops monitoring. Automated water irrigation was introduced and implemented using a 
+mobile application [33]. The designed smartphone application can acquire and process images of the soil 
+around the root area of the plants to determine sensor-less the current quantity of water. Based on ARM9 
+processor, a smart drip irrigation system was developed, displaying environmental conditions such as 
+high temperature , low moisture, CO2 concentration , and the activities of the devel oped system [34]. 
+Zaier et al. [35] proposed a wireless-controlled irrigation system to leverage the use of groundwater in 
+the large -scale farms of Oman. Zhang et al. [36] exploit the IoT and big data to develop a real -time 
+monitoring system of the growth of crops to support the wat er irrigation decisions. They proposed a 
+central unit to develop a crop growth model based on extracted plant data. The Open Platform 
+Communications (OPC) have been investigated for smart farming. The feasibility of OPC unified 
+architecture was further studies to be deployed for mobile applications of agricultural machinery systems 
+in [37]. To monitor specific crop conditions, Zhang et al. [38] proposed an intelligent IoT-based system 
+to diagnose and forecast Wheat diseases, pests and weeds. Another IoT-based system has been developed 
+to manage the use of insecticides and fungicides based on predication models of crop disease and pest 
+data [39]. Chieochan et al. [40] proposed an IoT-based irrigation system in the Lingzhi mushroom farm. 
+They used humidity sensors which recorded high values between 90 to 95% humidity data in the farm. 
+A Closed-Circuit Television (CCTV) system was established to monitor and control the sprinkler and 
+fog pumps automatically. 
+ 
+1.2 Contributions of this study 
+In this article, we propose a wireless sensor network to sense and send a range of environmental 
+parameters, namely temperature, humidity and soil moisture in different regions of a farm using Internet 
+of Things (IoT) platform and a drone to collect all environmental recorded values and send them to the 
+cloud-based server . Two main contributions of this study can be summarized as follows. First, w e 
+introduce a new water irrigation system by integrated the use of the UAV with IoT -based embedded 
+system for smart farming. Second, the proposed irrigation system bas been practically implemented and 
+tested in the laboratory successfully. 
+The rem ainder of this paper is divided into the following sections: Section 2 describes the proposed 
+agricultural water irrigation system, including hardware and software components of the drone and IoT-
+
+--- Page 4 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+based embedded system. Section 3 presents the practical results and evaluation of the developed smart 
+irrigation system. Finally, conclusion and future remarks of this research work are given in Section 4. 
+ 
+2. Materials and Methods 
+2.1 Materials 
+Technical description of each component of our proposed agricultural UAV is illustrated in Table 1. It 
+includes one Arduino microcontroller board, F330 4 -Axis RC Quadcopter frame kit, four brushless 
+motors with electronic speed control (ESC), radio frequency (RF) transmitter and receiver, and 
+rechargeable LIPO battery. Moreover, schematic diagram of connected wiring components of the UAV 
+is depicted in Fig. 3. A battery eliminator circuit (BEC) was added to supply electrical voltage to other 
+circuits without using additional batteries. 
+ 
+Table 1 Technical description of proposed UAV components in this study. 
+Component Description 
+Arduino UNO board The Arduino UNO broad includes Atmel microcontroller with analog 
+and digital input -output ports as a central unit for connecting and 
+controlling drone hardware components altogether. 
+Drone frame the drone frame in this study is F330 4-Axis RC Quadcopter Frame Kit. 
+It has built-in circuit to support ESC connections. 
+Electronic Speed Control 
+(ESC) 
+An electronic speed control or ESC is an electronic circuit that controls 
+and regulates the speed of an electric brushless motor. 
+Brushless motor 
+ 
+Have been used in this project a servo motor is a rotary actuator or linear 
+actuator that allows for precise control of angular or linear position, 
+velocity and acceleration. 
+Rechargeable battery 
+ 
+LIPO battery is a rechargeable battery of lithium -ion technology using 
+a polymer electrolyte instead of a liquid electrolyte. These batteries 
+provide higher specific energy than other lithium battery types and are 
+used in our designed drone system because of its light weight. 
+RF transmitter and 
+receiver 
+The flight controller works b y sending a radio signal from the remote 
+control to the drone. That allows the drone to cover possible regions of 
+the farm, collecting all required environmental data for smart irrigation. 
+ 
+ 
+Fig. 3 Schematic diagram of wiring circuit components of the proposed agricultural drone. All 
+nomenclatures have been defined in the context. 
+
+--- Page 5 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+For implementing our practical IoT -based irrigation embedded system , the following hardware and 
+software components have been used for measuring the required environmental data and sending them 
+via the drone to the cloud hosting server to handle the functional status of water pumps automatically. 
+• Arduino UNO microcontroller board 
+• Wi-Fi Module (ESP8266) 
+• DHT22 as temperature and humidity sensors 
+• Soil Moisture Sensor (FC28) 
+• Water pump 5.0 Vdc 
+The microcontroller board connects all environmental sensors of temperature and humidity sensors 
+(DHT22) and soil moisture sensor (FC28) through analog input ports in the range of 5.0 Vdc . The 
+measurement of soil moisture is calculated [41], as given by 
+ 
+ (%) 
+weight of water contained in the soilSoil moisture weight of dry soil samples=
+ (1) 
+ 
+In each region of the farm, the Wi-Fi module (ESP8266) is used for wireless communications 
+(transmitting and receiving the environmental data) between the Arduino UNO board and the cloud 
+server to automatically control the ON/OFF operations of the water pumps. The Arduino IDE is the 
+development interface for programming the Arduino bord with peripherals, i.e. Wi-Fi module, electronic 
+sensors and water pumps using ArduinoC programming language [42]. Arduino RemoteXY application 
+provides a simple Android User Interface (UI) programming with free cloud services to remotely monitor 
+the connected devices and the acquired data for the users [6]. 
+ 
+2.1. Methods 
+Fig. 4 shows the schematic diagram of overall designed system components of our proposed IoT-based 
+agricultural irrigation system. The drone is flying and collect ing the data from two regions in the farm. 
+Three readings of the environmental data, namely temperature , humidity and soil moisture are acquired 
+by electronic sensors for each farm region. The Wi -Fi module sends these reading to the drone, which 
+transmits them to the cloud. Then, the specialists or farmers can be notified by the status of the farm 
+regions with the automatic estimation of water irrigation quantity. Finally, the developed system results 
+will automatically operate the water pumps if needed. 
+ 
+Fig. 4 Schematic diagram of the proposed smart irrigation system using IoT and a drone. 
+ 
+
+--- Page 6 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+The activity diagram of our proposed smart IoT-based irrigation system is shown in Fig. 5. The drone is 
+initially configured with an Internet Protocol (IP) address for wireless connection with each Arduino 
+microcontroller board in all regions of the farm. Once the drone covers a farm region, it collects the 
+corresponding data of temperature, humidity and soil moisture, and send them to the cloud for getting 
+the decision of operating the water irrigation pumps. 
+ 
+ 
+Fig. 5 The activity diagram of monitoring the environmental data of temperature, humidity, and soil 
+moisture using a drone and IoT-based system. 
+ 
+3. Results and Discussion 
+Fig. 6 shows the developed Android -based mobile user interfaces of our smart irrigation system using 
+Arduino RemoteXY. In this study, two regions of the farm are defined as Region 1 and Region 2. The 
+farmer can simply select any agricultural region and display t he corresponding environmental data. The 
+measured values of temperature ( o C), humidity (%) and soil moisture (%) are monitored per region in 
+the IoT-cloud system. The processing latency of estimating the quantity of water irrigation is 0.5 second 
+because of the wireless delay transmission of the above measured data from sensors. Fig. 7 depicts the 
+practical prototype of our developed smart irrigation system. Moreover, the hardware components of 
+our proposed UAV for collecting environmental data in the far m are given as screenshots in Fig. 8. 
+Furthermore, the environmental sensor readings have been successfully tested and evaluated and 
+compared with the real weather news for temperature and humidity data in Riyadh, Saudi Arabia, as 
+shown in Fig. 9. The successful water irrigation control system using artificial neural networks has been 
+previously assessed in our study, as presented in Ref. [6] 
+
+--- Page 7 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+ 
+Fig. 6 Mobile user interfaces (UI) of the developed IoT -based water irrigation system based on the 
+measurements of temperature, humidity and soil moisture to operate the corresponding water pump. 
+ 
+Fig. 7 Practical implementation of the developed IoT-based irrigation system including Arduino board, 
+Wi-Fi module, electronic sensors of temperature, humidity and soil moisture. 
+ 
+ 
+Fig. 8 Screenshots of the practical design of our proposed agricultural UAV. 
+ 
+
+--- Page 8 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+ 
+ 
+Fig. 9 Comparative readings between the weather news and the developed system sensor readings 
+[Location: Riyadh; Date: 15 July 2020; Time: 3:00 -7:00 PM] 
+ 
+Although our developed IoT-based embedded system showed good results to monitor the environmental 
+data of temperature, humidity and soil moisture to control the water irrigation pumps in two regions, as 
+shown in Fig. 6 and 9. This study is still limited to experiments in the laboratory. The proposed 
+agricultural drone is still under development to accomplish the tasks of collecting data in open air of the 
+farm with permissions of official authorities and stakeholders in Saudi Arab ia. Nevertheless, the 
+designed and development of our smart irrigation system is still valid and scalable for saving water 
+resources in the farm using IoT and UAV. 
+ 
+
+--- Page 9 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+4. Conclusions and Outlook 
+In this study, a new smart IOT -based irrigation system has been successfully implemented to monitor 
+the environmental data in the agricultural field. In addition, a drone has been designed and partially 
+implemented to support smart water irrigation system, as shown in Fig. 8. Therefore, the main prospect 
+of this research work is the real-time deployment of our developed irrigation system in the farms around 
+the province area of Shaqra , Saudi Arabia . Also, th is smart irrigation system can be extended to 
+accomplish the following advanced tasks:1) E xploring water irrigation needs to a specific crop and 
+inform the farmer by SMS ; and 2) Analysis of crop growth stages using an UAV -based camera . 
+Furthermore, Automatic flight control using the hand movement will be considered in the future design 
+of our proposed agricultural UAV. 
+ 
+Acknowledgment 
+This project is supported by the College of Computing and Information Technology, Shaqra 
+University. 
+References 
+[1] H. Willer, M. Yussefi, and N. Sorensen, The World of Organic Agriculture: Statistics and 
+Emerging Trends 2008. Taylor & Francis Group, 2010. 
+[2] C. Ringler, A. K. Biswas, and S. Cline, Global Change: Impacts on Water and food Security. 
+Springer Berlin Heidelberg, 2010. 
+[3] J. Shi, X. Wu, X. Wang, M. Zhang, L. Han, W. Zhang, W. Liu, Q. Z uo, X. Wu, H. Zhang, and A. 
+Ben-Gal, "Determining threshold values for root-soil water weighted plant water deficit index 
+based smart irrigation," Agricultural Water Management, vol. 230, p. 105979, 2020/03/01/ 2020. 
+[4] H. Chen, A. Chen, L. Xu, H. Xie, H. Qiao, Q. Lin, and K. Cai, "A deep learning CNN architecture 
+applied in smart near-infrared analysis of water pollution for agricultural irrigation resources," 
+Agricultural Water Management, vol. 240, p. 106303, 2020/10/01/ 2020. 
+[5] N. Ahmed, D. De, and I. Hussain, "Internet of Things (IoT) for Smart Precision Agriculture and 
+Farming in Rural Areas," IEEE Internet of Things Journal, vol. 5, no. 6, pp. 4890-4899, 2018. 
+[6] [6] M. E. Karar, M. al-Rasheed, A. Al-Rasheed, and O. Reyad, "IoT and Neural Network-Based 
+Water Pumping Control System For Smart Irrigation," Information Sciences Letters, vol. 9, no. 2, 
+pp. 107-112, 2020. 
+[7] M. E. Karar, A. M. Al-Masaad, and O. Reyad, " GASDUINO-Wireless Air Quality Monitoring 
+System Using Internet of Things," Information Sciences Letters, vol. 9, no. 2, pp. 113-117, 2020. 
+[8] O. Reyad, K. Hamed, and M. E. Karar, "Hash-enhanced elliptic curve bit-string generator for 
+medical image encryption," Journal of Intelligent & Fuzzy Systems, vol. 39, pp. 7795-7806, 2020. 
+[9] M. E. Karar, "Robust RBF neural network–based backstepping controller for implantable cardiac 
+pacemakers," International Journal of Adaptive Control and Signal Processing, vol. 32, no. 7, pp. 
+1040-1051, 2018. 
+[10] M. E. Karar, O. Reyad, H. I. Shehata, A. A. Abdelhamid, and S. Alotaibi, "A New Intelligent 
+System for Performance Enhancement of Dual-Sensor Cardiac Pacemakers Using Iterative 
+Learning Control," in 2020 6th Conference on Data Science and Machine Learning Applications 
+(CDMA), 2020, pp. 158-163. 
+[11] M. E. Karar, "Practical microcontroller-based simulator of graphical heart sounds with disorders," 
+in 2017 Intl Conf on Advanced Control Circuits Systems (ACCS) Systems & 2017 Intl Conf on New 
+Paradigms in Electronics & Information Technology (PEIT), 2017, pp. 326-331. 
+[12] A. Escamilla-García, G. M. Soto-Zarazúa, M. Toledano-Ayala, E. Rivas-Araiza, and A. Gastélum-
+Barrios, "Applications of Artificial Neural Networks in Greenhouse Technology and Overview for 
+Smart Agriculture Development," vol. 10, no. 11, p. 3835, 2020. 
+[13] M. F. Hasan, M. M. Haque, M. R. Khan, R. I. Ruhi, and A. Charkabarty, "Implementation of 
+Fuzzy Logic in Autonomous Irrigation System for Efficient Use of Water," in 2018 Joint 7th 
+International Conference on Informatics, Electronics & Vision (ICIEV) and 2018 2nd 
+International Conference on Imaging, Vision & Pattern Recognition (icIVPR), 2018, pp. 234-238. 
+[14] M. Pathan, N. Patel, H. Yagnik, and M. Shah, "Artificial cognition for applications in smart 
+agriculture: A comprehensive review," Artificial Intelligence in Agriculture, vol. 4, pp. 81-95, 
+2020/01/01/ 2020. 
+
+--- Page 10 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+[15] O. Elijah, T. A. Rahman, I. Orikumhi, C. Y. Leow, and M. N. Hindia, "An Overview of Internet of 
+Things (IoT) and Data Analytics in Agriculture: Benefits and Challenges," IEEE Internet of Things 
+Journal, vol. 5, no. 5, pp. 3758-3773, 2018. 
+[16] A. Yazdinejad, R. M. Parizi, A. Dehghantanha, H. Karimipour, G. Srivastava, and M. Aledhari, 
+"Enabling Drones in the Internet of Things with Decentralized Blockchain -based Security," IEEE 
+Internet of Things Journal, pp. 1-1, 2020. 
+[17] W. Shi, H. Zhou, J. Li, W. Xu, N. Zhang, and X. Shen, "Drone Assisted Vehicular Networks: 
+Architecture, Challenges and Opportunities," IEEE Network, vol. 32, no. 3, pp. 130-137, 2018. 
+[18] P. Daponte, L. De Vito, L. Glielmo, L. Iannelli, D. Liuzza, F. Picariello, and G. Sil ano, "A review 
+on the use of drones for precision agriculture," IOP Conference Series: Earth and Environmental 
+Science, vol. 275, p. 012022, 2019/05/21 2019. 
+[19] M. M. Vihari, U. R. Nelakuditi, and M. P. Teja, "IoT based Unmanned Aerial Vehicle system for 
+Agriculture applications," in 2018 International Conference on Smart Systems and Inventive 
+Technology (ICSSIT), 2018, pp. 26-28. 
+[20] M. Roopaei, P. Rad, and K. R. Choo, "Cloud of Things in Smart Agriculture: Intelligent Irrigation 
+Monitoring by Thermal Imaging," IEEE Cloud Computing, vol. 4, no. 1, pp. 10-15, 2017. 
+[21] F. A. O. U. Nations and W. H. Organization, Manual on development and use of FAO and WHO 
+specifications for pesticides. World Health Organization, 2016. 
+[22] B. Brzozowski, P. Daponte, L. D. Vito, F. Lamonaca, F. Picariello, M. Pompetti, I. Tudosa, and K. 
+Wojtowicz, "A remote-controlled platform for UAS testing," IEEE Aerospace and Electronic 
+Systems Magazine, vol. 33, no. 8, pp. 48-56, 2018. 
+[23] M. Bacco, A. Berton, E. Ferro, C. Gennaro, A. Gotta, S. Matteoli, F. Paonessa, M. Ruggeri, G. 
+Virone, and A. Zanella, "Smart farming: Opportunities, challenges and technology enablers," in 
+2018 IoT Vertical and Topical Summit on Agriculture - Tuscany (IOT Tuscany), 2018, pp. 1-6. 
+[24] W. H. Maes and K. Steppe, "Perspectives for Remote Sensing with Unmanned Aerial Vehicles in 
+Precision Agriculture," Trends in Plant Science, vol. 24, no. 2, pp. 152-164, 2019. 
+[25] A. D. Boursianis, M. S. Papadopoulou, P. Diamantoulakis, A. Liopa-Tsakalidi, P. Barouchas, G. 
+Salahas, G. Karagiannidis, S. Wan, and S. K. Goudos, "Internet of Things (IoT) and Agricultural 
+Unmanned Aerial Vehicles (UAVs) in smart farming: A comprehensive review," Internet of 
+Things, p. 100187, 2020/03/07/ 2020. 
+[26] N. Chebrolu, T. Läbe, and C. Stachniss, "Robust Long-Term Registration of UAV Images of Crop 
+Fields for Precision Agriculture," IEEE Robotics and Automation Letters, vol. 3, no. 4, pp. 3097-
+3104, 2018. 
+[27] A. Chang, J. Jung, M. M. Maeda, and J. Landivar, "Crop height monitoring with digital imagery 
+from Unmanned Aerial System (UAS)," Computers and Electronics in Agriculture, vol. 141, pp. 
+232-237, 2017/09/01/ 2017. 
+[28] L. Roth, H. Aasen, A. Walter, and F. Liebisch, "Extracting leaf area index using viewing geometry 
+effects—A new perspective on high-resolution unmanned aerial system photography," ISPRS 
+Journal of Photogrammetry and Remote Sensing, vol. 141, pp. 161-175, 2018/07/01/ 2018. 
+[29] L. Deng, Z. Mao, X. Li, Z. Hu, F. Duan, and Y. Yan, "UAV-based multispectral remote sensing 
+for precision agriculture: A comparison between different cameras," ISPRS Journal of 
+Photogrammetry and Remote Sensing, vol. 146, pp. 124-136, 2018/12/01/ 2018. 
+[30] R. Jannoura, K. Brinkmann, D. Uteau, C. Bruns, and R. G. Joergensen, "Monitoring of crop 
+biomass using true colour aerial photographs taken from a remote controlled hexacopter," 
+Biosystems Engineering, vol. 129, pp. 341-351, 2015/01/01/ 2015. 
+[31] X. Wang, H. Sun, Y. Long, L. Zheng, H. Liu, and M. Li, "Development of Visualization System 
+for Agricultural UAV Crop Growth Information Collection," IFAC-PapersOnLine, vol. 51, no. 17, 
+pp. 631-636, 2018/01/01/ 2018. 
+[32] C. A. Rokhmana, "The Potential of UAV-based Remote Sensing for Supporting Precision 
+Agriculture in Indonesia," Procedia Environmental Sciences, vol. 24, pp. 245-253, 2015/01/01/ 
+2015. 
+[33] J. G. Jagüey, J. F. Villa-Medina, A. López-Guzmán, and M. Á. Porta-Gándara, "Smartphone 
+Irrigation Sensor," IEEE Sensors Journal, vol. 15, no. 9, pp. 5122-5127, 2015. 
+[34] G. Kavianand, V. M. Nivas, R. Kiruthika, and S. Lalitha, "Smart drip irrigation system for 
+sustainable agriculture," in 2016 IEEE Technological Innovations in ICT for Agriculture and Rural 
+Development (TIAR), 2016, pp. 19-22. 
+[35] R. Zaier, S. Zekri, H. Jayasuriya, A. Teirab, N. Hamza, and H. Al-Busaidi, "Design and 
+implementation of smart irrigation system for groundwater use at farm scale," in 2015 7th 
+International Conference on Modelling, Identification and Control (ICMIC), 2015, pp. 1-6. 
+
+--- Page 11 ---
+
+Accepted for publication in International Journal of Information Sciences Letters 
+http://dx.doi.org/10.18576/isl/100115 
+[36] P. Zhang, Q. Zhang, F. Liu, J. Li, N. Cao, and C. Song, "The Construction of the Integration of 
+Water and Fertilizer Smart Water Saving Irrigation System Based on Big Data," in 2017 IEEE 
+International Conference on Computational Science and Engineering (CSE) and IEEE 
+International Conference on Embedded and Ubiquitous Computing (EUC) , 2017, vol. 2, pp. 392-
+397. 
+[37] T. Oksanen, R. Linkolehto, and I. Seilonen, "Adapting an industrial auto mation protocol to remote 
+monitoring of mobile agricultural machinery: a combine harvester with IoT," IFAC-
+PapersOnLine, vol. 49, no. 16, pp. 127-131, 2016/01/01/ 2016. 
+[38] S. Zhang, X. Chen, and S. Wang, "Research on the monitoring system of wheat diseases, p ests and 
+weeds based on IOT," in 2014 9th International Conference on Computer Science & Education , 
+2014, pp. 981-985. 
+[39] H. Lee, A. Moon, K. Moon, and Y. Lee, "Disease and pest prediction IoT system in orchard: A 
+preliminary study," in 2017 Ninth International Conference on Ubiquitous and Future Networks 
+(ICUFN), 2017, pp. 525-527. 
+[40] O. Chieochan, A. Saokaew, and E. Boonchieng, "IOT for smart farm: A case study of the Lingzhi 
+mushroom farm at Maejo University," in 2017 14th International Joint Conference on Computer 
+Science and Software Engineering (JCSSE), 2017, pp. 1-6. 
+[41] Radi, Murtiningrum, Ngadisih, F. S. Muzdrikah, M. S. Nuha, and F. A. Rizqi, "Calibration of 
+Capacitive Soil Moisture Sensor (SKU:SEN0193)," in 2018 4th International Conference on 
+Science and Technology (ICST), 2018, pp. 1-6. 
+[42] M. Böhmer, Beginning Android ADK with Arduino. Apress, 2012.

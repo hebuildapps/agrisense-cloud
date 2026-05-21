@@ -1,0 +1,800 @@
+from datetime import date
+from pathlib import Path
+
+
+OUT = Path("pilot_study.md")
+
+
+papers = [
+    {
+        "title": "A Feasible IoT-Based System for Precision Agriculture",
+        "file": "papers/A Feasible IoT-Based System for Precision Agriculture.pdf",
+        "authors": "Radovan Stojanovic, Vesna Maras, Sanja Radonjic, Anita Martic, Jovan Durkovic, Katarina Pavicevic, Vasilije Mirovic and collaborators",
+        "publisher": "IEEE",
+        "year": "2016",
+        "doi": "10.1109/MIS.2015.67",
+        "focus": "low-cost field monitoring for precision agriculture and viticulture",
+        "type": "Hybrid",
+        "edge_device": "self-powered field station, remote collector",
+        "cloud": "ThingSpeak / web IoT server",
+        "ml": "none; monitoring and control logic",
+        "realtime": "near-real-time telemetry",
+        "comm": {"MQTT": "No", "HTTP": "Yes", "LoRa": "Referenced", "WiFi": "Yes", "Cellular": "Optional", "BLE": "No"},
+        "ai": {"Cloud AI": "No", "Edge AI": "No", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "The paper addresses the practical problem of giving farmers a low-cost, remotely accessible way to monitor field and crop conditions without expensive industrial SCADA infrastructure.",
+        "architecture": "A self-powered measuring station gathers field parameters and forwards them to a nearby collector. The collector bridges the farm node to home or office WiFi and then to an IoT server such as ThingSpeak. The architecture is simple but important: local acquisition, gateway forwarding, cloud visualization, and web/API-based access for authorized users.",
+        "tech": "Self-powered sensor station, remote collector, WiFi, commercial IoT server, ThingSpeak APIs, web applications, field sensors for viticulture monitoring.",
+        "contrib": [
+            "Demonstrates a feasible low-cost IoT monitoring architecture for precision agriculture.",
+            "Separates field sensing from Internet connectivity through a collector/gateway.",
+            "Uses an accessible public IoT server model for visualization and farmer access.",
+        ],
+        "method": "The authors design and deploy a field/crop data acquisition setup, route data through a collector, and validate feasibility through remote visualization and control concepts.",
+        "findings": "The main finding is that precision-agriculture monitoring can be implemented with inexpensive distributed components when cloud visualization is decoupled from the constrained field node.",
+        "limits": "The work is monitoring-heavy, has limited AI, limited autonomy, and does not deeply address intermittent connectivity, edge inference, data fusion, or Indian smallholder economics.",
+        "agrosense": "This paper maps closely to AgroSense's ESP32 soil-sensing and telemetry layer. The collector/gateway idea can be reused for villages where field nodes cannot directly reach the Internet. ThingSpeak-style visualization is similar to the current Firebase/ThingSpeak direction, while AgroSense can extend the design with RS485 Modbus probes, GPS-tagged samples, and edge Random Forest inference.",
+        "ideas": [
+            "Use a gateway tier between ESP32 sensor nodes and Firebase when direct WiFi is unreliable.",
+            "Keep ThingSpeak as a low-friction backup dashboard for early pilots.",
+            "Add store-and-forward buffering in the collector to tolerate field connectivity loss.",
+        ],
+    },
+    {
+        "title": "A Pilot Study of Smart Agricultural Irrigation using Unmanned Aerial Vehicles and IoT-Based Cloud System",
+        "file": "papers/A Pilot Study of Smart Agricultural Irrigation using Unmanned aerial vehicle and iot based cloud systems.pdf",
+        "authors": "Mohamed Esmail Karar, Faris Alotaibi, Abdullah Al Rasheed, Omar Reyad",
+        "publisher": "International Journal of Information Sciences Letters",
+        "year": "2021",
+        "doi": "10.18576/isl/100115",
+        "focus": "UAV-assisted smart irrigation and cloud-based water requirement estimation",
+        "type": "Hybrid",
+        "edge_device": "Arduino microcontroller boards, WiFi modules, UAV payload",
+        "cloud": "IoT-based cloud and Android application",
+        "ml": "rule-based irrigation computation",
+        "realtime": "remote monitoring and control",
+        "comm": {"MQTT": "No", "HTTP": "Likely", "LoRa": "No", "WiFi": "Yes", "Cellular": "Mobile app", "BLE": "No"},
+        "ai": {"Cloud AI": "Partial", "Edge AI": "No", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "The paper targets inefficient irrigation, wasted water, and poor spatial awareness in farms where fixed sensing alone may not capture condition differences across regions.",
+        "architecture": "Environmental sensors measure temperature, humidity, and soil moisture. A UAV collects readings from different farm regions and sends the data into a cloud system. The cloud computes irrigation quantities for each region and exposes farm status through an Android application, while water pumps execute irrigation actions.",
+        "tech": "UAV, Arduino boards, WiFi modules, water pumps, temperature sensors, humidity sensors, soil-moisture sensors, cloud computing, Android app.",
+        "contrib": [
+            "Combines UAV mobility with IoT sensing for irrigation planning.",
+            "Uses cloud computation to calculate water requirements by farm region.",
+            "Shows a mobile application workflow for farmer-facing irrigation guidance.",
+        ],
+        "method": "The study implements a prototype using embedded boards, sensors, pumps, UAV data collection, cloud computation, and mobile monitoring, then evaluates whether irrigation waste can be reduced.",
+        "findings": "The system demonstrates that UAV-assisted sensing can improve spatial coverage and cloud logic can guide more precise irrigation than manual methods.",
+        "limits": "The architecture depends on UAV availability, cloud connectivity, and relatively simple control logic. It does not deeply cover edge failover, flight planning constraints, or low-cost mass deployment.",
+        "agrosense": "This is one of the strongest matches for AgroSense's UAV photogrammetry and ground-sensor fusion direction. AgroSense can combine aerial crop-stress imagery with ESP32 soil-moisture/NPK readings, then use cloud orthomosaic outputs and Firebase telemetry to drive irrigation or sampling recommendations.",
+        "ideas": [
+            "Use UAV missions to fill spatial gaps between fixed soil probes.",
+            "Create zone-level irrigation recommendations by fusing RGB stress maps with soil-moisture readings.",
+            "Expose water recommendations in the AgroSense dashboard with farmer-readable priority levels.",
+        ],
+    },
+    {
+        "title": "Chatbot Application to Support Smart Agriculture in Thailand",
+        "file": "papers/Chatbot Application to Support Smart Agriculture.pdf",
+        "authors": "Paweena Suebsombut, Suepphong Chernbumroong, Pradorn Sureephong, Abdelaziz Bouras, Aicha Sekhari",
+        "publisher": "IEEE",
+        "year": "2020",
+        "doi": "10.1109/ECTIDAMTNCON48261.2020.90906",
+        "focus": "farmer decision support using a LINE chatbot and cultivation knowledge",
+        "type": "Cloud",
+        "edge_device": "farmer smartphone and existing smart agriculture sensors",
+        "cloud": "LINE chatbot / knowledge service",
+        "ml": "knowledge representation and recommendation logic",
+        "realtime": "real-time conversational support",
+        "comm": {"MQTT": "No", "HTTP": "Yes", "LoRa": "No", "WiFi": "Yes", "Cellular": "Yes", "BLE": "No"},
+        "ai": {"Cloud AI": "Partial", "Edge AI": "No", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "Most smart agriculture systems stop at sensing and dashboards; this paper addresses the gap between raw IoT data and actionable cultivation knowledge for farmers.",
+        "architecture": "The system uses a chatbot as the user interface. Smart agriculture information and cultivation knowledge are represented behind the chatbot, which answers farmer questions and delivers recommendations through LINE.",
+        "tech": "LINE chatbot, knowledge representation, smart agriculture data, mobile messaging interface, recommendation support.",
+        "contrib": [
+            "Adds conversational decision support to smart agriculture workflows.",
+            "Emphasizes crop-cultivation knowledge rather than sensor display alone.",
+            "Uses a familiar messaging interface to reduce adoption friction.",
+        ],
+        "method": "The authors design a chatbot application and knowledge flow for responding to crop-cultivation questions in the context of smart agriculture.",
+        "findings": "Conversational access can make smart-agriculture systems more usable by presenting recommendations where farmers already communicate.",
+        "limits": "The work is less focused on sensing architecture, edge computing, and quantitative agronomic validation. It depends heavily on knowledge-base quality.",
+        "agrosense": "AgroSense should not only produce maps and sensor charts; it should translate them into simple farmer actions. A chatbot layer could explain why a zone needs sampling, irrigation, pest inspection, or fertilizer correction using Firebase data and UAV stress outputs.",
+        "ideas": [
+            "Add WhatsApp/LINE-style advisory messages for stress zones and NPK alerts.",
+            "Generate local-language explanations from dashboard events.",
+            "Convert model outputs into question-answer flows for field operators.",
+        ],
+    },
+    {
+        "title": "Edge-Based Predictive Data Reduction for Smart Agriculture: A Lightweight Approach to Efficient IoT Communication",
+        "file": "papers/Edge-Based Predictive Data Reduction cost effective.pdf",
+        "authors": "Dora Krekovic, Mario Kusek, Ivana Podnar Zarko, Danh Le-Phuoc",
+        "publisher": "Research paper / conference-style manuscript",
+        "year": "2025",
+        "doi": "Not specified in PDF",
+        "focus": "edge-side predictive filtering to reduce redundant IoT transmissions",
+        "type": "Hybrid",
+        "edge_device": "edge gateway / constrained IoT node",
+        "cloud": "cloud mirror model for consistency",
+        "ml": "lightweight analytical prediction and cross-site generalization",
+        "realtime": "yes, selective transmission",
+        "comm": {"MQTT": "Referenced", "HTTP": "Referenced", "LoRa": "Referenced", "WiFi": "Referenced", "Cellular": "Referenced", "BLE": "Referenced"},
+        "ai": {"Cloud AI": "Partial", "Edge AI": "Yes", "Hybrid AI": "Yes", "TinyML": "Referenced", "On-device inference": "Yes"},
+        "problem": "Continuous IoT transmission wastes bandwidth and battery because many agriculture sensor readings change slowly over time.",
+        "architecture": "A predictive model runs at the edge and estimates the next sensor reading. The node transmits only when measured data deviates from prediction beyond a tolerance. A complementary cloud model reconstructs or validates the expected stream to preserve system consistency.",
+        "tech": "Edge predictive filter, cloud-side mirror model, in situ sensor observations, satellite observations, IoT communication protocols, simulation validation.",
+        "contrib": [
+            "Reduces communication overhead with a lightweight edge prediction filter.",
+            "Maintains cloud consistency through a dual-model edge/cloud strategy.",
+            "Uses both local and satellite observations to improve robustness.",
+        ],
+        "method": "The paper validates predictive reduction through simulation, testing tolerance-based transmission and cross-site model deployment.",
+        "findings": "The approach can cut redundant communication while preserving enough fidelity for downstream analytics, making it attractive for battery-powered field deployments.",
+        "limits": "Tolerance selection is application-sensitive. Abnormal agronomic events may be hidden if thresholds are poorly chosen. Real hardware and farmer-facing validation remain important.",
+        "agrosense": "This is directly useful for ESP32 nodes that send soil moisture, NPK, pH, EC, and temperature to Firebase/ThingSpeak. AgroSense can reduce cloud writes, bandwidth, and power use by transmitting only meaningful changes or model residuals.",
+        "ideas": [
+            "Add edge-side delta/prediction filters before Firebase uploads.",
+            "Mirror prediction logic in the cloud so missing samples are reconstructable.",
+            "Use stricter thresholds during crop-stress events and looser thresholds during stable periods.",
+        ],
+    },
+    {
+        "title": "Energy-Efficient Edge-Fog-Cloud Architecture for IoT-Based Smart Agriculture Environment",
+        "file": "papers/energy-efficient-edge-fog-cloud-architecture-for-iot-based-59eynsuzfn.pdf",
+        "authors": "Hatem A. Alharbi, Mohammad Aldossary",
+        "publisher": "IEEE Access",
+        "year": "2021",
+        "doi": "10.1109/ACCESS.2021.3101397",
+        "focus": "energy-efficient multi-tier edge-fog-cloud smart agriculture architecture",
+        "type": "Hybrid",
+        "edge_device": "edge/fog nodes for local processing",
+        "cloud": "central cloud data center",
+        "ml": "optimization model; AI-enabled architecture context",
+        "realtime": "yes at edge/fog layers",
+        "comm": {"MQTT": "Not central", "HTTP": "Not central", "LoRa": "Referenced", "WiFi": "Not central", "Cellular": "Referenced", "BLE": "No"},
+        "ai": {"Cloud AI": "Yes", "Edge AI": "Yes", "Hybrid AI": "Yes", "TinyML": "No", "On-device inference": "Partial"},
+        "problem": "Traditional cloud-only agriculture architectures spend too much energy and network capacity moving heterogeneous farm data to distant cloud data centers.",
+        "architecture": "The proposed architecture partitions processing across edge, fog, and cloud. Real-time functions such as weather, soil moisture, soil acidity, and irrigation are handled near the farm, while heavier storage and broader analytics remain in the cloud.",
+        "tech": "IoT sensors, edge computing, fog computing, cloud computing, MILP optimization, energy and carbon-emission modeling.",
+        "contrib": [
+            "Defines an integrated edge-fog-cloud architecture for smart agriculture.",
+            "Uses mixed-integer linear programming to model energy-efficient placement.",
+            "Shows that processing closer to sensors can reduce cloud load and emissions.",
+        ],
+        "method": "The authors model thousands of sensors and compare the proposed multi-tier architecture against traditional cloud-centric implementation.",
+        "findings": "Edge/fog processing improves energy efficiency and makes real-time agriculture services more practical at scale.",
+        "limits": "MILP models can simplify field realities. Hardware cost, rural maintenance, and smallholder affordability need further deployment validation.",
+        "agrosense": "AgroSense can use this as its reference architecture: ESP32 nodes as edge, a phone/Raspberry Pi/Jetson gateway as fog, and Firebase/cloud processing for dashboards and historical analytics.",
+        "ideas": [
+            "Classify AgroSense workloads as edge-critical, fog-aggregated, or cloud-archival.",
+            "Run irrigation and alert decisions locally when connectivity drops.",
+            "Use cloud only for orthomosaic processing, model management, and long-term analytics.",
+        ],
+    },
+    {
+        "title": "Everything You Wanted to Know About Smart Agriculture",
+        "file": "papers/EVERYTHING_YOU_WANTED_TO_KNOW_ABOUT_SMART_AGRI_45PAGES.pdf",
+        "authors": "Alakananda Mitra, Sukrutha L. T. Vangipuram, Anand K. Bapatla, Venkata K. V. V. Bathalapalli, Saraju P. Mohanty, Elias Kougianos, Chittaranjan Ray",
+        "publisher": "arXiv preprint",
+        "year": "2022",
+        "doi": "arXiv:2201.04754",
+        "focus": "broad smart agriculture survey, architectures, applications, datasets, networking, and challenges",
+        "type": "Hybrid",
+        "edge_device": "survey covers sensors, edge devices, Raspberry Pi, ESP32-class boards",
+        "cloud": "cloud, edge, and blockchain-enabled frameworks",
+        "ml": "AI/ML survey including crop, soil, UAV, and security use cases",
+        "realtime": "varies by application",
+        "comm": {"MQTT": "Referenced", "HTTP": "Referenced", "LoRa": "Referenced", "WiFi": "Referenced", "Cellular": "Referenced", "BLE": "Referenced"},
+        "ai": {"Cloud AI": "Yes", "Edge AI": "Yes", "Hybrid AI": "Yes", "TinyML": "Referenced", "On-device inference": "Referenced"},
+        "problem": "The survey organizes the rapidly expanding smart-agriculture field and identifies technologies, architectures, applications, datasets, and open research problems.",
+        "architecture": "The paper discusses layered agriculture cyber-physical systems: sensing/device layers, connectivity, edge/cloud processing, analytics, security, and application layers across crop, livestock, UAV, and automation scenarios.",
+        "tech": "IoT, AI, ML, UAVs, wireless sensor networks, edge computing, cloud computing, blockchain/DLT, PUF security, TinyML, Raspberry Pi, ESP8266/ESP32 examples, datasets.",
+        "contrib": [
+            "Provides a broad taxonomy of smart agriculture technologies and applications.",
+            "Connects Agriculture 4.0 with IoT, AI/ML, UAVs, robotics, edge/cloud, and security.",
+            "Identifies future research problems across technology and networking.",
+        ],
+        "method": "The authors synthesize prior literature, architectures, datasets, networking options, and challenge areas into a comprehensive survey.",
+        "findings": "Smart agriculture is moving toward integrated cyber-physical systems where local sensing, AI, connectivity, and secure data management must be designed together.",
+        "limits": "As a survey, it provides breadth more than implementable prototypes. Quantitative comparisons across architectures are limited.",
+        "agrosense": "This paper gives AgroSense its broad literature map. It validates the combination of UAV photogrammetry, ground sensors, edge AI, ESP32-class embedded devices, cloud dashboards, and future security features.",
+        "ideas": [
+            "Use the survey taxonomy to organize AgroSense literature review chapters.",
+            "Benchmark AgroSense against Agriculture 4.0 themes: sensing, autonomy, intelligence, connectivity, security, and usability.",
+            "Track future work around low-power TinyML and hardware security for field nodes.",
+        ],
+    },
+    {
+        "title": "A Fog-Based Smart Agriculture System to Detect Animal Intrusion",
+        "file": "papers/Fog-based Smart Agriculture System to Detect animal anomalies.pdf",
+        "authors": "Jinpeng Miao, Dasari Rajasekhar, Shivakant Mishra, Sanjeet Kumar Nayak, Ramanarayan Yadav",
+        "publisher": "Research paper / IEEE-style manuscript",
+        "year": "2023",
+        "doi": "Not specified in PDF",
+        "focus": "low-cost fog and LoRa animal intrusion detection",
+        "type": "Hybrid",
+        "edge_device": "PIR sensors, cameras, local/fog computing nodes",
+        "cloud": "limited; fog-first design",
+        "ml": "computer vision and prediction algorithm",
+        "realtime": "yes, intrusion alerts",
+        "comm": {"MQTT": "Not central", "HTTP": "Not central", "LoRa": "Yes", "WiFi": "Local", "Cellular": "Optional", "BLE": "No"},
+        "ai": {"Cloud AI": "No", "Edge AI": "Yes", "Hybrid AI": "Partial", "TinyML": "No", "On-device inference": "Yes"},
+        "problem": "Rural farmers need timely and affordable animal intrusion detection, but cloud-only systems suffer from latency, bandwidth cost, and disconnections.",
+        "architecture": "The system combines PIR sensors, cameras, LoRa communication, and fog computing. Local sensing detects potential intrusion, camera/computer-vision components identify animals, and fog logic predicts future locations before sending alerts.",
+        "tech": "LoRa, PIR sensors, cameras, computer vision, fog computing, low-cost sensor layouts, farmer alerting.",
+        "contrib": [
+            "Presents an end-to-end fog-based farm intrusion detection infrastructure.",
+            "Compares sensor layouts for cost and detection coverage.",
+            "Predicts animal future locations to alert farmers before crop damage.",
+        ],
+        "method": "The authors design sensor layouts and a prediction algorithm, then experimentally evaluate detection speed and cost relative to alternatives.",
+        "findings": "Fog computing and LoRa can reduce latency and bandwidth dependence while remaining affordable for rural farms.",
+        "limits": "Animal detection performance depends on sensor placement, camera visibility, lighting, species behavior, and maintenance of distributed devices.",
+        "agrosense": "AgroSense can adopt the fog-first alerting pattern for pest/animal/security events. UAV imagery could locate damage zones, while ground PIR/camera nodes provide continuous watch near field boundaries.",
+        "ideas": [
+            "Add optional LoRa boundary nodes for animal/pest intrusion pilots.",
+            "Run lightweight image classification on a Raspberry Pi or Jetson gateway.",
+            "Route urgent alerts through SMS/WhatsApp when Firebase connectivity is delayed.",
+        ],
+    },
+    {
+        "title": "IoT-Aerial Base Station Task Offloading with Risk-Sensitive Reinforcement Learning for Smart Agriculture",
+        "file": "papers/IoT-Aerial_Base_Station_Task_Offloading_with_RLbased_for_Smartagri.pdf",
+        "authors": "Turgay Pamuklu, Anne Catherine Nguyen, Aisha Syed, W. Sean Kennedy, Melike Erol-Kantarci",
+        "publisher": "IEEE Transactions on Green Communications and Networking / arXiv",
+        "year": "2022",
+        "doi": "10.1109/TGCN.2022.3205330",
+        "focus": "UAV/aerial base station task offloading with risk-sensitive reinforcement learning",
+        "type": "Edge",
+        "edge_device": "IoT devices and aerial base stations",
+        "cloud": "not central; aerial edge offloading",
+        "ml": "multi-actor risk-sensitive reinforcement learning",
+        "realtime": "deadline-constrained task processing",
+        "comm": {"MQTT": "No", "HTTP": "No", "LoRa": "Referenced", "WiFi": "No", "Cellular": "5G context", "BLE": "No"},
+        "ai": {"Cloud AI": "No", "Edge AI": "Yes", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "IoT farm devices have limited energy and compute, while aerial base stations also have limited battery. Task offloading must meet deadlines without exhausting aerial resources.",
+        "architecture": "IoT nodes offload computational tasks to UAV/aerial base stations. A multi-actor risk-sensitive RL scheduler chooses task assignments while considering deadlines, ABS energy, and hovering time.",
+        "tech": "UAV, aerial base station, IoT task offloading, risk-sensitive reinforcement learning, Q-learning baseline, MILP lower bound.",
+        "contrib": [
+            "Models smart-farm computation offloading to aerial base stations.",
+            "Introduces a risk-sensitive multi-actor RL scheduling approach.",
+            "Compares against heuristics, classic Q-learning, and MILP bounds.",
+        ],
+        "method": "The authors formulate deadline-constrained task offloading, build an RL scheduler, and evaluate it through simulation against heuristic and optimization baselines.",
+        "findings": "Risk-sensitive scheduling improves guaranteed task service while increasing aerial station hovering time.",
+        "limits": "The work is simulation-focused and assumes aerial infrastructure that may be expensive for smallholders. It does not implement physical AgroSense-style sensors or dashboards.",
+        "agrosense": "AgroSense can use this concept in a lighter way: UAVs or mobile gateways can temporarily act as data mules or compute nodes for fields without connectivity, especially during scouting missions.",
+        "ideas": [
+            "Treat UAV flights as opportunistic data-collection/offload windows.",
+            "Prioritize urgent field-node uploads using battery and deadline scores.",
+            "Use simpler scheduling heuristics first, then evaluate RL once enough telemetry exists.",
+        ],
+    },
+    {
+        "title": "A LoRa-IoT Framework with Machine Learning for Remote Livestock Monitoring in Smart Agriculture",
+        "file": "papers/lora_iot_mlbased_livestock_monitoring_insmartagri2510.07322v1.pdf",
+        "authors": "Hitesh Mohapatra",
+        "publisher": "arXiv preprint",
+        "year": "2025",
+        "doi": "arXiv:2510.07322",
+        "focus": "LoRa livestock tracking, health monitoring, anomaly detection, and cloud analytics",
+        "type": "Hybrid",
+        "edge_device": "wearable collars with GPS, motion, and temperature sensors",
+        "cloud": "cloud visualization, alerts, and analytics",
+        "ml": "predictive health alerts and behavioral anomaly detection",
+        "realtime": "yes, tracking and alerts",
+        "comm": {"MQTT": "Likely", "HTTP": "Likely", "LoRa": "Yes", "WiFi": "Gateway-side", "Cellular": "Gateway-side", "BLE": "No"},
+        "ai": {"Cloud AI": "Yes", "Edge AI": "Partial", "Hybrid AI": "Yes", "TinyML": "No", "On-device inference": "Partial"},
+        "problem": "Remote livestock environments need low-power long-range monitoring without relying on dense cellular or WiFi infrastructure.",
+        "architecture": "Wearable sensor collars collect GPS, movement, and temperature. Data moves over LoRa to gateways and then to cloud services for dashboards, alerts, predictive health analytics, and anomaly detection.",
+        "tech": "LoRa, GPS, motion sensors, temperature sensors, cloud analytics, ML-based health alerts, anomaly detection, gateway architecture.",
+        "contrib": [
+            "Presents AgroTrack, a low-power LoRa framework for livestock monitoring.",
+            "Adds ML analytics for health and behavior anomalies.",
+            "Reports field trials over a 30-acre area and scalability simulations.",
+        ],
+        "method": "The paper combines field trials with simulation, measuring packet success, range, battery life, scalability, throughput, and gateway-failure recovery.",
+        "findings": "LoRa can provide kilometer-scale rural telemetry with high packet success and practical battery life, while ML adds decision-support value.",
+        "limits": "Livestock tracking differs from crop monitoring; collars require maintenance, and cloud analytics still need reliable gateway backhaul.",
+        "agrosense": "AgroSense can reuse the LoRa gateway design for remote plots where WiFi is unrealistic. The field-trial metrics also provide a benchmark for coverage and power planning.",
+        "ideas": [
+            "Offer LoRa as an optional long-range telemetry mode for ESP32/RS485 sensor clusters.",
+            "Use gateway redundancy for village-scale deployments.",
+            "Adapt anomaly detection to soil moisture, EC, pH, and crop-stress time series.",
+        ],
+    },
+    {
+        "title": "Machine Learning Applications in IoT Based Agriculture and Smart Farming: A Review",
+        "file": "papers/machine-learning-applications-in-iot-based-agriculture-and-3qim24ivpa.pdf",
+        "authors": "M. W. P. Maduranga, Ruvan Abeysekera",
+        "publisher": "International Journal of Engineering Applied Sciences and Technology",
+        "year": "2020",
+        "doi": "Not specified in PDF",
+        "focus": "review of ML and IoT applications in smart agriculture",
+        "type": "Hybrid",
+        "edge_device": "IoT sensor nodes, embedded boards in reviewed systems",
+        "cloud": "cloud and data analytics systems in reviewed literature",
+        "ml": "MLIoT, SVM, classification, prediction, decision support",
+        "realtime": "varies by application",
+        "comm": {"MQTT": "Referenced", "HTTP": "Referenced", "LoRa": "Referenced", "WiFi": "Referenced", "Cellular": "Referenced", "BLE": "No"},
+        "ai": {"Cloud AI": "Yes", "Edge AI": "Partial", "Hybrid AI": "Yes", "TinyML": "No", "On-device inference": "Partial"},
+        "problem": "IoT creates large agriculture datasets, but productivity gains require meaningful analysis through machine learning.",
+        "architecture": "The review discusses the blend of IoT sensing, data collection, processing, and ML-based decision support across smart farming applications.",
+        "tech": "IoT, ML, smart farming, sensor data, predictive analytics, classification algorithms, farm-management decision support.",
+        "contrib": [
+            "Reviews IoT and ML approaches in agriculture.",
+            "Frames MLIoT as a combined paradigm for intelligent farm management.",
+            "Highlights opportunities for applying ML to large sensor datasets.",
+        ],
+        "method": "The authors review existing literature and propose concepts for blending ML and IoT in agriculture.",
+        "findings": "ML can improve farm productivity when sensor data is cleaned, contextualized, and transformed into prediction or recommendation workflows.",
+        "limits": "The review is high-level and provides limited implementation detail, benchmarking, or hardware guidance.",
+        "agrosense": "This supports AgroSense's Random Forest NPK estimation direction and broader sensor-fusion analytics. It reinforces that AgroSense must treat data quality and model selection as core system features.",
+        "ideas": [
+            "Build a repeatable ML pipeline for soil, crop-stress, and weather variables.",
+            "Start with interpretable models for farmer trust and debugging.",
+            "Create datasets from every pilot for future model retraining.",
+        ],
+    },
+    {
+        "title": "Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique",
+        "file": "papers/online-processing-of-vehicular-data-on-the-edge-through-an-unsupervised-model.pdf",
+        "authors": "Pedro Andrade, Ivanovitch Silva, Marianne Diniz, Thommas Flores, Daniel G. Costa, Eduardo Soares",
+        "publisher": "ACM Transactions / ACM manuscript",
+        "year": "2023",
+        "doi": "10.1145/3591356",
+        "focus": "unsupervised TinyML regression for edge streaming data",
+        "type": "Edge",
+        "edge_device": "microcontrollers and edge devices",
+        "cloud": "not central",
+        "ml": "unsupervised TinyML regression with typicality, eccentricity, and RLS",
+        "realtime": "yes, online stream processing",
+        "comm": {"MQTT": "No", "HTTP": "No", "LoRa": "Referenced", "WiFi": "No", "Cellular": "No", "BLE": "No"},
+        "ai": {"Cloud AI": "No", "Edge AI": "Yes", "Hybrid AI": "No", "TinyML": "Yes", "On-device inference": "Yes"},
+        "problem": "Streaming IoT data must be processed on constrained devices, but supervised models can be too heavy or require labeled datasets.",
+        "architecture": "The algorithm runs at the edge, processes incoming streams online, identifies patterns using typicality and eccentricity, and predicts values using a Recursive Least Squares component.",
+        "tech": "TinyML, unsupervised learning, regression, RLS filter, edge stream processing, microcontrollers, vehicular datasets.",
+        "contrib": [
+            "Introduces an unsupervised TinyML regression technique for edge streams.",
+            "Avoids reliance on labeled training data.",
+            "Reports lower error than RLS and CNN baselines in vehicular experiments.",
+        ],
+        "method": "The authors run extensive experiments on vehicular data streams and compare against RLS and CNN approaches using mean squared error.",
+        "findings": "Online unsupervised edge learning can outperform heavier methods for certain streaming regression tasks while remaining suitable for constrained devices.",
+        "limits": "The domain is vehicular rather than agriculture; transfer to soil or crop-stress data requires validation. Unsupervised models still need drift monitoring.",
+        "agrosense": "AgroSense can adapt this class of TinyML technique for on-device soil-moisture trend prediction, anomaly detection, or sensor fault detection on ESP32-class devices.",
+        "ideas": [
+            "Test TinyML regression for soil-moisture and EC forecasting on ESP32.",
+            "Use unsupervised residuals to detect sensor faults or irrigation leaks.",
+            "Compare against the current Random Forest pipeline for edge feasibility.",
+        ],
+    },
+    {
+        "title": "An Ontological Knowledge Representation for Smart Agriculture",
+        "file": "papers/ontological_knldg_Representation_For smartagri.pdf",
+        "authors": "Bikram Pratim Bhuyan, Ravi Tomar, Maanak Gupta, Amar Ramdane-Cherif",
+        "publisher": "IEEE-style conference paper",
+        "year": "2022",
+        "doi": "Not specified in PDF",
+        "focus": "ontology and knowledge graph representation for spatio-temporal agriculture data",
+        "type": "Cloud",
+        "edge_device": "not central; IoT/WSN data sources",
+        "cloud": "knowledge graph / semantic reasoning layer",
+        "ml": "semantic reasoning; possible integration with ML",
+        "realtime": "decision-support oriented",
+        "comm": {"MQTT": "No", "HTTP": "No", "LoRa": "No", "WiFi": "No", "Cellular": "No", "BLE": "No"},
+        "ai": {"Cloud AI": "Partial", "Edge AI": "No", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "Smart agriculture systems collect heterogeneous sensor and contextual data, but decision-making requires structured knowledge representation.",
+        "architecture": "The paper proposes an agricultural ontology and represents the knowledge graph as a lattice for spatio-temporal agricultural data reasoning.",
+        "tech": "Ontology, knowledge graph, lattice structure, IoT, WSN, spatio-temporal data, smart farming semantics.",
+        "contrib": [
+            "Defines an ontology-oriented smart agriculture knowledge model.",
+            "Uses lattice representation to support reasoning over agricultural data.",
+            "Connects IoT data collection with higher-level semantic decision support.",
+        ],
+        "method": "The authors formulate an ontology framework and discuss how extracted farm knowledge can be represented and reasoned over.",
+        "findings": "Semantic structure is valuable when raw sensor data must be transformed into explainable recommendations.",
+        "limits": "The work is conceptual and does not provide a full low-cost deployment, edge implementation, or farmer-facing interface.",
+        "agrosense": "AgroSense can use an ontology-lite design for its dashboard: field, plot, crop, sensor, UAV image, soil sample, NPK estimate, recommendation, and farmer action should be linked explicitly.",
+        "ideas": [
+            "Create a simple AgroSense data model that connects sensor readings to zones and recommendations.",
+            "Use semantic labels to explain alerts in the dashboard and chatbot.",
+            "Store provenance: which UAV flight, soil probe, and model produced each recommendation.",
+        ],
+    },
+    {
+        "title": "Reliable and Cost-Efficient IoT Connectivity for Smart Agriculture: A Comparative Study of LPWAN, 5G, and Hybrid Connectivity Models",
+        "file": "papers/Reliable and Cost-Efficient IoT Connectivity for Smart agri LWPAN 5G.pdf",
+        "authors": "Mohamed Shabeer Mohamed Rafi, Mehran Behjati, Ahmad Sahban Rafsanjani",
+        "publisher": "Research paper / review manuscript",
+        "year": "2025",
+        "doi": "Not specified in PDF",
+        "focus": "LPWAN, 5G, and hybrid connectivity tradeoffs for smart agriculture",
+        "type": "Hybrid",
+        "edge_device": "field IoT nodes and gateways",
+        "cloud": "cloud backhaul through gateway/cellular networks",
+        "ml": "not central",
+        "realtime": "depends on connectivity tier",
+        "comm": {"MQTT": "Referenced", "HTTP": "Referenced", "LoRa": "Yes", "WiFi": "Referenced", "Cellular": "Yes", "BLE": "No"},
+        "ai": {"Cloud AI": "No", "Edge AI": "No", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "Agriculture deployments need reliable connectivity across diverse terrain, but no single network technology balances cost, range, bandwidth, and latency for all use cases.",
+        "architecture": "The paper compares LPWAN technologies such as LoRaWAN, NB-IoT, and Sigfox with 4G/5G, then recommends hybrid LPWAN-5G models where low-power sensors use LPWAN and gateways or high-bandwidth devices use cellular links.",
+        "tech": "LoRaWAN, NB-IoT, Sigfox, 4G/5G, hybrid networking, IoT gateways, smart-farm case studies.",
+        "contrib": [
+            "Compares LPWAN and cellular options for farm connectivity.",
+            "Evaluates hybrid LPWAN-5G models for cost and reliability.",
+            "Provides recommendations for network selection by agriculture requirement.",
+        ],
+        "method": "The study synthesizes 2020-2024 literature and case studies, emphasizing cost, reliability, and deployment suitability.",
+        "findings": "Hybrid LPWAN-5G models can reduce connectivity cost while improving reliability in remote agricultural settings.",
+        "limits": "5G availability in Indian villages is uneven, NB-IoT/Sigfox ecosystem support varies, and business-model costs can dominate technical suitability.",
+        "agrosense": "This is central to AgroSense scaling. Smallholder deployments should not assume continuous WiFi. ESP32 nodes can use WiFi in greenhouse/lab pilots, LoRa in open fields, and cellular/5G only at gateways or UAV upload points.",
+        "ideas": [
+            "Design AgroSense communications as pluggable: WiFi, LoRa, cellular gateway.",
+            "Use LoRa for low-rate soil telemetry and WiFi/cellular for UAV imagery upload.",
+            "Add a connectivity decision matrix to deployment planning.",
+        ],
+    },
+    {
+        "title": "Simulating Battery-Powered TinyML Systems Optimised using Reinforcement Learning in Image-Based Anomaly Detection",
+        "file": "papers/RL_in_image_based_anomaly_Detection.pdf",
+        "authors": "Jared M. Ping, Ken J. Nixon",
+        "publisher": "TinyML / research preprint",
+        "year": "2024",
+        "doi": "Not specified in PDF",
+        "focus": "RL-based battery optimization for TinyML image anomaly detection",
+        "type": "Hybrid",
+        "edge_device": "battery-powered TinyML image device",
+        "cloud": "cloud anomaly processing when needed",
+        "ml": "reinforcement learning, image anomaly detection, on-device training/inference",
+        "realtime": "event-driven",
+        "comm": {"MQTT": "No", "HTTP": "No", "LoRa": "Referenced", "WiFi": "No", "Cellular": "Referenced", "BLE": "No"},
+        "ai": {"Cloud AI": "Yes", "Edge AI": "Yes", "Hybrid AI": "Yes", "TinyML": "Yes", "On-device inference": "Yes"},
+        "problem": "Battery-powered TinyML systems must balance inference, on-device training, cloud offload, and communication to maximize lifetime.",
+        "architecture": "A simulated battery-powered IoT image-anomaly system uses RL to choose operational modes, including cloud anomaly processing and on-device training, compared against static and dynamic optimization policies.",
+        "tech": "TinyML, reinforcement learning, image anomaly detection, battery simulation, cloud processing, on-device training, low-memory model.",
+        "contrib": [
+            "Optimizes TinyML system operations with RL for battery life.",
+            "Benchmarks RL against static and dynamic policies.",
+            "Shows a low-memory approach suitable for constrained hardware.",
+        ],
+        "method": "The authors run modeled simulations and compare battery life effects across control policies.",
+        "findings": "RL improves battery life by 22.86% over static and 10.86% over dynamic optimization in the reported setup.",
+        "limits": "The study is simulation-first and needs hardware benchmarking. Image-based field deployments must handle lighting, dust, weather, and model drift.",
+        "agrosense": "AgroSense can use RL-style or simpler adaptive policies for when ESP32/edge cameras should sample, infer, train, transmit, or sleep. This is especially relevant for solar/battery sensor nodes.",
+        "ideas": [
+            "Start with rule-based adaptive duty cycling, then test RL once pilot telemetry exists.",
+            "Schedule UAV/image uploads based on battery, confidence, and connectivity.",
+            "Use TinyML anomaly detection for crop-stress snapshots at boundary nodes.",
+        ],
+    },
+    {
+        "title": "Smart Agriculture Architecture and Current State in India",
+        "file": "papers/Smart Agriculture Architecture and Current developement in INDIA.pdf",
+        "authors": "Parul Verma",
+        "publisher": "International Journal of Technology, Management & Knowledge Processing",
+        "year": "2021",
+        "doi": "Not specified in PDF",
+        "focus": "IoT smart agriculture framework and Indian deployment context",
+        "type": "Hybrid",
+        "edge_device": "smart sensors and wireless devices",
+        "cloud": "analytics and smart agriculture framework",
+        "ml": "data analytics for precision farming",
+        "realtime": "monitoring-oriented",
+        "comm": {"MQTT": "Referenced", "HTTP": "Referenced", "LoRa": "Referenced", "WiFi": "Referenced", "Cellular": "Referenced", "BLE": "No"},
+        "ai": {"Cloud AI": "Partial", "Edge AI": "Partial", "Hybrid AI": "Partial", "TinyML": "No", "On-device inference": "No"},
+        "problem": "Indian agriculture needs precision-farming approaches to manage weather, soil, fertilizer, pest control, cattle, and resource efficiency.",
+        "architecture": "The paper outlines a smart agriculture framework based on IoT devices, sensors, wireless technologies, data collection, and analytics for precision farming.",
+        "tech": "IoT, smart sensors, wireless technologies, precision farming, Indian agriculture use cases, analytics.",
+        "contrib": [
+            "Frames the role of IoT in Indian smart agriculture.",
+            "Discusses smart agriculture architecture and data analytics.",
+            "Highlights India-specific need for technology integration in farming.",
+        ],
+        "method": "The work is a conceptual/review paper describing architecture and current state rather than a field prototype.",
+        "findings": "India's agriculture sector can benefit from sensor-driven precision farming, but practical adoption depends on cost, usability, and local context.",
+        "limits": "The paper has limited quantitative evaluation, limited hardware specifics, and limited edge/cloud optimization detail.",
+        "agrosense": "This paper anchors AgroSense's startup context: Indian farmers need affordable, usable, locally maintainable tools. It supports focusing on low-cost ESP32 nodes, human-guided workflows, and practical dashboards rather than over-automated expensive systems.",
+        "ideas": [
+            "Prioritize Indian smallholder constraints in every feature: price, repairability, language, and intermittent connectivity.",
+            "Design pilot studies around crop-specific local workflows.",
+            "Use analytics that produce simple recommendations, not only charts.",
+        ],
+    },
+    {
+        "title": "Smart Agriculture: Implementing IoT for Greenhouse Monitoring",
+        "file": "papers/Smart Agriculture_Implementing-AWSIoTandalot.pdf",
+        "authors": "Sergio Apolinario da Costa",
+        "publisher": "Turku University of Applied Sciences bachelor thesis",
+        "year": "2024",
+        "doi": "Not applicable",
+        "focus": "ESP32 greenhouse monitoring with MQTT, AWS, MongoDB, and Angular",
+        "type": "Hybrid",
+        "edge_device": "ESP32 devices with BME680 and BH1750 sensors",
+        "cloud": "AWS IoT, database/backend, dashboard",
+        "ml": "monitoring; no major ML focus",
+        "realtime": "yes, greenhouse telemetry",
+        "comm": {"MQTT": "Yes", "HTTP": "Yes", "LoRa": "No", "WiFi": "Yes", "Cellular": "No", "BLE": "Referenced"},
+        "ai": {"Cloud AI": "No", "Edge AI": "No", "Hybrid AI": "No", "TinyML": "No", "On-device inference": "No"},
+        "problem": "Greenhouse farmers need reliable environmental monitoring to optimize resource use and plant growth.",
+        "architecture": "ESP32 devices collect environmental data and send it through MQTT/WiFi to a central program/cloud stack. Data is organized and stored in a database and visualized through a dashboard.",
+        "tech": "ESP32, MQTT, AWS, BME680, BH1750, MongoDB, Angular, greenhouse sensors, database-backed dashboard.",
+        "contrib": [
+            "Implements a complete greenhouse IoT monitoring prototype.",
+            "Uses ESP32 and common sensors in a maintainable architecture.",
+            "Reports a 45-day greenhouse test with reliable operation.",
+        ],
+        "method": "The thesis designs, implements, and tests the system over 45 days in a greenhouse, assessing data continuity and operational reliability.",
+        "findings": "A modest ESP32-based system can monitor greenhouse conditions reliably for extended periods without maintenance.",
+        "limits": "The system targets greenhouse conditions, not open-field ruggedness. It is monitoring-oriented and lacks integrated agronomic ML or UAV fusion.",
+        "agrosense": "This is highly practical for AgroSense's embedded and dashboard stack. It validates ESP32, MQTT-style telemetry, and real deployment testing. AgroSense can swap AWS/MongoDB for Firebase/ThingSpeak where appropriate.",
+        "ideas": [
+            "Adopt MQTT for more scalable telemetry than direct REST writes when node count grows.",
+            "Use a 30-45 day reliability test as a minimum field-pilot benchmark.",
+            "Mirror the dashboard architecture for greenhouse or nursery AgroSense pilots.",
+        ],
+    },
+    {
+        "title": "Survey of Intelligent Agricultural IoT Based on 5G",
+        "file": "papers/Survey of Intelligent Agricultural IoT Based on 5G.pdf",
+        "authors": "Jun Liu, Lei Shu, Xu Lu, Ye Liu",
+        "publisher": "Electronics, MDPI",
+        "year": "2023",
+        "doi": "10.3390/electronics12102336",
+        "focus": "5G-enabled intelligent agricultural IoT survey",
+        "type": "Hybrid",
+        "edge_device": "massive sensor nodes, terminal devices, edge nodes",
+        "cloud": "5G cloud-edge-end architecture",
+        "ml": "AI, big data, lightweight deep learning, UAV and machinery intelligence",
+        "realtime": "yes for 5G-enabled scenarios",
+        "comm": {"MQTT": "Referenced", "HTTP": "Referenced", "LoRa": "Referenced", "WiFi": "Referenced", "Cellular": "Yes", "BLE": "No"},
+        "ai": {"Cloud AI": "Yes", "Edge AI": "Yes", "Hybrid AI": "Yes", "TinyML": "Referenced", "On-device inference": "Partial"},
+        "problem": "Agriculture requires higher production, sustainability, intelligence, and efficiency; 5G changes what is possible for sensing, control, and autonomous machinery.",
+        "architecture": "The survey describes 5G agricultural IoT as a cloud-edge-end system combining terminal sensing, communication, edge computing, cloud services, AI, UAVs, and intelligent machinery.",
+        "tech": "5G, IoT, edge computing, cloud services, AI, big data, UAVs, intelligent machinery, massive sensing, lightweight deep learning, network slicing concepts.",
+        "contrib": [
+            "Summarizes the architecture and enabling technologies of 5G agricultural IoT.",
+            "Reviews application scenarios across farms, forestry, animal husbandry, and fishing.",
+            "Identifies key scientific problems and future development directions.",
+        ],
+        "method": "The authors review recent 5G-IoT smart agriculture research, architectures, technologies, cases, and challenges.",
+        "findings": "5G strengthens real-time monitoring, UAV operations, machine autonomy, and cloud-edge collaboration, but also raises cost, coverage, and system-complexity questions.",
+        "limits": "The 5G vision can exceed the budget and coverage realities of Indian smallholders. The survey is broad and not a low-cost deployment guide.",
+        "agrosense": "AgroSense should be 5G-ready without being 5G-dependent. Its architecture can follow cloud-edge-end principles while relying on WiFi/LoRa/local gateways in early low-cost pilots.",
+        "ideas": [
+            "Define AgroSense as cloud-edge-end from the start.",
+            "Use 5G/cellular only where it improves UAV upload or gateway backhaul.",
+            "Prepare for future autonomous machinery integration through standardized APIs.",
+        ],
+    },
+]
+
+
+def row(values):
+    return "| " + " | ".join(str(v).replace("\n", " ") for v in values) + " |"
+
+
+def bullet(items):
+    return "\n".join(f"- {item}" for item in items)
+
+
+def paper_section(i, p):
+    return f"""## Paper {i} - {p['title']}
+
+### Basic Metadata
+- Authors: {p['authors']}
+- Publisher: {p['publisher']}
+- Year: {p['year']}
+- DOI / Link: {p['doi']}
+- Local PDF: `{p['file']}`
+
+### Research Problem
+{p['problem']}
+
+### Core Architecture
+{p['architecture']}
+
+### Technologies Used
+{p['tech']}
+
+### Key Contributions
+{bullet(p['contrib'])}
+
+### Methodology
+{p['method']}
+
+### Important Findings
+{p['findings']}
+
+### Limitations
+{p['limits']}
+
+### Relevance to AgroSense
+{p['agrosense']}
+
+### Possible Implementation Ideas
+{bullet(p['ideas'])}
+"""
+
+
+def main():
+    lines = []
+    lines.extend(
+        [
+            "# Pilot Study and Literature Review",
+            "## Cloud-Edge Precision Agriculture Systems for AgroSense",
+            "",
+            f"- Date: {date.today().isoformat()}",
+            f"- Total papers analyzed: {len(papers)}",
+            "- Main research domains: precision agriculture, UAV monitoring, ESP32/IoT telemetry, edge-fog-cloud architecture, TinyML, LPWAN/5G connectivity, smart irrigation, sensor fusion, farmer decision support, and cloud dashboards.",
+            "",
+            "# 1. Cover Title",
+            "",
+            "This pilot study synthesizes the local PDF corpus in `papers/` for AgroSense, a low-cost precision agriculture system for Indian smallholder farmers. The review focuses on practical architecture lessons: what belongs on ESP32-class devices, what should run at a gateway or fog node, what should be pushed to the cloud, and how UAV scouting and ground sensing can become a coherent product workflow.",
+            "",
+            "# 2. Master Summary Table",
+            "",
+            row(["No", "Paper Title", "Year", "Publisher", "Main Focus", "Cloud / Edge / Hybrid", "Key Contribution", "Relevance to AgroSense"]),
+            row(["---", "---", "---", "---", "---", "---", "---", "---"]),
+        ]
+    )
+    for i, p in enumerate(papers, 1):
+        lines.append(
+            row(
+                [
+                    i,
+                    p["title"],
+                    p["year"],
+                    p["publisher"],
+                    p["focus"],
+                    p["type"],
+                    p["contrib"][0],
+                    p["agrosense"].split(".")[0] + ".",
+                ]
+            )
+        )
+
+    lines.extend(["", "# 3. Individual Paper Analysis", ""])
+    for i, p in enumerate(papers, 1):
+        lines.append(paper_section(i, p))
+
+    lines.extend(
+        [
+            "# 4. Thematic Grouping",
+            "",
+            "## Edge AI Systems",
+            "Edge AI appears in the predictive data-reduction paper, the TinyML regression paper, the RL TinyML anomaly-detection work, and the fog-based animal intrusion system. The shared trend is that raw farm data should not always be sent to the cloud. Local inference, residual detection, duty-cycle control, and selective transmission reduce bandwidth and power use. The tradeoff is that edge logic must be simple enough for constrained hardware and carefully monitored so that rare but important agronomic events are not suppressed.",
+            "",
+            "## Cloud Agriculture Platforms",
+            "ThingSpeak, AWS IoT, Firebase-like dashboards, Android apps, LINE chatbots, and cloud analytics recur across the corpus. Cloud platforms are strongest for visualization, storage, remote access, model management, and long-term analytics. Their weakness is dependence on connectivity and recurring cost. AgroSense should keep the cloud as the coordination and insight layer, not the only place where urgent farm logic can run.",
+            "",
+            "## UAV-Based Monitoring",
+            "The UAV irrigation paper, aerial base station task-offloading work, 5G survey, and broad smart-agriculture survey show two UAV roles: sensing platforms and temporary communication/compute infrastructure. UAVs are powerful for spatial coverage but constrained by battery, flight planning, regulations, weather, and image-processing cost. For AgroSense, UAV flights should be tied to field tasks: stress mapping, waypoint-guided soil sampling, and validation of ground sensor anomalies.",
+            "",
+            "## Sensor Fusion Systems",
+            "The corpus repeatedly combines soil moisture, temperature, humidity, pH/acidity, light, GPS, image, PIR, and livestock motion data. Fusion is useful only if each reading has location, time, calibration status, and provenance. AgroSense should fuse UAV RGB stress, GPS-tagged soil samples, RS485 Modbus readings, and weather context into zone-level recommendations rather than treating every sensor stream separately.",
+            "",
+            "## TinyML / Embedded ML",
+            "TinyML papers show that edge inference and even lightweight online learning are possible, but battery management and model drift become first-class design concerns. TinyML is most appropriate for anomaly detection, trend prediction, sensor fault detection, and local classification when cloud access is weak. AgroSense can begin with Random Forest inference at a gateway and progressively push smaller models onto ESP32-class hardware.",
+            "",
+            "## IoT Telemetry Systems",
+            "Telemetry examples range from WiFi/ThingSpeak and ESP32/MQTT/AWS to LoRa livestock collars and LPWAN/5G hybrids. The engineering pattern is clear: high-volume data such as UAV imagery should use WiFi/cellular upload at gateways, while low-rate soil telemetry can use WiFi, LoRa, or store-and-forward depending on the field.",
+            "",
+            "## Precision Agriculture Frameworks",
+            "Survey and India-focused papers emphasize that precision agriculture is socio-technical: sensing and AI must fit farmer budgets, local crops, repair constraints, language, connectivity, and trust. AgroSense's strongest product direction is not maximum automation; it is affordable guidance that fits real smallholder workflows.",
+            "",
+            "## Distributed Edge Architectures",
+            "Edge-fog-cloud and fog-intrusion papers argue for multi-tier computation. Edge nodes sense and pre-filter, fog/gateway nodes aggregate and infer, and cloud services store, visualize, and coordinate. This is the most suitable architecture family for AgroSense.",
+            "",
+            "## Real-Time Monitoring Systems",
+            "Greenhouse monitoring, intrusion detection, irrigation, and livestock tracking require timely alerts. The tradeoff is between latency and cost: local alerts are fastest, cloud dashboards are easiest to maintain, and hybrid paths give resilience.",
+            "",
+            "## Smart Irrigation / Fertigation",
+            "The UAV irrigation and sensor-monitoring papers support irrigation decisions from moisture, temperature, humidity, and aerial observations. AgroSense can extend this to fertigation by adding NPK estimation, soil EC/pH, crop stress, and zone prescriptions.",
+            "",
+            "## Autonomous Navigation",
+            "The aerial base station and UAV survey material point toward autonomous or semi-autonomous navigation. For AgroSense's current stage, human-guided waypoint navigation is the right intermediate step because it reduces cost and operational risk while still producing GPS-aligned data.",
+            "",
+            "# 5. Comparative Analysis",
+            "",
+            "## Architecture Comparison",
+            "",
+            row(["Paper", "Architecture Type", "Edge Device", "Cloud Platform", "ML Type", "Real-time Support"]),
+            row(["---", "---", "---", "---", "---", "---"]),
+        ]
+    )
+    for p in papers:
+        lines.append(row([p["title"], p["type"], p["edge_device"], p["cloud"], p["ml"], p["realtime"]]))
+
+    lines.extend(["", "## Communication Stack Comparison", ""])
+    lines.append(row(["Paper", "MQTT", "HTTP", "LoRa", "WiFi", "Cellular", "BLE"]))
+    lines.append(row(["---", "---", "---", "---", "---", "---", "---"]))
+    for p in papers:
+        c = p["comm"]
+        lines.append(row([p["title"], c["MQTT"], c["HTTP"], c["LoRa"], c["WiFi"], c["Cellular"], c["BLE"]]))
+
+    lines.extend(["", "## AI Deployment Comparison", ""])
+    lines.append(row(["Paper", "Cloud AI", "Edge AI", "Hybrid AI", "TinyML", "On-device inference"]))
+    lines.append(row(["---", "---", "---", "---", "---", "---"]))
+    for p in papers:
+        a = p["ai"]
+        lines.append(row([p["title"], a["Cloud AI"], a["Edge AI"], a["Hybrid AI"], a["TinyML"], a["On-device inference"]]))
+
+    lines.extend(
+        [
+            "",
+            "# 6. Research Gaps",
+            "",
+            "- Affordability remains underdeveloped. Many architectures assume cloud, 5G, UAV infrastructure, or multiple gateways without showing a smallholder cost model.",
+            "- Intermittent connectivity is recognized but rarely solved end to end. More work is needed on local buffering, sync conflict handling, offline dashboards, and delayed UAV/image uploads.",
+            "- Low-power design is often discussed separately from AI accuracy. AgroSense needs joint evaluation of battery life, sampling rate, model confidence, and transmission frequency.",
+            "- Real-world Indian deployment evidence is thin. Field trials should include heat, dust, monsoon humidity, patchy mobile coverage, farmer training, sensor calibration, and repair workflows.",
+            "- Edge-cloud collaboration lacks standard decision rules. Papers argue that some work should move to edge/fog, but few give practical workload partitioning templates for low-cost farms.",
+            "- Explainability is weak. Farmers need to know why a zone is marked stressed or why irrigation/fertilizer is recommended.",
+            "- Sensor fusion is often named but not operationalized. UAV imagery, soil probes, GPS sampling, and weather data need a shared spatial data model.",
+            "- Cloud cost and write-volume management are underexplored. Predictive data reduction and event-based upload should be part of the architecture from the beginning.",
+            "- Model transfer across farms is unresolved. Soil type, crop variety, irrigation method, and sensor calibration can break models trained elsewhere.",
+            "- Maintenance and calibration are rarely central. Smallholder products need calibration reminders, rugged connectors, replaceable probes, and clear fault detection.",
+            "",
+            "# 7. Opportunities for AgroSense",
+            "",
+            "- Build a cloud-edge-end product instead of a dashboard-only system: ESP32 nodes for acquisition, gateway/fog for aggregation and inference, cloud for maps, history, and collaboration.",
+            "- Use predictive data reduction to lower Firebase writes and power use while preserving agronomic events.",
+            "- Offer multiple connectivity profiles: WiFi greenhouse mode, LoRa open-field mode, and cellular gateway mode.",
+            "- Fuse UAV RGB stress maps with GPS-tagged soil readings to recommend sampling points and interventions.",
+            "- Make farmer usability a differentiator through local-language alerts, conversational explanations, and simple zone priorities.",
+            "- Treat every pilot as dataset generation. Store raw readings, calibration metadata, UAV flight metadata, recommendations, and farmer actions.",
+            "- Add edge reliability features: offline queue, sensor fault detection, clock sync, and gateway health reporting.",
+            "- Build a modular architecture where Firebase/ThingSpeak/AWS can be swapped depending on client budget and deployment scale.",
+            "- Use interpretable ML first: Random Forest, regression, threshold rules, residual models, and feature importance before heavier deep learning.",
+            "- Differentiate with low-cost implementation evidence in Indian field conditions, not just algorithmic novelty.",
+            "",
+            "# 8. Suggested Final Architecture",
+            "",
+            "## Edge Layer",
+            "ESP32 nodes collect soil moisture, temperature, pH, EC, NPK-related probe values, light, and local weather data. Nodes perform calibration checks, timestamping, local validation, and predictive/delta filtering. They should buffer readings during network loss and expose a simple health status.",
+            "",
+            "## Sensor Layer",
+            "RS485 Modbus soil probes provide structured soil measurements. Optional PIR/camera boundary nodes can support animal or pest intrusion pilots. Every sensor reading should carry field ID, plot/zone ID, GPS coordinate or mapped location, device ID, calibration version, and battery/voltage status.",
+            "",
+            "## Telemetry Layer",
+            "Use WiFi/MQTT for greenhouse and nearby gateway deployments, LoRa for long-range low-rate telemetry, and cellular/5G only at gateways or UAV upload stations. MQTT should become the scalable default as node count grows, with Firebase/ThingSpeak adapters downstream.",
+            "",
+            "## Fog / Gateway Layer",
+            "A phone, Raspberry Pi, or Jetson-class gateway aggregates ESP32 data, runs heavier validation, synchronizes offline queues, and executes Random Forest or lightweight anomaly models. The gateway should also translate local protocols into cloud APIs and provide local alerts when the Internet is down.",
+            "",
+            "## UAV Layer",
+            "UAV flights capture RGB imagery for crop-stress analysis and map generation. Cloud orthomosaic processing can remain centralized initially, while mission metadata and stress zones are linked to ground readings. UAV outputs should generate sampling waypoints rather than standalone images.",
+            "",
+            "## AI Layer",
+            "Use a tiered AI strategy: thresholds and predictive filters on ESP32, Random Forest and anomaly detection on the gateway, and retraining/orthomosaic analytics in the cloud. TinyML should be introduced for specific high-value tasks such as sensor-fault detection or crop-stress snapshot classification.",
+            "",
+            "## Cloud Layer",
+            "Firebase or an equivalent cloud backend stores telemetry, users, fields, zones, alerts, model outputs, and dashboard state. Heavy image processing, historical analytics, model training, and cross-farm benchmarking stay in the cloud. ThingSpeak can remain useful for quick public/engineering visualizations.",
+            "",
+            "## Dashboard Layer",
+            "The dashboard should show field maps, stress zones, soil trends, sensor health, sampling waypoints, NPK estimates, and recommended actions. It should prioritize clarity: traffic-light zone status, confidence levels, and reason codes for every recommendation.",
+            "",
+            "## Future Scalability Layer",
+            "Add pluggable connectivity, multi-farm tenancy, role-based access, data export, model-version tracking, local-language advisory messages, and optional chatbot support. For larger deployments, introduce queue-based ingestion, MQTT brokers, geospatial indexing, and gateway fleet management.",
+            "",
+            "# 9. Final Conclusion",
+            "",
+            "The PDF corpus strongly supports AgroSense's direction toward a low-cost cloud-edge precision agriculture system. The most relevant papers converge on a practical architecture: constrained field devices should sense, validate, and reduce data locally; gateways should aggregate, infer, and survive intermittent connectivity; cloud systems should visualize, store, coordinate, and train models; UAVs should provide spatial context that guides ground sampling and intervention.",
+            "",
+            "The strongest research directions for AgroSense are hybrid cloud-edge design, UAV and ground-sensor fusion, low-power telemetry, predictive data reduction, and farmer-facing decision support. The literature also warns against overbuilding around expensive assumptions such as always-on 5G, cloud-only analytics, or fully autonomous UAV workflows before the field economics are proven.",
+            "",
+            "Implementation priority should therefore be: reliable ESP32/RS485 telemetry, gateway buffering and inference, UAV stress-zone mapping, Firebase/ThingSpeak dashboard integration, GPS-guided soil sampling, interpretable Random Forest NPK estimation, and local-language recommendations. If AgroSense can demonstrate these pieces in Indian smallholder conditions with clear cost and usability evidence, it will stand ahead of many research prototypes that remain either too conceptual, too cloud-dependent, or too expensive for real farms.",
+            "",
+            "## Extraction Note",
+            "",
+            "The analysis was generated after extracting text and metadata from all 17 PDFs in `papers/`. Intermediate extraction files are stored in `pdf_extracts/`, and the extraction helper is `extract_pdf_corpus.py`.",
+        ]
+    )
+
+    OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Wrote {OUT} with {len(papers)} papers.")
+
+
+if __name__ == "__main__":
+    main()

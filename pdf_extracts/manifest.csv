@@ -1,0 +1,342 @@
+file,text_file,metadata_file,title,authors,year,doi,pages,chars_extracted,abstract
+papers\A Feasible IoT-Based System for Precision Agriculture.pdf,pdf_extracts\A_Feasible_IoT-Based_System_for_Precision_Agriculture.txt,pdf_extracts\A_Feasible_IoT-Based_System_for_Precision_Agriculture.json,Paper Title (use style: paper title),User,2016,10.1109/MIS.2015.67.,4,14759,"This paper presents a feasible and a low-cost IoT based 
+monitoring system for precision agriculture , with emphasis to 
+viticulture. A field/crop data a re acqu ired by self -powered 
+measuring station and sent to remote collector, located in the home 
+or office. The collector accepts the data and forward them via 
+home/office WiFi to commercial or open IoT servers (as 
+ThingSpeak) for further visualization, analyze and react back . 
+Using available APIs, any web application on any server can 
+communicate with IoT server, and thus with field station. Every 
+authorized person or farmer , who has computer or gadget with 
+Internet access can monitor parameters of interest and control 
+back associated processes as irrigation or ventilation. Principle of 
+operation, h ardware and software architecture as well as 
+preliminary results are shortly elaborated."
+papers\A Pilot Study of Smart Agricultural Irrigation using Unmanned aerial vehicle and iot based cloud systems.pdf,pdf_extracts\A_Pilot_Study_of_Smart_Agricultural_Irrigation_using_Unmanned_aerial_vehicle_and_iot_based_cloud_systems.txt,pdf_extracts\A_Pilot_Study_of_Smart_Agricultural_Irrigation_using_Unmanned_aerial_vehicle_and_iot_based_cloud_systems.json,--- Page 1 ---,FaReS Alotaibi,,10.18576/isl/100115,11,29900,"This article introduces a new mobile-based application of modern information and 
+communication technology in agriculture based on Internet of Things (IoT), embedded systems and an 
+unmanned aerial vehicle (UAV). The proposed agricultural monitoring system was designed and 
+implemented using Arduino microcontroller boards, Wi -Fi modules , water pumps and electronic 
+environmental sensors, namely temperature, humidity and soil moisture. The role of UAV in this study 
+is to collect these environmental data from different regions of the farm. Then, the quantity of water 
+irrigation is automatically computed fo r each region in the cloud. Moreover, the developed system can 
+monitor the farm conditions including the water requirements remotely on Android mobile application 
+to guide the farmers. The results of this study demonstrated that our proposed IoT-based embe dded 
+system can be effective to avoid unnecessary and wasted water irrigation within the framework of smart 
+agriculture."
+papers\Chatbot Application to Support Smart Agriculture.pdf,pdf_extracts\Chatbot_Application_to_Support_Smart_Agriculture.txt,pdf_extracts\Chatbot_Application_to_Support_Smart_Agriculture.json,Paper Title (use style: paper title),IEEE,2016,10.1109/ECTIDAMTNCON48261.2020.90906,4,18032,"A chatbot is a software d eveloped to help reply to 
+text or voice co nversat ions automatica lly and quic kly in real 
+tim e. In t he agr iculture s ector, t he exist ing smart agr iculture 
+syst ems just use data from sensi ng and internet of th ings (IoT) 
+technologies that exclud e crop cultivation knowledge to sup port 
+decis ion-making by farm ers. To enha nce this, the c hat bot 
+applicat ion ca n be a n ass istant to farm ers to provide crop 
+cult ivation know ledge. Consequently, we propos e the LINE 
+chatbot app licat ion as an informa tion a nd knowle dge 
+repres entation prov iding crop c ultivat ion recommendations to 
+farm ers. It wor ks with smart agriculture and r ecommendation 
+syst ems. Our proposed LINE chatbot app lication co nsists of five 
+main functions (start/stop m enu, main pag e, drip irri gation 
+page, mist irrigatio n pag e, a nd mo nitor pag e). Farm ers will 
+receiv e information for data monitori ng to s upport their 
+decis ion-making. Mor eover, t hey can contro l t he irr igation 
+syst em via t he LIN E c hatbot. F urthermore, farm ers ca n ask 
+quest ions relevant to the crop environment v ia a chat box. After 
+imp lementi ng our proposed c hatbot, farmers are v ery satisfied 
+with the app lication, scoring a 96% satisfaction score. Ho wever, 
+in t erms of as king q uestions v ia c hat box, t his LIN E c hat bot 
+applicat ion is a rule-based bot or scr ipt bot. Farm ers have to 
+type in t he correct keywords as prescribed, otherwise they won't 
+get a respo nse from the chatbots. In the f uture, we will enhance 
+the as king function of our LINE chatbot to b e an intelligent bot."
+papers\Edge-Based Predictive Data Reduction cost effective.pdf,pdf_extracts\Edge-Based_Predictive_Data_Reduction_cost_effective.txt,pdf_extracts\Edge-Based_Predictive_Data_Reduction_cost_effective.json,Edge-Based Predictive Data Reduction for Smart Agriculture: A Lightweight Approach to Efficient IoT Communication,Dora Krekovic; Mario Kusek; Ivana Podnar Zarko; Danh Le-Phuoc,2025,,8,44605,"The rapid growth of IoT devices has led to an
+enormous amount of sensor data that requires transmission
+to cloud servers for processing, resulting in excessive network
+congestion, increased latency and high energy consumption.
+This is particularly problematic in resource-constrained and
+remote environments where bandwidth is limited, and battery-
+dependent devices further emphasize the problem. Moreover, in
+domains such as agriculture, consecutive sensor readings often
+have minimal variation, making continuous data transmission
+inefficient and unnecessarily resource intensive. To overcome
+these challenges, we propose an analytical prediction algorithm
+designed for edge computing environments and validated through
+simulation. The proposed solution utilizes a predictive filter at
+the network edge that forecasts the next sensor data point and
+triggers data transmission only when the deviation from the
+predicted value exceeds a predefined tolerance. A complementary
+cloud-based model ensures data integrity and overall system
+consistency. This dual-model strategy effectively reduces com-
+munication overhead and demonstrates potential for improving
+energy efficiency by minimizing redundant transmissions. In
+addition to reducing communication load, our approach leverages
+both in situ and satellite observations from the same locations
+to enhance model robustness. It also supports cross-site general-
+ization, enabling models trained in one region to be effectively
+deployed elsewhere without retraining. This makes our solution
+highly scalable, energy-aware, and well-suited for optimizing
+sensor data transmission in remote and bandwidth-constrained
+IoT environments."
+papers\energy-efficient-edge-fog-cloud-architecture-for-iot-based-59eynsuzfn.pdf,pdf_extracts\energy-efficient-edge-fog-cloud-architecture-for-iot-based-59eynsuzfn.txt,pdf_extracts\energy-efficient-edge-fog-cloud-architecture-for-iot-based-59eynsuzfn.json,Energy-Efficient Edge-Fog-Cloud Architecture for IoT-Based Smart Agriculture Environment,"Hatem A. Alharbi, Mohammad Aldossary",2021,10.1109/ACCESS.2021.3101397,13,61247,"--- Page 1 ---
+
+This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+10.1109/ACCESS.2021.3101397, IEEE Access
+ 
+1 
+ 
+Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000. 
+Digital Object Iden tifier 10 .110 9/ACCESS.20 19.Doi Number 
+ 
+Energy-Efficient Edge-Fog-Cloud 
+Architecture for IoT-based Smart 
+Agriculture Environment 
+ 
+Hatem A. Alharbi1 and Mohammad Aldossary2 
+1Department of Computer Engineering, College of Computer Science and Engineering, Taibah University, 12512, Al-Madinah, Saudi Arabia 
+2Department of Computer Science, College of Arts and Science, Prince Sattam bin Abdulaziz University, Al-Kharj, Saudi Arabia 
+Corresponding authors: Hatem A. Alharbi : (e-mail:hmehmadi@taibahu.edu.sa), and Mohammad Aldossary (e-mail:mm.aldossary @psau.edu.sa) 
+ABSTRACT The current agriculture systems compete to take advantage of industry advanced technologi es, 
+including the internet of things"
+papers\EVERYTHING_YOU_WANTED_TO_KNOW_ABOUT_SMART_AGRI_45PAGES.pdf,pdf_extracts\EVERYTHING_YOU_WANTED_TO_KNOW_ABOUT_SMART_AGRI_45PAGES.txt,pdf_extracts\EVERYTHING_YOU_WANTED_TO_KNOW_ABOUT_SMART_AGRI_45PAGES.json,--- Page 1 ---,,2020,,45,153347,"The world population is anticipated to increase by close to2 billion by 2050 causing a rapid escalation
+of food demand. A recent projection shows that the world is lagging behind accomplishing the
+“Zero Hunger” goal, in spite of some advancements. Socio-economic and well being fallout will
+affect the food security. Vulnerable groups of people will suffer malnutrition. To cater to the
+needs of the increasing population, the agricultural industry needs to be modernized, become smart,
+and automated. Traditional agriculture can be remade to efﬁcient, sustainable, eco-friendly smart
+agriculture by adopting existing technologies. In this survey paper the authors present the applications,
+technological trends, available datasets, networking options, and challenges in smart agriculture. How
+Agro Cyber Physical Systems are built upon the Internet-of-Agro-Things is discussed through various
+application ﬁelds. Agriculture4.0 is also discussed as a whole. We focus on the technologies, such as
+Artiﬁcial Intelligence (AI) and Machine Learning (ML) which support the automation, along with the
+Distributed Ledger Technology (DLT) which provides data integrity and security. After an in-depth
+study of different architectures, we also present a smart agriculture framework which relies on the
+location of data processing. We have divided open research problems of smart agriculture as future
+research work in two groups - from a technological perspective and from a networking perspective.
+AI, ML, the blockchain as a DLT, and Physical Unclonable Functions (PUF) based hardware security
+fall under the technology group, whereas any network related attacks, fake data injection and similar
+threats fall under the network research problem group.
+arXiv:2201.04754v1 [cs.CY] 13 Jan 2022
+
+--- Page 2 ---
+
+Everything You wanted to Know about Smart Agriculture A PREPRINT"
+papers\Fog-based Smart Agriculture System to Detect animal anomalies.pdf,pdf_extracts\Fog-based_Smart_Agriculture_System_to_Detect_animal_anomalies.txt,pdf_extracts\Fog-based_Smart_Agriculture_System_to_Detect_animal_anomalies.json,--- Page 1 ---,,2023,,9,41915,"Smart agriculture is one of the most promising
+areas where IoT-enabled technologies have the potential to
+substantially improve the quality and quantity of the crops
+and reduce the associated operational cost. However, building a
+smart agriculture system presents several challenges, including
+high latency and bandwidth consumption associated with cloud
+computing, frequent Internet disconnections in rural areas, and
+the need to keep costs low for farmers. This paper presents
+an end-to-end, fog-based smart agriculture infrastructure that
+incorporates edge computing and LoRa-based communication to
+address these challenges. Our system is deployed to transform
+traditional agriculture land of rural areas into smart agriculture.
+We address the top concern of farmers - animals intruding - by
+proposing a solution that detects animal intrusion using low-
+cost PIR sensors, cameras, and computer vision. In particular,
+we propose three different sensor layouts and a novel algorithm
+for predicting animals’ future locations. Our system can detect
+animals before they intrude into the field, identify them, predict
+their future locations, and alert farmers in a timely manner. Our
+experiments show that the system can effectively and quickly
+detect animal intrusions while maintaining a much lower cost
+than current state-of-the-art systems."
+papers\IoT-Aerial_Base_Station_Task_Offloading_with_RLbased_for_Smartagri.pdf,pdf_extracts\IoT-Aerial_Base_Station_Task_Offloading_with_RLbased_for_Smartagri.txt,pdf_extracts\IoT-Aerial_Base_Station_Task_Offloading_with_RLbased_for_Smartagri.json,--- Page 1 ---,,2022,10.1109/TGCN.2022.3205330.,11,54398,"Aerial base stations (ABSs) allow smart farms to
+ofﬂoad processing responsibility of complex tasks from int ernet
+of things (IoT) devices to ABSs. IoT devices have limited ene rgy
+and computing resources, thus it is required to provide an
+advanced solution for a system that requires the support of A BSs.
+This paper introduces a novel multi-actor-based risk-sens itive
+reinforcement learning approach for ABS task scheduling fo r
+smart agriculture. The problem is deﬁned as task ofﬂoading
+with a strict condition on completing the IoT tasks before
+their deadlines. Moreover , the algorithm must also conside r the
+limited energy capacity of the ABSs. The results show that ou r
+proposed approach outperforms several heuristics and the c lassic
+Q-Learning approach. Furthermore, we provide a mixed integ er
+linear programming solution to determine a lower bound on
+the performance, and clarify the gap between our risk-sensi tive
+solution and the optimal solution, as well. The comparison p roves
+our extensive simulation results demonstrate that our meth od is
+a promising approach for providing a guaranteed task proces sing
+services for the IoT tasks in a smart farm, while increasing t he
+hovering time of the ABSs in this farm."
+papers\lora_iot_mlbased_livestock_monitoring_insmartagri2510.07322v1.pdf,pdf_extracts\lora_iot_mlbased_livestock_monitoring_insmartagri2510.07322v1.txt,pdf_extracts\lora_iot_mlbased_livestock_monitoring_insmartagri2510.07322v1.json,A LoRa IoT Framework with Machine Learning for Remote Livestock Monitoring in Smart Agriculture,Hitesh Mohapatra,2023,,26,59447,"This work presents AgroTrack, a LoRa-based IoT framework for remote livestock
+monitoring in smart agriculture. Designed for low-power, long-range communi-
+cation, the system enables real-time tracking and basic health monitoring of
+free-range livestock using GPS, motion, and temperature sensors embedded in
+wearable collars. Data is transmitted via LoRa to gateways and then to a cloud
+platform for visualization, alerts, and analytics. To strengthen AgroTrack’s prac-
+tical deployment, this paper integrates advanced analytics, including machine
+learning models for predictive health alerts and behavioral anomaly detection,
+transforming the system from simple tracking to intelligent decision support.
+Field trials conducted over a 30-acre grazing area with 15 cattle demonstrated
+reliable data transmission up to 6.5 km, with a 97.5% packet success rate and
+average collar battery life of 28 days. Extended simulation studies showed that
+the system maintains packet loss below 3.5% up to 200 animals, with through-
+put peaking at 75 messages per second when scaled to 600 animals. Robustness
+analysis revealed 85% data recovery under four simultaneous gateway failures,
+underscoring the system’s resilience. AgroTrack is scalable, cost-effective, and
+suitable for rural environments with limited connectivity. By combining real-
+world validation with simulation-based scalability and robustness assessments,
+this work offers a comprehensive, practical solution for modernizing livestock
+management and advancing precision agriculture."
+papers\machine-learning-applications-in-iot-based-agriculture-and-3qim24ivpa.pdf,pdf_extracts\machine-learning-applications-in-iot-based-agriculture-and-3qim24ivpa.txt,pdf_extracts\machine-learning-applications-in-iot-based-agriculture-and-3qim24ivpa.json,Machine learning applications in iot based agriculture and smart farming: a review,"M.W.P. Maduranga, Ruvan Abeysekera",2020,,4,18687,"the Internet of Things (IoT) technology has 
+revolutionized every aspect of everyday life by making 
+everything smarter. Among the vast range of IoT 
+applications, IoT based smart agriculture has fascinated 
+many researchers and has used Machine Learning(M L) 
+and IoT technologies to conduct innovative researches. IoT 
+based data-driven farm management techniques can help 
+increase agricultural yields by planning input costs, 
+reducing losses, and using resources more efficiently. The 
+IoT generates big amount da ta with different 
+characteristics based on location and time. To improve 
+productivity of agriculture through intelligent farm 
+management, the data analyzing must be well analyzed 
+and processed. High-performance computing capability in 
+ML opens up new oppor tunities for data -intensive science 
+as the amount of data collected increases; ML algorithms 
+could be applied to further enhance application 
+intelligence and functionality. In this article we review 
+existing approaches have been made to the smart 
+agriculture and farming based on IoT and ML separately. 
+Also we propose novel concepts that how can ML -IoT can 
+be blended in such applications."
+papers\online-processing-of-vehicular-data-on-the-edge-through-an-unsupervised-model.pdf,pdf_extracts\online-processing-of-vehicular-data-on-the-edge-through-an-unsupervised-model.txt,pdf_extracts\online-processing-of-vehicular-data-on-the-edge-through-an-unsupervised-model.json,Online Processing of Vehicular Data on the Edge Through an Unsupervised TinyML Regression Technique,others than the author(s) must be honored.,2022,10.1145/3591356,29,83969,"--- Page 1 ---
+
+Online Processing of Vehicular Data on the Edge Through an
+Unsupervised TinyML Regression Technique
+PEDRO ANDRADE, IV ANOVITCH SILV A, MARIANNE DINIZ, and THOMMAS FLORES,Federal
+University of Rio Grande do Norte, Brazil
+DANIEL G. COSTA, INEGI, Faculty of Engineering, University of Porto, Portugal
+EDUARDO SOARES, Lancaster University, United Kingdom
+The Internet of Things (IoT) has made it possible to include everyday objects in a connected network, allowing them to
+intelligently process data and respond to their environment. Thus, it is expected that those objects will gain an intelligent
+understanding of their environment and be able to process data more eiciently than before. Particularly, such edge com-
+puting paradigm has allowed the execution of inference methods on resource-constrained devices such as microcontrollers,
+signiicantly changing the way IoT applications have evolved in recent years. However, although this scenario has supported
+the development of Tiny Machine Learning (TinyML) approaches on such devices, there are still some challenges that require
+further investigation when optimizing data streaming on the edge. Therefore, this article proposes a"
+papers\ontological_knldg_Representation_For smartagri.pdf,pdf_extracts\ontological_knldg_Representation_For_smartagri.txt,pdf_extracts\ontological_knldg_Representation_For_smartagri.json,--- Page 1 ---,,2020,,7,34949,"In order to provide the agricultural industry with
+the infrastructure it needs to take advantage of advanced technol-
+ogy, such as big data, the cloud, and the internet of things (IoT);
+smart farming is a management concept that focuses on pro-
+viding the infrastructure necessary to track, monitor, automate,
+and analyse operations. To represent the knowledge extracted
+from the primary data collected is of utmost importance. An
+agricultural ontology framework for smart agriculture systems
+is presented in this study. The knowledge graph is represented
+as a lattice to capture and perform reasoning on spatio-temporal
+agricultural data."
+papers\Reliable and Cost-Efficient IoT Connectivity for Smart agri LWPAN 5G.pdf,pdf_extracts\Reliable_and_Cost-Efficient_IoT_Connectivity_for_Smart_agri_LWPAN_5G.txt,pdf_extracts\Reliable_and_Cost-Efficient_IoT_Connectivity_for_Smart_agri_LWPAN_5G.json,--- Page 1 ---,Markus Richter,2020,,23,67831,". The integration of the Internet of Things (IoT) in smart agriculture 
+has transformed farming practices by enabling real -time monitoring, data -
+driven decision-making, and automation. However, ensuring reliable connectiv-
+ity in diverse agricultural environments remains a critical challenge. This paper 
+analyzes the performance trade-offs between Low-Power Wide-Area Networks 
+(LPWAN)—specifically LoRaWAN, NB -IoT, and Sigfox —and cellular net-
+works (4G/5G) in agricultural applications. Beyond a comprehensive literature 
+review (2020–2024), this study evaluates hybrid LPWAN–5G architectures that 
+integrate the strengths of both network types to enhance cost -efficiency and 
+connectivity reliability. Using real-world case studies, the findings demonstrate 
+that hybrid LPWAN –5G models can reduce connectivity costs by up to 30% 
+while significantly improving network reliability in remote agricultural settings. 
+This work provides actionable recommendations for selecting optimal IoT con-
+nectivity solutions based on agricultural requirements and proposes future re-
+search directions to further optimize IoT infrastructure in smart farming."
+papers\RL_in_image_based_anomaly_Detection.pdf,pdf_extracts\RL_in_image_based_anomaly_Detection.txt,pdf_extracts\RL_in_image_based_anomaly_Detection.json,Simulating Battery-Powered TinyML Systems Optimised using Reinforcement Learning in Image-Based Anomaly Detection,,2020,,7,38097,"Advances in Tiny Machine Learning (TinyML) have bolstered the
+creation of smart industry solutions, including smart agriculture,
+healthcare and smart cities. Whilst related research contributes
+to enabling TinyML solutions on constrained hardware, there is a
+need to amplify real-world applications by optimising energy con-
+sumption in battery-powered systems. The work presented extends
+and contributes to TinyML research by optimising battery-powered
+image-based anomaly detection Internet of Things (IoT) systems.
+Whilst previous work in this area has yielded the capabilities of on-
+device inferencing and training, there has yet to be an investigation
+into optimising the management of such capabilities using machine
+learning approaches, such as Reinforcement Learning (RL), to im-
+prove the deployment battery life of such systems. Using modelled
+simulations, the battery life effects of an RL algorithm are bench-
+marked against static and dynamic optimisation approaches, with
+the foundation laid for a hardware benchmark to follow. It is shown
+that using RL within a TinyML-enabled IoT system to optimise
+the system operations, including cloud anomaly processing and
+on-device training, yields an improved battery life of 22.86% and
+10.86% compared to static and dynamic optimisation approaches
+respectively. The proposed solution can be deployed to resource-
+constrained hardware, given its low memory footprint of 800 B,
+which could be further reduced. This further facilitates the real-
+world deployment of such systems, including key sectors such as
+smart agriculture."
+papers\Smart Agriculture Architecture and Current developement in INDIA.pdf,pdf_extracts\Smart_Agriculture_Architecture_and_Current_developement_in_INDIA.txt,pdf_extracts\Smart_Agriculture_Architecture_and_Current_developement_in_INDIA.json,--- Page 1 ---,"overcoming various 
+challenges of weather changes and other environmental 
+factors. Incorporating IoT will lead to the smart farming 
+concept and it will enable t h e agriculture industry to 
+increas
+e 
+operational efficiency, lower costs, reduce waste, and 
+improve the quality of their yield.",2021,,6,26758,"-The IoT (Internet of Things) is going hand in hand with 
+every domain. The agriculture domain is also set to exploit the 
+benefits of IoT. Smart agriculture, Precision farming are the 
+buzzwords in the agriculture domain. It will help farmers in getting 
+more and more benefits of their crops and can also help them in 
+avoiding many issues related to weather and soil conditions which 
+are harmful to their crops. Farmers can keep an eye on various 
+factors like changing weather conditions, soil and fertilizers, pest 
+control, cattle, etc. by using the precision farming concept. Use of 
+smart sensors and analyzing data received from them will lead to the 
+precision farming concept. Precision farming is the latest concept in 
+the agriculture field whereby making using of wireless technologies 
+one can do precise and controlled farming. Agriculture is an 
+important pillar of the Indian economy hence integrating technology 
+with agriculture will give rise to a new era and will strengthen the 
+economy as well. This paper is outlined to discuss the role of IoT in 
+the Agriculture
+ domain, Smart Agriculture Framework, and the 
+analytics that can be done on data accessed through smart devices. 
+The paper will also outline current state of smart agriculture in 
+India."
+papers\Smart Agriculture_Implementing-AWSIoTandalot.pdf,pdf_extracts\Smart_Agriculture_Implementing-AWSIoTandalot.txt,pdf_extracts\Smart_Agriculture_Implementing-AWSIoTandalot.json,Thesis template (win),Tuominen Jarno,2024,,67,75987,"Turku University of Applied Sciences 
+Information and Communications Technology 
+2024 | 67 pages 
+Sérgio Apolinário da Costa 
+Smart Agriculture: Implementing IoT for Greenhouse 
+Monitoring 
+Modern agriculture demands sustainable and efficient farming methods to 
+tackle climate change and resource scarcity. Greenhouse farming, in particular, 
+faces inefficiencies in resource management and production. This thesis 
+addresses these issues by developing an IoT-based system to monitor key 
+environmental parameters in greenhouses. The goal was to use sensor data to 
+optimise resource use and promote healthier plant growth. 
+To achieve this, a system was created using ESP32 devices to collect data from 
+the greenhouse environment. These devices send the data to a central 
+computer program that organises and stores the information in a database. This 
+setup is flexible, allowing easy integration of new devices. 
+The system was tested over 45 days in a greenhouse, operating reliably without 
+missing data or needing maintenance. The results demonstrated that the 
+system met the necessary performance standards, showing its potential to 
+improve greenhouse farming efficiency and sustainability significantly. This 
+project provides a valuable solution for optimising resource utilisation and 
+enhancing plant growth in controlled environments, addressing critical 
+agricultural challenges."
+papers\Survey of Intelligent Agricultural IoT Based on 5G.pdf,pdf_extracts\Survey_of_Intelligent_Agricultural_IoT_Based_on_5G.txt,pdf_extracts\Survey_of_Intelligent_Agricultural_IoT_Based_on_5G.json,Survey of Intelligent Agricultural IoT Based on 5G,"Jun Liu, Lei Shu, Xu Lu and Ye Liu",2023,10.3390/electronics12102336,46,235619,"In the future, agriculture will face the need for increasing production, sustainability, wisdom,
+and efﬁciency, which will bring signiﬁcant challenges to the development of modern agriculture. With
+the gradual popularization of 5G, advanced information technologies such as the Internet of Things
+and artiﬁcial intelligence promoted the evolution of modern agriculture to intelligent agriculture.
+The 5G-based Internet of Things will play an essential role in the development of smart agriculture.
+This paper investigates the research progress of 5G Internet of Things in smart agriculture. It sorts
+out the development status of 5G smart agriculture Internet of Things in recent years. Following that,
+the concept of 5G smart agriculture Internet of Things is put forward. It expounds on the connotation,
+architecture, and enabling key technologies. According to the key application scenarios of smart
+agriculture, practical cases are presented, the development trend and application value of 5G smart
+agriculture Internet of Things are shown, and the future development direction is put forward. Firstly,
+the concept of smart agriculture is distinguished, and the category scenarios of smart agriculture
+are summarized. Following that, the current review research on 5G-IoT is analyzed. This paper
+focuses on the analysis and summary of the changes brought by 5G to various key scenarios in smart
+agriculture. This paper analyzes the related key technologies and challenges, puts forward some
+key scientiﬁc problems, and summarizes the research ideas. Finally, the development trend and
+application value of 5G smart agriculture Internet of Things are shown. The future development
+direction is also proposed."

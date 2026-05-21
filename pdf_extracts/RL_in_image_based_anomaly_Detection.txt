@@ -1,0 +1,768 @@
+--- Page 1 ---
+
+Simulating Battery-Powered TinyML Systems Optimised using
+Reinforcement Learning in Image-Based Anomaly Detection
+Jared M. Ping
+jp140694@gmail.com
+School of Electrical and Information Engineering,
+University of the Witwatersrand & Digital Matter
+Johannesburg, South Africa
+Ken J. Nixon
+ken.nixon@wits.ac.za
+School of Electrical and Information Engineering,
+University of the Witwatersrand
+Johannesburg, South Africa
+ABSTRACT
+Advances in Tiny Machine Learning (TinyML) have bolstered the
+creation of smart industry solutions, including smart agriculture,
+healthcare and smart cities. Whilst related research contributes
+to enabling TinyML solutions on constrained hardware, there is a
+need to amplify real-world applications by optimising energy con-
+sumption in battery-powered systems. The work presented extends
+and contributes to TinyML research by optimising battery-powered
+image-based anomaly detection Internet of Things (IoT) systems.
+Whilst previous work in this area has yielded the capabilities of on-
+device inferencing and training, there has yet to be an investigation
+into optimising the management of such capabilities using machine
+learning approaches, such as Reinforcement Learning (RL), to im-
+prove the deployment battery life of such systems. Using modelled
+simulations, the battery life effects of an RL algorithm are bench-
+marked against static and dynamic optimisation approaches, with
+the foundation laid for a hardware benchmark to follow. It is shown
+that using RL within a TinyML-enabled IoT system to optimise
+the system operations, including cloud anomaly processing and
+on-device training, yields an improved battery life of 22.86% and
+10.86% compared to static and dynamic optimisation approaches
+respectively. The proposed solution can be deployed to resource-
+constrained hardware, given its low memory footprint of 800 B,
+which could be further reduced. This further facilitates the real-
+world deployment of such systems, including key sectors such as
+smart agriculture.
+KEYWORDS
+optimisation, reinforcement learning, battery life, edge processing,
+anomaly detection, TinyML, internet of things
+ACM Reference Format:
+Jared M. Ping and Ken J. Nixon. 2024. Simulating Battery-Powered TinyML
+Systems Optimised using Reinforcement Learning in Image-Based Anomaly
+Detection. In Proceedings of tinyML Research Symposium (tinyML Research
+Symposium’24).ACM, New York, NY, USA, 7 pages.
+1 INTRODUCTION
+The rapid emergence of TinyML enables applications in several
+fields such as smart agriculture, healthcare, and smart cities [7, 16].
+Permission to make digital or hard copies of part or all of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed
+for profit or commercial advantage and that copies bear this notice and the full citation
+on the first page. Copyrights for third-party components of this work must be honored.
+For all other uses, contact the owner/author(s).
+tinyML Research Symposium’24, April 2024, San Francisco, CA
+© 2024 Copyright held by the owner/author(s).
+Several TinyML applications within the smart agriculture sector
+leverage existing IoT hardware, specifically containing low-power
+Microcontroller Units (MCUs) constrained in resource and com-
+putational capability [25]. These limited MCUs can now achieve
+advanced edge processing through optimised inferencing and on-
+device training [13], which yields security benefits by mitigating
+the need to transmit sensitive data over the air.
+These advancements unlock value in existing low-cost hardware
+but present a new challenge as many such systems utilise a finite
+battery power supply that would be depleted faster due to the
+increased computation [7]. An existing battery-powered TinyML
+IoT data-logging system, periodically uploading results, intended
+to last many years in the field, now equipped with the additional
+capabilities to perform inferencing and re-training on new data
+collected, would last a fraction of its original deployment battery
+life. Hence, there is a requirement for an intelligent optimisation
+scheme to orchestrate the balance between function and limited
+power supply within such solutions to improve the viability of
+real-world deployments.
+This paper presents and evaluates the simulated impact of utilis-
+ing RL as a means of autonomous optimisation compared to tradi-
+tional static and dynamic optimisation schemes. Static optimisation
+is performed at compile or load time. This infers that the optimisa-
+tion is performed once, and the results are applied for the entirety
+of the system deployment. Dynamic optimisation is better suited to
+solutions where behaviour adoption is required or environmental
+conditions differ from expectations. Autonomous optimisation is a
+mechanism of dynamic optimisation whereby the optimal action is
+self-learned rather than explicitly dictated by the algorithm.
+The autonomous approach implements a decayed epsilon-greedy
+Q-learning, off-policy, RL algorithm within an image-based anom-
+aly detection system, which enables the system to determine the
+optimal action by tracking the remaining battery capacity, number
+of classified anomaly images, and anomaly status per sample [4, 21].
+Q-learning is well-suited due to the discrete nature of the limited
+state information being tracked within such a system [ 8]. This
+translates to a small memory footprint, allowing it to scale to many
+resource-constrained MCUs typically found within TinyML-capable
+IoT solutions. The algorithm can be pre-trained and supports ongo-
+ing learning to enable adaptation to changing or new environments.
+A generic reward function allows the algorithm to be hardware
+agnostic, provided hardware meets the minimum resource and
+functional requirements [15].
+The hardware and environment are simulated for a battery-
+powered TinyML image-based anomaly detection IoT system to
+arXiv:2403.05106v2 [cs.LG] 10 Apr 2024
+
+--- Page 2 ---
+
+tinyML Research Symposium’24, April 2024, San Francisco, CA Jared M. Ping and Ken J. Nixon
+validate this solution. Hardware simulation involves selecting com-
+monly available components that may feature in such a system,
+which will be validated through a forthcoming physical experiment.
+The system supply is constrained to an ideal finite battery sup-
+ply, with the battery being modelled to have a predefined capacity
+and linear discharge characteristics. The environment is simulated
+through control of varying anomaly occurrence ratios, ranging
+from 5% to 40%. Re-training behaviour is modelled and varies ac-
+cording to the number of input data samples supplied. Variations in
+environmental conditions are constrained and reliably reproduced
+to facilitate accurate comparison between optimisation methods.
+This research provides the following valuable contributions to
+the field of TinyML:
+• Modelling and implementing static, dynamic, and autonomous
+optimisation algorithms for a TinyML image-based anomaly
+detection IoT system that supports on-device inferencing
+and training as well as cloud-based inferencing.
+• The battery life impact of the autonomous optimisation algo-
+rithm has been measured against static and dynamic optimi-
+sation algorithms and verified through detailed simulation,
+yielding an improvement of 22.86% and 10.86% respectively.
+2 RELATED WORK
+Research conducted by Liu et al. in 2019 [14] proposes a Q-greedy
+reinforcement algorithm to optimise the power versus latency trade-
+off of a system with on-device processing and cloud offloading
+capabilities. The proposed algorithm utilises a cellular medium to
+perform network uploads. The scope of this work is illustrated
+in Figure 1. The result of this previous work yields a small im-
+provement in optimising the average power consumption of the
+edge devices through an RL optimisation scheme whilst improving
+offloading task latency in tandem.
+Agent
+Environment
+Reward
+Rt
+Action
+At
+State
+St
+Resume
+sensing
+On-device
+inferencing
+Sensor
+data
+Upload for
+cloud
+inference
+Figure 1: Reinforcement learning state machine with the in-
+clusion of optimisation actions to balance on-board power
+consumption versus cloud processing latency in prior re-
+search.
+This provides a new research opportunity to extend the proposed
+algorithm to include the capability of on-device training within the
+action set. On-device training consumes much energy and requires
+optimal control to ensure it is performed sparingly to prevent a
+drastic reduction in the deployment battery life.
+Research conducted by Ren et al. in 2019 complements the afore-
+mentioned work by considering that offloading computation incurs
+transmission delays and requires available cloud capacity for such
+computation to be processed off-device[19]. This demonstrates the
+complexity involved in offloading and the significance of reducing
+this off-device compute load, where possible, such as through on-
+device training, although this has other benefits, such as reducing
+energy usage on frequent offloading uploads.
+Research conducted by Basaklar et al. in 2022 highlights the appli-
+cability of utilising RL in the scope of TinyML action optimisation
+by considering the balance in responding to shifting environmental
+conditions whilst achieving functional objectives on systems with
+limited battery power and computational capacity[3].
+3 OPTIMISING WITH REINFORCEMENT
+LEARNING
+Core motivations and objectives are defined in this section. Static,
+dynamic and autonomous optimisations are explored and algo-
+rithms are proposed for comparison. A brief overview of the au-
+tonomous algorithm selection criteria and trade-offs is discussed
+before detailing the implementation of the autonomous RL optimi-
+sation scheme.
+3.1 Problem Definition
+A large portion of TinyML research has contributed to enabling edge
+functionality on resource-constrained hardware through optimisa-
+tion, including inferencing and training [1, 11–13, 18]. Many propos-
+als leverage machine learning optimisation techniques, specifically
+RL, to achieve this goal [8, 10, 14]. There is demonstrated value in
+utilising RL to optimise the orchestration of constrained hardware
+that utilises on-device inferencing and training.
+The optimisation problem shifts from the prior work illustrated
+in Figure 1, of balancing latency and power consumption of on-
+device versus fog inferencing. The current problem is balancing
+environmental image-based anomaly uploads versus performing
+on-device training to remove a continued upload requirement and
+conserve remaining system energy. The choice of upload medium
+relies on the data bandwidth and latency requirements. This solu-
+tion uses NB-IoT as a wireless medium, as processing latency is not
+a priority, and data bandwidth is sufficient for small image uploads.
+On-device models need to be lightweight to fit within the limited
+MCU resources, and hence, a cloud server exists with a larger model
+to classify the locally inferred anomalies. Cloud-classified anomalies
+are returned to the edge system to provide direction on whether the
+anomaly is valid or classified into an identifiable class. Achieving
+optimised on-device training enables real-world application of such
+functionality. This new scope of work is illustrated in Figure 2.
+Agent
+Environment
+Reward
+Rt
+Action
+At
+State
+St
+Resume
+inferencing
+On-device
+learning to
+improve model
+Anomaly
+detected
+Upload for cloud
+inference
+Figure 2: Reinforcement learning state machine with the
+inclusion of actions to be optimised to extend system deploy-
+ment battery life in the current scope of research.
+
+--- Page 3 ---
+
+Simulating Battery-Powered TinyML Systems Optimised using Reinforcement Learning tinyML Research Symposium’24, April 2024, San Francisco, CA
+Research has been performed to select a candidate RL algorithm
+to optimise such a system and simulate the battery life impacts
+compared to non-machine learning approaches. Given a minimum
+viable hardware implementation of such a system, it is clear that the
+optimisation should focus on optimising the balance of, and hence
+total energy consumed by, both anomaly upload and on-device
+training actions since it can be generally stated that:
+𝐸𝑢𝑝𝑙𝑜𝑎𝑑 ≫ 𝐸𝑖𝑚𝑎𝑔𝑒_𝑐𝑎𝑝𝑡𝑢𝑟𝑒 , 𝐸𝑖𝑚𝑎𝑔𝑒_𝑖𝑛𝑓 𝑒𝑟 (𝑜𝑛 −𝑑𝑒𝑣𝑖𝑐𝑒 ) (1)
+𝐸𝑡𝑟𝑎𝑖𝑛 ≫ 𝐸𝑖𝑚𝑎𝑔𝑒_𝑐𝑎𝑝𝑡𝑢𝑟𝑒 , 𝐸𝑖𝑚𝑎𝑔𝑒_𝑖𝑛𝑓 𝑒𝑟 (𝑜𝑛 −𝑑𝑒𝑣𝑖𝑐𝑒 ) (2)
+3.2 Static and Dynamic Approaches
+This approach is typically a good candidate for IoT systems that
+are functionally simple, and it relies on environmental conditions
+being known or assumed before deployment [22]. Therefore, the
+optimisation yields are thwarted when environmental variances
+occur. These changes could be accounted for by delivering system
+updates over the air. However, this requires ongoing monitoring
+of the environmental conditions and is generally not perceived as
+scalable or maintainable. A candidate static algorithm is proposed in
+Algorithm 1, with initial thresholds defined based on the simulated
+environment behaviour in Section 4.1.
+Algorithm 1: Static Optimisation Algorithm
+𝑁 ← 0 ; /* Number of classified anomalies */
+𝑇 ← 35 ; /* Required training threshold */
+𝑉 ← 0.85 ; /* Training validation threshold */
+if N >= T then
+𝑅 ← 𝑇 𝑟𝑎𝑖𝑛𝐴𝑛𝑑𝑉 𝑎𝑙𝑖𝑑𝑎𝑡𝑒 () ; /* Validation acc. */
+if R >= V then
+𝑁 ← 0;
+This approach allows the system to maximise the intended opti-
+misation yields in response to a range of environmental changes,
+though some may not have been anticipated at design time, by
+analysing the current state of the system and the anticipated future
+states [22]. This optimisation does have its drawbacks, as the algo-
+rithm may lag in responding to certain environmental conditions.
+Furthermore, the complexity of designing and implementing such
+an all-encompassing algorithm can be significantly more complex
+than a static approach. A candidate dynamic algorithm is proposed
+in Algorithm 2, with initial thresholds defined based on the simu-
+lated environment behaviour in Section 4.1.
+3.3 Autonomous Approaches
+This approach utilises the dynamic state space of the environment
+in conjunction with the available actions to learn the optimal ap-
+proach rather than having the strategy explicitly defined. This can
+reduce the design complexity compared to a dynamic optimisa-
+tion algorithm and better adjust to unanticipated events that the
+dynamic algorithm design has not considered. This optimisation
+approach can incur large computation and energy costs as the agent
+needs to experience the environmental changes to learn the optimal
+solution [23].
+Algorithm 2: Dynamic Optimisation Algorithm
+𝑁 ← 0 ; /* Number of classified anomalies */
+𝑇 ← 10 ; /* Required training threshold */
+𝑉 ← 0.85 ; /* Training validation threshold */
+𝑆 ← 0 ; /* Successful training iterations */
+𝑍 ← 5 ; /* Data set reduction threshold */
+if N >= T then
+𝑅 ← 𝑇 𝑟𝑎𝑖𝑛𝐴𝑛𝑑𝑉 𝑎𝑙𝑖𝑑𝑎𝑡𝑒 () ; /* Validation acc. */
+if R >= V then
+𝑁 ← 0;
+𝑆 ← 𝑆 + 1;
+if S >= Z then
+𝑇 ← 𝑇 − 1;
+else
+𝑆 ← 0;
+𝑇 ← 𝑇 + 1;
+Considering the target system in question, the state includes the
+current remaining battery life, the latest sample anomaly status,
+and the data available to re-train the device model. The actions
+include continuing anomaly uploads to the cloud or performing
+on-device re-training. Three candidate algorithms are identified in
+order of candidacy:
+Q-learning: An off-policy RL algorithm that learns a value func-
+tion, estimating the expected reward per action in a particular state
+[6]. The value function is learned through trial and error, through
+rewarding the agent for taking actions that maximise the overall
+battery life of the system.
+Policy gradient: An RL algorithm that learns a policy which
+maps states to relevant actions [24]. The algorithm optimises the
+reward function, which can incur a larger computational overhead
+than Q-learning. However, this can yield a better solution to a
+frequently changing environment.
+Actor-critic: A hybrid RL algorithm that combines both the
+Q-learning and policy gradient approaches to yield the advantages
+of both [5]. The critic uses Q-learning to learn the value function,
+while the actor uses policy gradient to learn a well-suited policy.
+The trade-off is that the implementation thereof can be significantly
+more complex.
+3.4 Proposed Autonomous Scheme
+Due to RL algorithms being computationally intensive by nature,
+the available computational resources should be considered when
+selecting a candidate algorithm [2]. Classical Q-learning is chosen
+as the primary evaluation candidate as it yields optimal results
+within a small dataset and is well suited to a small discrete envi-
+ronment [6, 26]. This solution is well suited within a single-agent
+environment, and the moderate number of state-action pairs trans-
+lates to a small memory footprint that many resource-constrained
+MCUs can support [6]. A decayed epsilon-greedy policy is applied
+to this algorithm to maximise initial exploration during training
+before eventually exploiting what has been learnt [ 23]. Training
+versus ongoing algorithm usage bears implementation resemblance,
+
+--- Page 4 ---
+
+tinyML Research Symposium’24, April 2024, San Francisco, CA Jared M. Ping and Ken J. Nixon
+where the former utilises higher exploration rates to populate the
+Q-table with informed state-action pairs. The evaluation, described
+in Section 4.2, has yielded sufficient improvements that the remain-
+ing candidates have not been evaluated. This implementation is
+described in Algorithm 3.
+Algorithm 3: Initial Q-Table Training Algorithm
+𝛼 ← 0.2 ; /* Learning rate */
+𝛾 ← 0.95 ; /* Discount factor */
+𝜖 ← 1 ; /* Initial exploration rate */
+Initialise Q-table 𝑄 (𝑠, 𝑎) state-action pairs (𝑠, 𝑎) to zero;
+for each episode do
+Initialise state 𝑠;
+while 𝑠 is not terminal do
+𝛼 ← 𝛼 × 0.995;
+Pick action 𝑎 for state 𝑠 via decayed 𝜖-greedy policy:
+𝜖 ← 𝜖 × 0.99;
+𝑟𝑛𝑑 ← random number between 0 and 1;
+if 𝑟𝑛𝑑 < 𝜖 then
+𝑎 ← choose random action from possible
+actions;
+else
+𝑎 ← 𝑎𝑟𝑔𝑚𝑎𝑥 over 𝑎 from 𝑄 (𝑠, 𝑎);
+Do action 𝑎, observe reward 𝑟 and next state 𝑠′;
+Update Q-value for state-action pair (𝑠, 𝑎):
+𝑄 (𝑠, 𝑎) ←
+𝑄 (𝑠, 𝑎) + 𝛼 (𝑟 + 𝛾 max𝑎′ 𝑄 (𝑠′, 𝑎′) − 𝑄 (𝑠, 𝑎));
+𝑠 ← 𝑠′;
+4 EV ALUATION
+The proposed autonomous optimisation scheme is benchmarked
+against both proposed static and dynamic algorithms for each cho-
+sen anomaly occurrence ratio is evaluated in this section. This in-
+cludes simulated system definition, modelled consumption proper-
+ties, and emulated re-training behaviour. Thereafter, the cumulative
+energy consumption per action is compared, algorithm behaviour
+is explored, and the overall battery life improvement of the system
+is compared.
+4.1 Simulated System and Environment
+The core system components are illustrated in Figure 3, required to
+implement the states and actions detailed in Table 1. These repre-
+sent all significant contributors to energy utilisation during system
+operation.
+The simulated system is a theoretical hardware implementation
+of the system illustrated in Figure 3. The functional components and
+corresponding simulated hardware are described in Table 1. This
+includes the modelled energy consumption per state and action
+extracted from the relevant datasheets, including reference to prior
+benchmark results for timing results of specific actions [13]. The
+model utilised for benchmarking the training and inference time
+is a visual wake words model requiring 478 KB and 190 KB of
+MCU flash and RAM, respectively. There is demonstrated value
+Host System (MCU)
+SPI
+Camera
+Cellular
+Modem
+Figure 3: Block diagram of simplified image-based anomaly
+detection TinyML IoT system to be simulated.
+Table 1: States and actions supported by the system and sim-
+ulated system hardware including energy consumption
+State/Action Responsible
+Component
+Simulated
+Hardware
+𝐸𝑎𝑣𝑔
+System Active MCU STM32F746xx 400 mWh
+System Sleep MCU STM32F746xx 50 µWh
+Infer Result MCU STM32F746xx 17 µWh
+Re-training MCU STM32F746xx 556 µWh/img
+Image Capture SPI camera OV2640 180 µWh
+Anomaly Upload Cell modem SIM7000E 3 mWh
+in providing benchmarks that utilise existing hardware [17]. The
+selected simulated components offer a balance of cost versus power
+efficiency for the required system, criteria that would apply to any
+real-world design.
+The power supply of such a system can vary substantially de-
+pending on the cost, lifespan, and housing constraints of the project.
+Furthermore, there is the consideration of a single-use battery ver-
+sus a rechargeable solution, whereby the latter may be comple-
+mented by a renewable power source such as solar. For simplicity,
+the simulated system emulates a single-use ideal battery solution
+offering 5 V over a battery capacity of 3.5 Ah, yielding 17.5 Wh
+of deliverable energy. The ideal source was chosen to remove the
+complexities of modelling the non-linear discharge characteristics
+of different battery chemistries.
+The SIM7000E cellular modem supports multiple radio access
+technologies. However, the energy consumption is modelled specif-
+ically for NB-IoT, a common industry technology utilised in IoT
+deployments [9]. While obtaining a Global Navigation Satellite
+System (GNSS) fix in a deployed system may be required, this re-
+quirement has been excluded to simplify simulations. It should
+be noted that this requirement can be easily included at a later
+time due to the SIM7000E module containing an integrated GNSS
+module [20].
+Several varying factors may contribute to variance in model
+accuracy when performing re-training. However, considering that
+an existing model has been selected and successfully trained with
+acceptable accuracy for the initial deployment, the largest validation
+accuracy impact factor when performing re-training is the size and
+quality of the data set being utilised, respectively.
+Assuming the quality of sourced data is sufficiently consistent,
+the re-training behaviour can be modelled to vary according to the
+
+--- Page 5 ---
+
+Simulating Battery-Powered TinyML Systems Optimised using Reinforcement Learning tinyML Research Symposium’24, April 2024, San Francisco, CA
+input data set size. This simulated modelling accounts for antici-
+pated variance in smaller data sets, which slowly diminishes as the
+data set size grows, given a more reliable re-training outcome is
+more likely. Whilst the simulated modelling behaviour may still dif-
+fer from the behaviour of real-world model training, this modelling
+allows for such a variable to be constrained for a fair benchmark per
+optimisation scheme. This modelling is described in Algorithm 4.
+Algorithm 4: Re-training validation and energy modelling
+algorithm
+Data: 𝑁 _𝑠𝑎𝑚𝑝𝑙𝑒𝑠, 𝐸 _𝑡𝑟𝑎𝑖𝑛 _𝑖𝑚𝑎𝑔𝑒
+Result: 𝑉 _𝑎𝑐𝑐𝑢𝑟𝑎𝑐𝑦, 𝐸 _𝑐𝑜𝑛𝑠𝑢𝑚𝑒𝑑
+𝑉 _𝑎𝑐𝑐𝑢𝑟𝑎𝑐𝑦 ← 0 ; /* Validation accuracy */
+𝐸_𝑐𝑜𝑛𝑠𝑢𝑚𝑒𝑑 ← 0 ; /* Re-train energy */
+𝑇 _𝑜 𝑓 𝑓 𝑠𝑒𝑡 ← 2×𝑟𝑎𝑛𝑑 ( ) −1
+10 × 0.95𝑁 _𝑠𝑎𝑚𝑝𝑙𝑒𝑠 ;
+𝑇 _𝑟𝑒𝑠𝑢𝑙𝑡 ← 1
+(1+𝑒 −0.6×log(𝑁 _𝑠𝑎𝑚𝑝𝑙𝑒𝑠 ) ) − 0.4
+𝑁 _𝑠𝑎𝑚𝑝𝑙𝑒𝑠 − 𝑇 _𝑜 𝑓 𝑓 𝑠𝑒𝑡 ;
+if V_accuracy > 1 then
+𝑉 _𝑎𝑐𝑐𝑢𝑟𝑎𝑐𝑦 ← 1;
+else if V_accuracy < 0 then
+𝑉 _𝑎𝑐𝑐𝑢𝑟𝑎𝑐𝑦 ← 0;
+𝐸_𝑐𝑜𝑛𝑠𝑢𝑚𝑒𝑑 ← 𝐸_𝑡𝑟𝑎𝑖𝑛 _𝑖𝑚𝑎𝑔𝑒 × 𝑁 _𝑠𝑎𝑚𝑝𝑙𝑒𝑠 ;
+The algorithm considers the estimated energy required to per-
+form the re-training based on the size of the data set being utilised.
+This is computed by referencing the average MCU power consump-
+tion at the maximum configured frequency whilst considering the
+average time to re-train per image. The resulting simulated model
+is illustrated in Figure 4.
+0
+25
+50
+75
+100
+0.00
+0.01
+0.02
+0.03
+0 10 20 30 40 50
+Input samples to re−train model
+Validation accuracy (%)
+Energy consumed (Wh)
+Figure 4: Simulated modelling of anticipated validation ac-
+curacy and energy required when performing re-training.
+4.2 Benchmarks and Results
+Several simulated benchmarks have been performed using each
+optimisation algorithm described in Section 3. The variance be-
+tween each benchmark test case is introduced through an adjusted
+anomaly detection ratio, namely the probability that a captured
+image yields an anomaly classification after inputting the trained
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+ 5 10 20 40
+Anomaly Ratio (%)
+Energy Consumed (Wh)
+Sleep Capture Infer Upload Train
+Figure 5: Simulated energy consumption per state and action
+within static optimisation benchmark.
+onboard neural network. The variations of anomaly detection ratio
+are set in order of anticipated likeliness, based on the expectation
+of slow-changing environment conditions, namely 5%, 10%, 20%
+and 40%. The anomalies are artificially inserted probabilistically to
+ensure the target ratios are achieved.
+The benchmarks are designed to monitor all states and actions
+described in Table 1. This ensures that the system battery life is
+fairly modelled as parasitic energy consumers, such as the sleep
+state, account for a significant portion of consumed battery life over
+the deployment of a system. The impact of sleep state consump-
+tion is generally larger when the deployment lifetime is longer, as
+illustrated in Figure 5.
+A delimiter of 50 anomaly classifications is introduced to stan-
+dardise the behaviour of anomaly classification after a successful
+re-training operation has taken place. This dictates the number of
+future anomalies that can be successfully identified onboard before
+a subsequent anomaly is treated as unknown and will require the
+results to be uploaded for server classification. Whilst this real-
+istically varies in the field, ensuring the benchmarks offer a fair
+comparison with what is effectively treated as a shared seed for
+anomaly identification validity is crucial.
+Each benchmark ensures system operation under the same con-
+ditions whereby the system is configured to wake hourly to capture
+an image, thereafter feeding the captured image into the onboard
+neural network for anomaly detection. If an anomaly is detected,
+an upload is performed, yielding an emulated classification from
+the server. The optimisation algorithm then determines whether
+a sufficient number of anomaly classifications has been obtained
+to attempt re-training the on-device neural network before return-
+ing to sleep. This process repeats until the available energy of the
+battery has been exhausted.
+Each loop is defined as a sampling iteration . Given the fixed
+frequency of sampling iterations, the total achievable iterations are
+translated into a simulated battery life per deployment on a single
+full charge of the emulated battery power supply. The obtained
+results from the respective benchmarks are tabulated in Table 2.
+
+--- Page 6 ---
+
+tinyML Research Symposium’24, April 2024, San Francisco, CA Jared M. Ping and Ken J. Nixon
+0
+5
+10
+15
+0
+50
+100
+150
+200
+100 101 102 103 104 105
+Image Capture and Infererence Iterations
+Battery Capacity (Wh)
+On−Device Operations
+Capacity: Autonomous
+Capacity: Dynamic
+Capacity: Static
+Operations: Autonomous
+Operations: Dynamic
+Operations: Static
+(a) Anomaly ratio of 5%.
+0
+5
+10
+15
+0
+50
+100
+150
+200
+100 101 102 103 104 105
+Image Capture and Infererence Iterations
+Battery Capacity (Wh)
+On−Device Operations
+Capacity: Autonomous
+Capacity: Dynamic
+Capacity: Static
+Operations: Autonomous
+Operations: Dynamic
+Operations: Static (b) Anomaly ratio of 40%.
+Figure 6: Simulated energy utilisation through varying optimisation schemes to improve re-training attempt frequency.
+Overall, the autonomous optimisation yields a deployment bat-
+tery life improvement of 22.86% and 10.86% respectively when
+compared to the static and dynamic optimisation approaches re-
+spectively. The simulated system collecting samples at an hourly
+rate translates to a single deployment battery life of 4.11 years com-
+pared to the 3.35 years and 3.71 years of the static and dynamic sys-
+tems, respectively. Although the autonomous optimisation scheme
+supports ongoing learning, it is found that further improvements
+in battery life during change of anomaly ratios are mitigated by the
+additional training. A larger year differential in the total deploy-
+ment time will be seen if the frequency of the sampling interval
+is reduced from the simulated 1 h period. The variance in device
+actions is illustrated in Figure 6, demonstrating how the actions are
+optimised by each algorithm when the system experiences different
+anomaly occurrence ratios. This behaviour is subject to fine-tuning
+of the hyperparameters utilised by Algorithm 3, which requires
+iterative evaluation to achieve maximised Q-table population.
+4.3 Deployability
+The simulated modelling and evaluation of such a solution high-
+lights the portability of such a solution as it requires no specialised
+Table 2: Simulated benchmark results comparing anomaly
+ratios and their respective impact per optimisation algorithm
+Anomaly
+Ratio
+(%)
+Static
+Battery Life
+(hr)
+Dynamic
+Battery Life
+(hr)
+Autonomous
+Battery Life
+(hr)
+5 45 956 49 728 53 292
+10 34 741 38 162 41 988
+20 22 909 26 304 29 809
+40 13 781 15 909 19 137
+Avg. 29 347 32 526 36 057
+hardware and features a minuscule memory footprint of 800 B. Pi-
+lot deployments will yield maximised value by allowing sufficient
+data collection of the initial environmental conditions. The initial
+training can then occur on cloud infrastructure, with the resulting
+Q-table deployed to edge deployments thereafter. The autonomous
+algorithm supports ongoing learning, allowing dynamic environ-
+mental conditions to be further accounted for and the learnings
+shared with deployments in similar environments.
+The choice of simulated hardware for the benchmarks has been
+made with the intent to acquire the specified components and vali-
+date the simulated improvements through a physical experiment.
+Such a system is well-suited for use cases like those within smart
+agriculture, where varying visual conditions across deployments
+are probable.
+Whilst this work does not include data privacy considerations, it
+should be noted that uploading anomaly data to the cloud should be
+done securely for any real-world deployment. The method in which
+this is achieved may have a battery life impact, such as encryption
+and decryption of anomaly data and server classification results.
+5 CONCLUSION
+The functional capabilities of TinyML devices continue to grow
+and enhance the value of several industries and sectors, such as
+smart agriculture. However, the unlocked enhancements can incur
+an increased power consumption profile that should be carefully
+managed for battery-powered systems. In working towards this
+goal, this paper presents the battery life benefits of utilising re-
+inforcement learning, specifically Q-learning, to coordinate the
+operational management of image-based anomaly detection IoT
+systems capable of supporting on-board training to maximise the
+battery life per deployment. The solution is scalable due to its small
+memory footprint, requiring 800 B. The proposed solution achieves
+22.86% and 10.86% more battery life compared to the benchmarked
+static and dynamic algorithms respectively. Future work includes
+the scope of a physical experiment to validate the simulated im-
+provements on actual components chosen for the simulation.
+
+--- Page 7 ---
+
+Simulating Battery-Powered TinyML Systems Optimised using Reinforcement Learning tinyML Research Symposium’24, April 2024, San Francisco, CA
+REFERENCES
+[1] Youssef Abadade, Anas Temouden, Hatim Bamoumen, Nabil Benamar, Yousra
+Chtouki, and Abdelhakim Senhaji Hafid. 2023. A Comprehensive Survey on
+TinyML. IEEE Access 11 (2023), 96892–96922. https://doi.org/10.1109/ACCESS.
+2023.3294111
+[2] Warren Armstrong, Peter Christen, Eric McCreath, and Alistair P Rendell. 2006.
+Dynamic Algorithm Selection Using Reinforcement Learning. In 2006 Interna-
+tional Workshop on Integrating AI and Data Mining . IEEE Computer Society, Los
+Alamitos, CA, USA, 18–25. https://doi.org/10.1109/AIDM.2006.4
+[3] Toygun Basaklar, Yigit Tuncel, and Umit Y. Ogras. 2022. tinyMAN: Light-
+weight Energy Manager using Reinforcement Learning for Energy Har-
+vesting Wearable IoT Devices. https://doi.org/10.48550/arXiv.2202.09297
+arXiv:2202.09297 [eess.SP]
+[4] Richard Bellman. 1957. Dynamic Programming . Princeton University Press,
+Princeton, NJ, USA.
+[5] Ivo Grondman, Lucian Busoniu, Gabriel A. D. Lopes, and Robert Babuska. 2012.
+A Survey of Actor-Critic Reinforcement Learning: Standard and Natural Policy
+Gradients. IEEE Transactions on Systems, Man, and Cybernetics, Part C (Applica-
+tions and Reviews) 42, 6 (2012), 1291–1307. https://doi.org/10.1109/TSMCC.2012.
+2218595
+[6] Beakcheol Jang, Myeonghwi Kim, Gaspard Harerimana, and Jong Wook Kim. 2019.
+Q-Learning Algorithms: A Comprehensive Classification and Applications. IEEE
+Access 7 (2019), 133653–133667. https://doi.org/10.1109/ACCESS.2019.2941229
+[7] Rakhee Kallimani, Krishna Pai, Prasoon Raghuwanshi, Sridhar Iyer, and Onel
+L. A. López. 2023. TinyML: Tools, applications, challenges, and future research
+directions. Multimedia Tools and Applications 1 (Sept. 2023), 31 pages. https:
+//doi.org/10.1007/s11042-023-16740-9
+[8] Tamás Kegyes, Zoltán Süle, and János Abonyi. 2021. The Applicability of Rein-
+forcement Learning Methods in the Development of Industry 4.0 Applications.
+Complexity 2021 (11 2021), 1–31. https://doi.org/10.1155/2021/7179374
+[9] Konstantinos Kousias, Giuseppe Caso, Ozgu Alay, Anna Brunstrom, Luca De
+Nardis, Maria-Gabriella Di Benedetto, and Marco Neri. 2020. Coverage and
+Deployment Analysis of Narrowband Internet of Things in the Wild. IEEE
+Communications Magazine 58, 9 (2020), 39–45. https://doi.org/10.1109/MCOM.
+001.2000131
+[10] Michael Laskin, Kimin Lee, Adam Stooke, Lerrel Pinto, Pieter Abbeel, and Aravind
+Srinivas. 2020. Reinforcement Learning with Augmented Data. In Advances
+in Neural Information Processing Systems (NIPS’20, Vol. 33) . Curran Associates
+Inc., Red Hook, NY, USA, 19884–19895. https://dl.acm.org/doi/10.5555/3495724.
+3497393
+[11] Ji Lin, Wei-Ming Chen, Han Cai, Chuang Gan, and Song Han. 2021. Memory-
+efficient Patch-based Inference for Tiny Deep Learning. In Advances in Neural
+Information Processing Systems (NIPS’21, Vol. 34). Curran Associates, Inc., Red
+Hook, NY, USA, 2346–2358. https://proceedings.neurips.cc/paper_files/paper/
+2021/file/1371bccec2447b5aa6d96d2a540fb401-Paper.pdf
+[12] Ji Lin, Wei-Ming Chen, Yujun Lin, John Cohn, Chuang Gan, and Song Han. 2020.
+MCUNet: Tiny Deep Learning on IoT Devices. In Advances in Neural Information
+Processing Systems (NIPS’20, Vol. 33) . Curran Associates, Inc., Red Hook, NY,
+USA, 11711–11722. https://proceedings.neurips.cc/paper_files/paper/2020/file/
+86c51678350f656dcc7f490a43946ee5-Paper.pdf
+[13] Ji Lin, Ligeng Zhu, Wei-Ming Chen, Wei-Chen Wang, Chuang Gan, and Song
+Han. 2022. On-Device Training Under 256KB Memory. In Advances in Neural
+Information Processing Systems (NIPS’22, Vol. 35). Curran Associates, Inc., Red
+Hook, NY, USA, 22941–22954. https://proceedings.neurips.cc/paper_files/paper/
+2022/file/90c56c77c6df45fc8e556a096b7a2b2e-Paper-Conference.pdf
+[14] Xiaolan Liu, Zhijin Qin, and Yue Gao. 2019. Resource Allocation for Edge Com-
+puting in IoT Networks via Reinforcement Learning. In ICC 2019 - 2019 IEEE
+International Conference on Communications (ICC) . Curran Associates Inc., Red
+Hook, NY, USA, 1–6. https://doi.org/10.1109/ICC.2019.8761385
+[15] Laëtitia Matignon, Guillaume Laurent, and Nadine Fort-Piat. 2006. Reward
+Function and Initial Values: Better Choices for Accelerated Goal-Directed Rein-
+forcement Learning, In Artificial Neural Networks – ICANN 2006. Lecture Notes
+in Computer Science 1, 840–849. https://doi.org/10.1007/11840817_87
+[16] Chollet Nicolas, Bouchemal Naila, and Ramdane-Cherif Amar. 2022. TinyML
+Smart Sensor for Energy Saving in Internet of Things Precision Agriculture
+platform. In 2022 Thirteenth International Conference on Ubiquitous and Future
+Networks (ICUFN). Association for Computing Machinery, New York, NY, USA,
+256–259. https://doi.org/10.1109/ICUFN55119.2022.9829675
+[17] Mateusz Piechocki, Marek Kraft, Tomasz Pajchrowski, Przemyslaw Aszkowski,
+and Dominik Pieczynski. 2022. Efficient People Counting in Thermal Images: The
+Benchmark of Resource-Constrained Hardware. IEEE Access 10 (2022), 124835–
+124847. https://doi.org/10.1109/ACCESS.2022.3225233
+[18] Partha Ray. 2021. A Review on TinyML: State-of-the-art and Prospects. Journal
+of King Saud University - Computer and Information Sciences 34 (11 2021). https:
+//doi.org/10.1016/j.jksuci.2021.11.019
+[19] Jianji Ren, Haichao Wang, Tingting Hou, Shuai Zheng, and Chaosheng Tang.
+2019. Federated Learning-Based Computation Offloading Optimization in Edge
+Computing-Supported Internet of Things. IEEE Access 7 (2019), 69194–69201.
+https://doi.org/10.1109/ACCESS.2019.2919736
+[20] SIMCom Wireless Solutions 2018. SIM7000 Hardware Design. SIMCom Wireless
+Solutions. Rev. 5.
+[21] Satinder Singh, Tommi Jaakkola, Michael Littman, and Csaba Szepesvári. 2000.
+Convergence Results for Single-Step On-Policy Reinforcement-Learning Algo-
+rithms. Machine Learning 38 (03 2000), 287–308. https://doi.org/10.1023/A:
+1007678930559
+[22] Chellammal Surianarayanan, John Lawrence, Pethuru Raj Chelliah, Edmond
+Prakash, and Chaminda Hewage. 2023. A Survey on Optimization Techniques
+for Edge Artificial Intelligence (AI). Sensors 23 (01 2023), 1279. https://doi.org/
+10.3390/s23031279
+[23] Richard Sutton and Andrew Barto. 2018. Reinforcement Learning: An Introduction
+(second ed.). MIT Press, Cambridge, MA, USA.
+[24] Richard S Sutton, David McAllester, Satinder Singh, and Yishay Mansour. 1999.
+Policy Gradient Methods for Reinforcement Learning with Function Approxima-
+tion. In Advances in Neural Information Processing Systems (NIPS’99, Vol. 12) . MIT
+Press, Cambridge, MA. https://proceedings.neurips.cc/paper_files/paper/1999/
+file/464d828b85b0bed98e80ade0a5c43b0f-Paper.pdf
+[25] Vasileios Tsoukas, Anargyros Gkogkidis, and Athanasios Kakarountas. 2023. A
+TinyML-Based System For Smart Agriculture. In Proceedings of the 26th Pan-
+Hellenic Conference on Informatics (Athens, Greece) (PCI ’22). Association for
+Computing Machinery, New York, NY, USA, 207–212. https://doi.org/10.1145/
+3575879.3575994
+[26] Xuezhou Zhang, Shubham Bharti, Yuzhe Ma, Adish Singla, and Xiaojin Zhu.
+2021. The Sample Complexity of Teaching by Reinforcement on Q-Learning.
+Proceedings of the AAAI Conference on Artificial Intelligence 35, 12 (May 2021),
+10939–10947. https://doi.org/10.1609/aaai.v35i12.17306

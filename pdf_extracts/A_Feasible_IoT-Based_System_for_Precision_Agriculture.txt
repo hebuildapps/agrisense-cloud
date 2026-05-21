@@ -1,0 +1,329 @@
+--- Page 1 ---
+
+A Feasible IoT-Based System for Precision Agriculture 
+ 
+Radovan Stojanović 
+Faculty of Electrical Engineering 
+University of Montenegro and 
+MECOnet 
+Podgorica, Montenegro 
+stox@ac.me 
+Vesna Maraš 
+Development sector 
+13. jul Plantaže, 
+Podgorica, Montenegro 
+vesna.maras@plantaze.com 
+Sanja Radonjić 
+Development sector 
+13. jul Plantaže, 
+Podgorica, Montenegro 
+sanja.radonjic@plantaze.com 
+Anita Martić 
+Development sector 
+13. jul Plantaže, 
+Podgorica, Montenegro 
+anita.martic@plantaze.com 
+ 
+Jovan Đurković 
+MANT and MECOnet 
+Podgorica, Montenegro 
+dj.jovan94@gmail.com 
+Katarina Pavićević 
+Development sector 
+13. jul Plantaže, 
+Podgorica, Montenegro 
+katarina.pavicevic@plantaze.com 
+Vasilije Mirović 
+Development sector 
+13. jul Plantaže, 
+Podgorica, Montenegro 
+vasilije.mirovic@plantaze.com 
+Miljan Cvetković 
+Faculty of Agriculture 
+University of Banja Luka 
+Banja Luka, Bosnia and 
+Herzegovina 
+miljan.cvetkovic@agro.unibl.org 
+ 
+Abstract—This paper presents a feasible and a low-cost IoT based 
+monitoring system for precision agriculture , with emphasis to 
+viticulture. A field/crop data a re acqu ired by self -powered 
+measuring station and sent to remote collector, located in the home 
+or office. The collector accepts the data and forward them via 
+home/office WiFi to commercial or open IoT servers (as 
+ThingSpeak) for further visualization, analyze and react back . 
+Using available APIs, any web application on any server can 
+communicate with IoT server, and thus with field station. Every 
+authorized person or farmer , who has computer or gadget with 
+Internet access can monitor parameters of interest and control 
+back associated processes as irrigation or ventilation. Principle of 
+operation, h ardware and software architecture as well as 
+preliminary results are shortly elaborated. 
+Keywords-IoT; LoRa; agriculture; telemonitoring; remote 
+control; node MCU; precision 
+I. INTRODUCTION 
+Global w orld growing population faces many challenges, 
+among others, in food production. T here are obvious efforts to 
+employ Industry 4.0 technologies in agriculture, in order to 
+achieve increased production in term of quantity and quality, 
+efficient ecological management, financial savings, water 
+supply management and other benefits. 
+Specific data for precision agriculture (PA) are provided by 
+range of specific sensors connected to hardware devices with 
+adequate software applications [2]. Such systems are capable to 
+measure, visualize, monitor and analyze soil and environmental 
+parameters [3] and provide adequate feedbacks from the user 
+[1,2,5,6]. There are a large number of such systems on the 
+market, with different characteristics and prices. The set of 
+parameters to be measured varies from temperature, humidity 
+to sunlight as well as to content of chlorophyll in the leaf. 
+Sometimes, the chemical elements in the soil are included. 
+Also, their working principle varies from stand -alone 
+components with manually readings to those that have their 
+own network and are powered by custom designed applications 
+on dedicated servers. 
+However, the d esigning PA system for purpose of 
+viticulture presents research and engineering challenge [1]. The 
+wine yards are of large areas, often away from home or office 
+and it is not easy to be covered by reliable communication 
+network. WiFi that is the most used networking protocol in PA 
+is suitable for small plots or indoor farming. Usually requires 
+the presence of electricity or more powerful solar sources on the 
+plantation, because the consumption of the router network is not 
+small. 
+Taking into account the specifics of viticulture and wine 
+yards concerning PA, this paper proposes an adequate system, 
+which can meet the requirements. Being inexpensive, based on 
+available and open-source technologies, scalable and dynamic, 
+such system is a feasible solution for developing countries, 
+where the farmers have not possibility to deal with expensive 
+commercial solutions . It offers several functional advantages 
+as: (i) powering autonomy, (ii) long-range communication, (iii) 
+integration with existing commercial or free IoT platforms like 
+ThingSpeak, (iv) easy embedding in individual or company 
+web sites/servers and (v) accessibility with any person or farmer 
+equipped by internet access. The same system and approach can 
+be employed in similar PA applications related to other crops. 
+Here we describe some elements of proposed PA solution : 
+operating principle, hardware -software architecture and 
+preliminary testing results. 
+II. PRINCIPLE OF OPERATION 
+A. Hardware considerations 
+The operation principle follows system architecture given in 
+Figure 1. Autonomy SMART-MES STATION integrates: solar 
+panel, p ower supply electro nics with internal battery, ESP32 
+based N ode MCU (from Heltec) with integrated Lo-Ra 
+communication module, sensors actuators (amplifiers or 
+interfaces) and power switches in forms of relays or 
+semiconductor outputs [7]. Currently, the system is capable to 
+measure three parameters: air temperature, humidity, and soil 
+moisture, but it can be easily extended to others. Low cost and 
+
+--- Page 2 ---
+
+widely available DHT11 sensor is used for air temperature and 
+humidity, while for soil moisture measurement t he special 
+sensor solution has been developed. After collecting data from 
+the sensors, the station send s them by LoRa communication 
+protocol to collector, which can be about 5 km away [8]. LoRa 
+technology uses the chirp modulation and two layers of 
+cryptography. It can grow into a complex network of any size 
+(LoRaWAN), transferring the data between the adjacent nodes. 
+The LoRa module MCU has external 19dB antenna, operating 
+at 868MHz (Europe) , while other frequencies are supported 
+worldwide. It has satisfac tory power consumption. With its 
+characteristics LoRa protocol represents a very competitive 
+solution for purpose of PA. 
+ 
+Figure 1: The general working principle of a proposed system 
+REMOTE COLLECTOR is a hybrid transmitter operated by 
+the identical MCU ESP32 based node from Heltec, with 
+integrated LoRaWAN module. Digital filters and software 
+routines are used to ensure correct encryption of the receiving 
+messages, under presence of different noise. In order to achieve 
+the maximal range between two LoRaWAN nodes, the message 
+should be as short as possible. It is because the error probability 
+increases with the message length, and only one misinterpreted 
+byte is enough to receive unusabl e content. Experiments have 
+shown that larger communication range was achieved when 
+sending only a few bytes compared to long descriptive strings. 
+Additionally, in some extreme cases when it is crucial to reach 
+the very top distance without using additiona l hardware, it can 
+be done by splitting a message into one-byte sized chunks, and 
+then sending them multiple times to gain satisfactory 
+probability. Both, node MCUs in the station and collector have 
+built-in OLED display to watch on -line data or to perform 
+adequate setting and user interfacing. 
+In addition of performing LoRa communication the 
+collector has possibility to simultaneously communicated with 
+nearby WiFi spot as it is home/office WiFi router. All 
+communications of node MCU are duplex. 
+The innovative sensor device, developed during this internal 
+experiment is a soil moisture sensor, based on capacitive 
+principle, Figure 2 . Namely, our experimentation proved that 
+exiting low-cost soil moisture sensors , such as Capacitive soil 
+moisture sensor v1.2 are not enough precise and, practically, 
+unusable. The proposed soil measurement sensor is based on 
+capacitive to PWM converter, Figure 2. It converts difference 
+of two capacitors, abs(Cx-Cref) into a duty cycle D of PWM 
+signal, and thus in average value of filtered PWM signal. 
+ 
+D=T2/(T1+T2) = f(abs(Cx-Cr)), VF=D*5V+(1-D)*0V (1) 
+ 
+The oscillator with core frequency f is driving two parallel 
+branches RCref and RCx, where Cx is the capacitance between 
+the sensor electrodes, while Cref is the reference capacitance. 
+In absence of the soil Cx and Cref are almost equal, Cx = Cref, 
+and DELAY (RCx) -DELAY (RCref) is practically equal to 0 , 
+that cause minimal duty cycle and minimal average voltage. 
+Figure 3, shows diagram s in characteristics points of proposed 
+capacitive sensor. Amplifier amplify signal VF in a range that 
+is readable in satisfactory resolution by microprocessor’s A/D , 
+usually in range 0-5V. 
+ 
+OSCILATOR
+R
+R
+Cx
+Cref
+AMPLIFIER
+A
+B
+C
+D
+B
+GND
+GND
+plates
+insulator
+soil
+B’
+C’
+R
+Low-pass filter
+E F
+ 
+Figure 2: Principal scheme of capacitive sensor 
+ 
+Figure 3: Diagrams in characteristic points of capacitive sensor 
+
+--- Page 3 ---
+
+B. Software considerations 
+The software consists of firmware and cloud-based software 
+applications. Firmware is responsible for NodeMCU general 
+operation, sensors handling, LoRa communication, 
+communication with ThingSpeak server and other on -board 
+related tasks. The main component of cloud -based software is 
+ThingSpeak application, where we setup our profile, API keys, 
+diagram channels and other applications like TalkBack, used 
+for handling and visualize our signals [9]. Both, nodeMCU and 
+user can communicate with ThingSpeak. Node MCU sends data 
+for channels (diagrams) updating and simultaneously get s the 
+last command stored in commands queue. It is done b y HTTP 
+GET or POST protocols, implemented on a Node MCU. There 
+are two ways to send commands to MCU via ThingSpeak. User 
+can do it through any web browser or web application by HTTP 
+POST and GET protocols. The same command can be set 
+within ThingSpeak HTTP interface. 
+ 
+ 
+Figure 4: Software flow for sending data for diagrams and get commands 
+III. TESTING PROCEDURE AND OBTAINED RESULTS 
+The proposed system was thoroughly tested over a period of 
+five months and found to be precise and reliable. The length of 
+a sending data string affected the probability of successful 
+communication when reaching the far distance limit. So, it had 
+to be shortened for the better results. The string was binary 
+compressed to the length of 4 characters and reached distance 
+of 1.5 km, which was more than enough for our testing 
+conditions. 
+In term of power consumption, the following results are 
+achieved: the device draws about 60 mA when all the circuits 
+are powered simultaneously , adding short peaks of another 60 
+mA while LoRa was active. 
+Figures 5 show the physical look of a system and the 
+collector serial communication output. Figure 6, shows 
+visualization of the data sent to ThingSpeak for 3 channels, as 
+well as visualization of active command value. Figure 7. shows 
+interface for sending commands implemented in JavaScript 
+code that can be very easily embedded in any web environment. 
+ 
+Figure 5: Station in wine yard and in micro farming environment. The 
+collector is a small device-box located far away from station in place where 
+Wi Fi is accessible. 
+ 
+ 
+ 
+
+--- Page 4 ---
+
+ 
+ 
+Figure 6: Charts showing: air humidity (1), air temperature (2), soil moisture 
+(3), and control (4) 
+Two-way communication over the internet is of crucial 
+significance to be able to have the fully functional IoT 
+application, meaning that we can control our system remotely 
+from any place in the world [6]. The Figure 7 shows an example 
+of sending the control data from server to the MCU. 
+ 
+Figure 7: Sending control commands 
+IV. CONCLUSION 
+Precision agriculture is a modern approach in agro 
+production that allows implementation of new ICT based 
+technologies with aim to increase production under better 
+quality as well as to visualize, analyze and control many of the 
+processes related to this area [2,4,5]. As example, w ater 
+management is the most important [5]. In this paper, we present 
+a system that is able to perform ICT based precision agriculture 
+tasks. It uses low-cost components and open code platforms and 
+as such is very suitable for developing countries, where the 
+farmers could not purc hase and install expensive commercial 
+solutions. The main components of the proposed systems are 
+station, collector and cloud software. The station consists of low 
+costs sensors, node ESP32 based MCU with LoRa 
+communication module , solar powering unit and energy 
+devices switching unit. Collector accepts data sent by LoRa and 
+forward them to the cloud. Its main component is identical 
+Node ESP32 based MCU. The main cloud component is IoT 
+server ThingSpeak, modular and suitable platform with many 
+upgrading possibilities. The user can communicate with station 
+in order to follow and control processes, directly via 
+ThingSpeak or indirectly via its simple web browser 
+application. The overall price of the system is less than 200 
+EUR. 
+ACKNOWLEDGMENTS 
+This paper is supported with following projects: 
+SMART4ALL ( Self-sustained customized cyberphysical 
+system experiments for capacity building among European 
+stakeholders) and VIRAL (Vitalising ICT Relevance in 
+Agricultural Learning). Authors are greatly thankful. 
+REFERENCES 
+[1] Elijah, O.; Rahman, T.A.; Orikumhi, I.; Leow, C.Y.; Hindia, M.N. An 
+Overview of Internet of Things (IoT) and Data Analytics in Agriculture: 
+Benefits and Challenges. IEEE Internet Things J. 2018, 5, 3758–3773 
+[2] Ivanov S., Bhargava K., Donnelly W. Precisio n farming: Sensor 
+analytics. IEEE Intell. Syst. 2015;30:76–80. doi: 
+10.1109/MIS.2015.67. [CrossRef] [Google Scholar] 
+[3] Maraš, V., Popović, T., Gajinov, S., Mugoša, M., Popović, V. Savović, 
+A., P avićević, K., Mirović, V. (2020): Precision Viticulture Using 
+Wireless Sensor Network. In 2020 9th Mediterranean Conference on 
+Embedded Computing (MECO) Budva, Montenegro. DOI: 
+10.1109/MECO49872.2020.9134174 
+[4] Maraš, V., Popović, T., Gajinov, S., Mugoša, M., Popović, V. Savović, 
+A., Pavićević, K., Mirović, V (2019): Optimal irrigation as a tool of 
+precision agriculture. In 2019 8th Mediterranean Conference on 
+Embedded Computing (MECO) Budva, Montenegro, pp. 533-536. DOI: 
+10.1109/MECO.2019.8760145 
+[5] Daniel Francis Selvaraj, J., Jeba Jingle, D., Mano Paul, P. (2019): 
+Automatic Wireless Water Management System(AWWMS) for Smart 
+Vineyard Irrigation using IoT Technology. International Journal of 
+Oceans and Oceanography. 13. 211-218. 
+[6] John Gialelis, Maria Fokaeos, Gerasimos Theodorou, Christos Paparizos, 
+Nikos Tsafas, A Low Cost Energy Efficient IoT Node Utilized in the 
+Agricultural Field, 2020 9th Mediterranean Conference on Embedded 
+Computing (MECO), 1-6. 
+[7] Heltec, https://heltec.org/project/wifi-lora-32/, Accessed 25.3.2021. 
+[8] LoRa Alliance, https://lora-alliance.org/, Accessed 25.3.2021. 
+[9] Thing Speak, https://thingspeak.com/, Accessed 25.3.2021.
