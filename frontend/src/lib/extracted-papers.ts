@@ -9,6 +9,15 @@ import type {
   PaperArtifact,
   RelatedPaper,
 } from "@/types/artifact";
+import {
+  cleanText,
+  cleanTitle,
+  cleanAuthorName,
+  cleanAbstract,
+  cleanSectionContent,
+  generateSummary,
+  truncateText,
+} from "@/lib/text-cleaning";
 
 type ManifestRow = {
   file: string;
@@ -79,25 +88,12 @@ function parseCsv(content: string): string[][] {
   return rows;
 }
 
-function normalizeWhitespace(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
-}
-
-function normalizeExtractText(value: string): string {
-  return value
-    .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n")
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n{4,}/g, "\n\n\n")
-    .trim();
-}
-
 function resolveExtractPath(relativePath: string): string {
   return path.resolve(process.cwd(), "..", relativePath);
 }
 
 function isPlaceholderTitle(value: string): boolean {
-  const normalized = normalizeWhitespace(value).toLowerCase();
+  const normalized = cleanText(value).toLowerCase();
   return (
     !normalized ||
     normalized.startsWith("paper title") ||
@@ -107,12 +103,12 @@ function isPlaceholderTitle(value: string): boolean {
 }
 
 function isPlaceholderAuthor(value: string): boolean {
-  const normalized = normalizeWhitespace(value).toLowerCase();
+  const normalized = cleanText(value).toLowerCase();
   return !normalized || normalized === "user" || normalized === "unknown author";
 }
 
 function isLikelyBoilerplateLine(value: string): boolean {
-  const normalized = normalizeWhitespace(value).toLowerCase();
+  const normalized = cleanText(value).toLowerCase();
 
   return (
     !normalized ||
@@ -121,77 +117,109 @@ function isLikelyBoilerplateLine(value: string): boolean {
     normalized.startsWith("http://") ||
     normalized.startsWith("https://") ||
     normalized.startsWith("doi:") ||
-    normalized.startsWith("abstract") ||
-    normalized.startsWith("keywords")
+    (normalized.startsWith("abstract") && normalized.length < 50) ||
+    (normalized.startsWith("keywords") && normalized.length < 50)
   );
 }
 
 function isSectionHeadingLine(value: string): boolean {
-  return /^(?:[IVX]+|\d+)\.?\s+[A-Z]/.test(normalizeWhitespace(value));
+  return /^(?:[IVX]+|\d+)\.?\s+[A-Z]/.test(cleanText(value));
 }
 
-function extractAbstractText(text: string): string {
-  const abstractMatch = text.match(/Abstract[—-]\s*([\s\S]*?)(?:Keywords?\s*[-—:]|I\.\s*INTRODUCTION|INTRODUCTION)/i);
+function extractAbstractFromText(text: string): string {
+  const cleaned = cleanText(text);
+  
+  const abstractMatch = cleaned.match(
+    /(?:^|\n)(?:Abstract|Biography)[—-]?\s*([\s\S]*?)(?=\n(?:Keywords?|I\.\s*INTRODUCTION|INTRODUCTION\s*\n))/i
+  );
 
   if (abstractMatch?.[1]) {
-    return normalizeWhitespace(abstractMatch[1]);
+    return cleanAbstract(abstractMatch[1]);
+  }
+
+  // Try simpler pattern
+  const simpleMatch = cleaned.match(
+    /(?:Abstract|Biography)[:\s]*([\s\S]{100,})/i
+  );
+  if (simpleMatch?.[1]) {
+    return cleanAbstract(simpleMatch[1].substring(0, 1000));
   }
 
   return "";
 }
 
-function extractKeywordsText(text: string): string {
-  const keywordsMatch = text.match(/Keywords?\s*[-—:]\s*([^\n\r]+)/i);
-  return normalizeWhitespace(keywordsMatch?.[1] || "");
+function extractKeywordsFromText(text: string): string[] {
+  const cleaned = cleanText(text);
+  
+  const keywordsMatch = cleaned.match(
+    /(?:Keywords?|Index Terms)[-—:]\s*([^\n]+)/i
+  );
+  
+  if (keywordsMatch?.[1]) {
+    return keywordsMatch[1]
+      .split(/[,;|]+/)
+      .map(k => cleanText(k).trim())
+      .filter(k => k.length > 2 && k.length < 30)
+      .slice(0, 8);
+  }
+  
+  return [];
 }
 
 function extractIntroExcerpt(text: string): string {
-  const lines = text.split(/\r?\n/).map(normalizeWhitespace);
-  const introIndex = lines.findIndex((line) => /^I\.\s*INTRODUCTION/i.test(line) || /^INTRODUCTION$/i.test(line));
+  const cleaned = cleanText(text);
+  const lines = cleaned.split(/\n{2,}/);
+  
+  const introIndex = lines.findIndex(
+    (line) => /^I\.\s*INTRODUCTION/i.test(line) || 
+               /^INTRODUCTION$/i.test(line) ||
+               /^\s*1\s+Introduction/i.test(line)
+  );
 
   if (introIndex < 0) {
+    // Try first paragraph after abstract
+    const abstractMatch = cleaned.match(/(?:Abstract|Biography)[:\s]*([\s\S]{100,})/i);
+    if (abstractMatch) {
+      const afterAbstract = cleaned.substring(cleaned.indexOf(abstractMatch[0]) + abstractMatch[0].length);
+      const firstPara = afterAbstract.split(/\n{2,}/).find(p => p.trim().length > 100);
+      if (firstPara) {
+        return truncateText(firstPara, 520);
+      }
+    }
     return "";
   }
 
   const excerptLines: string[] = [];
 
   for (let index = introIndex + 1; index < lines.length; index += 1) {
-    const line = lines[index];
+    const line = cleanText(lines[index]);
 
-    if (!line) {
-      if (excerptLines.length > 0) {
-        break;
-      }
-      continue;
-    }
+    if (!line || line.length < 10) continue;
 
-    if (isSectionHeadingLine(line)) {
-      break;
-    }
+    if (isSectionHeadingLine(line)) break;
 
-    if (isLikelyBoilerplateLine(line)) {
-      continue;
-    }
+    if (isLikelyBoilerplateLine(line)) continue;
 
     excerptLines.push(line);
-    if (excerptLines.join(" ").length >= 520) {
-      break;
-    }
+    if (excerptLines.join(" ").length >= 520) break;
   }
 
-  return normalizeWhitespace(excerptLines.join(" "));
+  return generateSummary(excerptLines.join(" "), 520);
 }
 
 function deriveTitleFromText(text: string): string {
-  const lines = text.split(/\r?\n/).map(normalizeWhitespace).filter(Boolean);
+  const cleaned = cleanText(text);
+  const lines = cleaned.split(/\n{2,}/).filter(Boolean);
 
   for (const line of lines) {
-    if (isLikelyBoilerplateLine(line)) {
-      continue;
-    }
-
-    if (line.length >= 5 && line.length <= 220) {
-      return line;
+    const trimmed = cleanText(line);
+    
+    if (!trimmed || trimmed.length < 10) continue;
+    if (isLikelyBoilerplateLine(trimmed)) continue;
+    
+    // Good title candidates are between 20-250 chars
+    if (trimmed.length >= 20 && trimmed.length <= 250) {
+      return trimmed;
     }
   }
 
@@ -199,50 +227,41 @@ function deriveTitleFromText(text: string): string {
 }
 
 function looksLikeAuthorLine(value: string): boolean {
-  const normalized = normalizeWhitespace(value);
+  const normalized = cleanText(value);
 
-  if (!normalized || /@/.test(normalized) || /\d/.test(normalized)) {
+  if (!normalized || /@/.test(normalized) || /\d{5,}/.test(normalized)) {
     return false;
   }
 
   const lowerValue = normalized.toLowerCase();
-  const affiliationTerms = [
-    "faculty",
-    "university",
-    "college",
-    "department",
-    "school",
-    "institute",
-    "laboratory",
-    "center",
-    "centre",
-    "sector",
-    "campus",
-    "research",
-    "engineering",
+  const skipTerms = [
+    "faculty", "university", "college", "department", "school",
+    "institute", "laboratory", "center", "centre", "sector",
+    "campus", "research", "engineering", "technology", "abstract",
+    "introduction", "keywords", "doi", "http", "copyright"
   ];
 
-  if (affiliationTerms.some((term) => lowerValue.includes(term))) {
+  if (skipTerms.some((term) => lowerValue.includes(term))) {
     return false;
   }
 
   const wordCount = normalized.split(/\s+/).length;
-  return wordCount >= 2 && wordCount <= 8;
+  return wordCount >= 2 && wordCount <= 6;
 }
 
 function extractAuthorsFromText(text: string, title: string): string[] {
-  const lines = text.split(/\r?\n/);
-  const titleIndex = lines.findIndex((line) => normalizeWhitespace(line) === title);
+  const cleaned = cleanText(text);
+  const lines = cleaned.split(/\n{2,}/);
+  
+  const titleIndex = lines.findIndex((line) => cleanText(line).includes(title.substring(0, 30)));
   const startIndex = titleIndex >= 0 ? titleIndex + 1 : 0;
   const authors: string[] = [];
 
   for (let index = startIndex; index < lines.length; index += 1) {
-    const line = normalizeWhitespace(lines[index]);
+    const line = cleanText(lines[index]);
 
-    if (!line) {
-      if (authors.length > 0) {
-        break;
-      }
+    if (!line || line.length < 5) {
+      if (authors.length > 0) break;
       continue;
     }
 
@@ -250,18 +269,21 @@ function extractAuthorsFromText(text: string, title: string): string[] {
       break;
     }
 
+    // Split by common separators
     const parts = line
       .split(/[;,]/)
-      .map((part) => normalizeWhitespace(part.replace(/\b\d+(?:,\s*\d+)*\b/g, "")))
+      .map((part) => cleanText(part.replace(/\b\d+(?:,\s*\d+)*\b/g, "")).trim())
       .filter(Boolean);
 
     const candidates = parts.length > 1 ? parts : [line];
 
     for (const candidate of candidates) {
       if (looksLikeAuthorLine(candidate) && !authors.includes(candidate)) {
-        authors.push(candidate);
+        authors.push(cleanAuthorName(candidate));
       }
     }
+    
+    if (authors.length >= 8) break;
   }
 
   return authors;
@@ -270,7 +292,13 @@ function extractAuthorsFromText(text: string, title: string): string[] {
 async function readExtractMetadata(relativePath: string): Promise<ExtractMetadata> {
   try {
     const rawMetadata = await fs.readFile(resolveExtractPath(relativePath), "utf8");
-    return JSON.parse(rawMetadata) as ExtractMetadata;
+    const parsed = JSON.parse(rawMetadata) as ExtractMetadata;
+    // Clean metadata values
+    const cleaned: ExtractMetadata = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      cleaned[key] = cleanText(value as string);
+    }
+    return cleaned;
   } catch {
     return {};
   }
@@ -278,7 +306,8 @@ async function readExtractMetadata(relativePath: string): Promise<ExtractMetadat
 
 async function readTextExtract(relativePath: string): Promise<string> {
   try {
-    return await fs.readFile(resolveExtractPath(relativePath), "utf8");
+    const raw = await fs.readFile(resolveExtractPath(relativePath), "utf8");
+    return cleanText(raw);
   } catch {
     return "";
   }
@@ -286,67 +315,61 @@ async function readTextExtract(relativePath: string): Promise<string> {
 
 function humanizeFromFilename(filePath: string): string {
   const baseName = path.basename(filePath, path.extname(filePath));
-  return normalizeWhitespace(
-    baseName.replace(/[_-]+/g, " ").replace(/\s+([a-z])/g, (_, letter: string) => ` ${letter.toUpperCase()}`)
-  );
+  let humanized = baseName
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\s+([a-z])/g, (_, letter: string) => ` ${letter.toUpperCase()}`);
+  
+  // Clean path prefixes
+  humanized = humanized.replace(/^[a-zA-Z]:\\|papers\\+/i, "");
+  humanized = humanized.replace(/^[a-zA-Z0-9_\-\.]+[\\\/]+/g, "");
+  
+  return cleanTitle(humanized);
 }
 
 function splitAuthors(rawAuthors: string): string[] {
-  const normalized = normalizeWhitespace(rawAuthors);
+  const normalized = cleanText(rawAuthors);
 
-  if (!normalized) {
-    return ["Unknown Author"];
+  if (!normalized || normalized === "unknown author") {
+    return [];
   }
 
-  if (normalized.includes(";")) {
-    return normalized
-      .split(";")
-      .map((author) => normalizeWhitespace(author))
-      .filter(Boolean);
-  }
+  // Clean each author name
+  const authors = normalized
+    .split(/[;]|, and | and |, ?(?:et\.?\s*al\.?|al\.?)/i)
+    .map((author) => cleanAuthorName(author.trim()))
+    .filter((author) => author.length > 2 && author !== "Unknown");
 
-  if (normalized.includes(" and ")) {
-    return normalized
-      .split(/\s+and\s+/i)
-      .map((author) => normalizeWhitespace(author))
-      .filter(Boolean);
-  }
-
-  if (normalized.includes(",") && normalized.split(",").length > 2) {
-    return normalized
-      .split(",")
-      .map((author) => normalizeWhitespace(author))
-      .filter(Boolean);
-  }
-
-  return [normalized];
+  return authors;
 }
 
 function inferPublicationType(title: string, doi: string): PaperArtifact["publicationType"] {
-  const candidate = `${title} ${doi}`.toLowerCase();
+  const searchable = `${title} ${doi}`.toLowerCase();
 
-  if (candidate.includes("arxiv") || candidate.includes("preprint")) {
+  if (searchable.includes("arxiv") || searchable.includes("preprint") || searchable.includes(" preprint")) {
     return "Preprint";
   }
 
-  if (candidate.includes("survey") || candidate.includes("review")) {
+  if (searchable.includes("survey") || searchable.includes("review") || searchable.includes("survey of")) {
     return "Journal Article";
   }
 
   if (
-    candidate.includes("proceeding") ||
-    candidate.includes("conference") ||
-    candidate.includes("workshop") ||
-    candidate.startsWith("10.1109")
+    searchable.includes("proceeding") ||
+    searchable.includes("conference") ||
+    searchable.includes("workshop") ||
+    searchable.includes("symposium") ||
+    searchable.startsWith("10.1109") ||
+    searchable.includes(" ieee ")
   ) {
     return "Proceedings Article";
   }
 
-  if (candidate.includes("chapter")) {
+  if (searchable.includes("chapter")) {
     return "Book Chapter";
   }
 
-  if (candidate.includes("posted")) {
+  if (searchable.includes("posted")) {
     return "Posted Content";
   }
 
@@ -354,66 +377,85 @@ function inferPublicationType(title: string, doi: string): PaperArtifact["public
 }
 
 function inferTags(title: string, abstract: string): string[] {
-  const searchableText = `${title} ${abstract}`.toLowerCase();
-  const inferredTags = [
-    ["iot", "IoT"],
+  const searchable = `${title} ${abstract}`.toLowerCase();
+  
+  const tagMappings: Array<[string, string]> = [
+    // Primary tech tags (order matters - more specific first)
+    ["reinforcement learning", "Reinforcement Learning"],
+    ["machine learning", "Machine Learning"],
+    ["deep learning", "Machine Learning"],
+    ["neural network", "Machine Learning"],
     ["tinyml", "TinyML"],
-    ["edge", "Edge Computing"],
-    ["fog", "Fog Computing"],
-    ["cloud", "Cloud Integration"],
+    ["edge computing", "Edge Computing"],
+    ["edge ai", "Edge Computing"],
+    ["fog computing", "Fog Computing"],
+    ["fog-based", "Fog Computing"],
+    ["cloud computing", "Cloud Integration"],
+    ["cloud-based", "Cloud Integration"],
     ["uav", "UAV"],
+    ["unmanned aerial", "UAV"],
     ["drone", "UAV"],
     ["lora", "LoRa"],
+    ["lorawan", "LoRa"],
     ["lpwan", "LPWAN"],
+    ["nb-iot", "LPWAN"],
+    ["nbiot", "LPWAN"],
     ["5g", "5G"],
     ["sensor fusion", "Sensor Fusion"],
-    ["machine learning", "Machine Learning"],
-    ["reinforcement learning", "Reinforcement Learning"],
-    ["anomal", "Anomaly Detection"],
+    ["iot", "IoT"],
+    ["internet of things", "IoT"],
+    // Application tags
     ["irrigat", "Smart Irrigation"],
-    ["crop", "Crop Monitoring"],
-    ["energy", "Energy Efficiency"],
-    ["battery", "Energy Efficiency"],
-    ["embedded", "Embedded Systems"],
+    ["irrigation", "Smart Irrigation"],
+    ["crop monitor", "Crop Monitoring"],
+    ["crop disease", "Crop Monitoring"],
+    ["livestock", "Livestock"],
+    ["precision agricultur", "Precision Agriculture"],
+    ["smart agricultur", "Precision Agriculture"],
     ["agricultur", "Precision Agriculture"],
-  ] as const;
+    // Quality tags
+    ["anomal", "Anomaly Detection"],
+    ["anomaly detection", "Anomaly Detection"],
+    ["energy efficient", "Energy Efficiency"],
+    ["battery-powered", "Energy Efficiency"],
+    ["power consumption", "Energy Efficiency"],
+    ["embedded system", "Embedded Systems"],
+    ["microcontroller", "Embedded Systems"],
+    ["esp32", "Embedded Systems"],
+    ["raspberry pi", "Embedded Systems"],
+  ];
 
-  const tags = inferredTags.reduce<string[]>((accumulator, [needle, tag]) => {
-    if (searchableText.includes(needle) && !accumulator.includes(tag)) {
-      accumulator.push(tag);
+  const foundTags = new Set<string>();
+  
+  for (const [needle, tag] of tagMappings) {
+    if (searchable.includes(needle)) {
+      foundTags.add(tag);
     }
-    return accumulator;
-  }, []);
-
-  if (tags.length === 0) {
-    tags.push("Precision Agriculture");
   }
 
-  return tags.slice(0, 6);
-}
-
-function buildSummary(abstract: string, title: string): string {
-  const fallback = `Auto-generated summary for ${title}. The extract is ready for a richer synthesis, citations, and manual highlights.`;
-  const cleanAbstract = normalizeWhitespace(abstract);
-
-  if (!cleanAbstract) {
-    return fallback;
+  const result = Array.from(foundTags);
+  
+  if (result.length === 0) {
+    result.push("Precision Agriculture");
   }
 
-  return cleanAbstract.length > 280
-    ? `${cleanAbstract.slice(0, 277)}...`
-    : cleanAbstract;
+  return result.slice(0, 6);
 }
 
 function getReadTime(pages: number, abstract: string): number {
-  const abstractBasedEstimate = Math.max(4, Math.round(normalizeWhitespace(abstract).length / 900));
-  return Math.max(4, Math.round(pages * 1.2), abstractBasedEstimate);
+  const abstractWords = abstract.split(/\s+/).length;
+  const abstractBasedEstimate = Math.max(2, Math.round(abstractWords / 200));
+  return Math.max(3, Math.round(pages * 1.5), abstractBasedEstimate);
 }
 
 function getHeatScore(year: number, pages: number, tags: string[]): number {
-  const ageBonus = Math.max(0, 2026 - year);
-  const score = 40 + Math.min(24, pages * 2) + Math.min(18, tags.length * 3) - Math.min(12, ageBonus);
-  return Math.max(24, Math.min(96, Math.round(score)));
+  const currentYear = new Date().getFullYear();
+  const ageBonus = Math.max(0, currentYear - year);
+  const pagesBonus = Math.min(20, pages * 1.5);
+  const tagsBonus = Math.min(18, tags.length * 3);
+  
+  const score = 50 + pagesBonus + tagsBonus - Math.min(20, ageBonus);
+  return Math.max(30, Math.min(95, Math.round(score)));
 }
 
 function buildKeyClaims(
@@ -422,38 +464,52 @@ function buildKeyClaims(
   charsExtracted: number,
   doi: string,
   abstract: string,
-  introExcerpt: string
+  introExcerpt: string,
+  authors: string[]
 ): string[] {
-  return [
-    abstract
-      ? "The abstract is captured directly from the text extract, so the card can show a readable summary even when PDF metadata is incomplete."
-      : `This extract is visible in the frontend so the full set of paper previews can be browsed immediately.`,
-    introExcerpt
-      ? "An opening excerpt is available from the introduction to help users scan the paper's actual framing and scope."
-      : "The snapshot keeps the extract browseable while a fuller manual synthesis is added later.",
-    doi ? `Metadata is linked to DOI ${doi}.` : "Metadata is available without a DOI and can be completed later.",
-    `The loaded record represents ${pages || 0} pages and ${charsExtracted || 0} captured characters from ${title}.`,
-  ];
+  const claims: string[] = [];
+
+  if (abstract && abstract.length > 50) {
+    claims.push(`This paper presents research findings on ${title.toLowerCase().replace(/[.,]/g, "")}. The abstract provides a summary of the methodology and key contributions.`);
+  } else {
+    claims.push(`Research extract available for ${title}. The full paper content has been processed and is searchable.`);
+  }
+
+  if (introExcerpt && introExcerpt.length > 50) {
+    claims.push(`The introduction establishes context for ${authors.length > 0 ? `research by ${authors[0]}${authors.length > 1 ? ` et al.` : ""}` : "this study"}, framing the problem space and objectives.`);
+  } else {
+    claims.push(`The paper covers ${pages || "multiple"} pages with approximately ${charsExtracted?.toLocaleString() || "thousands"} characters of extracted content.`);
+  }
+
+  if (doi) {
+    claims.push(`Full citation available via DOI: ${doi}. The paper can be accessed for complete methodology and results.`);
+  } else {
+    claims.push(`Complete metadata processing applied to the research extract. DOI will be added when available.`);
+  }
+
+  if (authors.length > 0) {
+    claims.push(`Attribution to ${authors.slice(0, 3).join(", ")}${authors.length > 3 ? ` and ${authors.length - 3} others` : ""}. Author affiliations can be found in the full text extract.`);
+  }
+
+  return claims;
 }
 
 function buildExperiments(title: string, tags: string[], introExcerpt: string): ExperimentIdea[] {
   const coreTags = tags.slice(0, 3);
-  const introFocus = introExcerpt ? introExcerpt.slice(0, 120) : "the extracted paper";
+  const focus = introExcerpt ? truncateText(introExcerpt, 100) : "this research";
 
   return [
     {
-      id: `${title}-exp-1`,
-      title: `Draft an editorial synthesis for ${title}`,
-      description:
-        `Use the extracted abstract, tags, and metadata to create a short research note with a problem statement, proposed method, and deployment implications for ${introFocus}.`,
+      id: `exp-${title.substring(0, 20)}-1`,
+      title: `Synthesize editorial summary for this paper`,
+      description: `Create a research note covering the problem statement, methodology, and key findings from ${focus}. Focus on practical implications for precision agriculture applications.`,
       difficulty: "medium",
       tags: coreTags,
     },
     {
-      id: `${title}-exp-2`,
-      title: `Turn the extract into a review-ready card for the sidebar`,
-      description:
-        "Refine the snapshot into a richer synopsis, then compare it with neighboring papers to surface likely research directions and gaps.",
+      id: `exp-${title.substring(0, 20)}-2`,
+      title: `Compare with related papers in collection`,
+      description: `Analyze ${title} against similar papers to identify research trends, methodological differences, and potential gaps in the literature.`,
       difficulty: "easy",
       tags: coreTags.length > 0 ? coreTags : ["Precision Agriculture"],
     },
@@ -471,101 +527,106 @@ function buildSections(
   keywords: string[],
   textExtract: string
 ): ArtifactSection[] {
-  const doiLine = row.doi ? `- DOI: ${row.doi}` : "- DOI: not supplied in the manifest";
-  const keywordLine = keywords.length > 0 ? `- Keywords: ${keywords.join(", ")}` : "- Keywords: not supplied in the text extract";
-  const previewExcerpt = introExcerpt || abstract || "The extract does not expose an introduction snippet, but the paper is still browseable from metadata.";
-  const authorLine = authors.length > 0 ? `- Detected authors: ${authors.slice(0, 5).join(", " )}${authors.length > 5 ? ", …" : ""}` : "- Detected authors: not recovered";
-  const fullExtract = normalizeExtractText(textExtract);
-
-  return [
+  const authorDisplay = authors.length > 0 
+    ? `${authors.slice(0, 3).join(", ")}${authors.length > 3 ? " et al." : ""}`
+    : "Authors under review";
+  
+  const sections: ArtifactSection[] = [
     {
-      id: `${title}-extract-preview`,
+      id: `snapshot-${title.substring(0, 20)}`,
       type: "markdown",
-      title: "Paper Snapshot",
-      content: `## Paper Snapshot
+      title: "Paper Overview",
+      content: `## ${title}
 
-This card is generated from the folder extract so users can browse every paper immediately, even when the original PDF metadata is incomplete.
+**${authorDisplay}**
 
-- Display title: ${title}
-- Source authors: ${authors.length > 0 ? authors.slice(0, 3).join(", ") : "Unknown"}
-- Source PDF: ${row.file}
-- Text extract: ${row.text_file}
-- Metadata file: ${row.metadata_file}
-- Pages extracted: ${pages || "unknown"}
-- Characters extracted: ${charsExtracted || "unknown"}
-${keywordLine}
-${doiLine}
-${authorLine}
+This research extract has been processed for the AgriSense collection. Below is a structured overview of the paper content.
 
-> Snapshot note: this card is built from the OCR/text extract so users can browse the paper immediately, then refine it with citations and highlights later.
-`,
-    },
-    {
-      id: `${title}-text-preview`,
-      type: "markdown",
-      title: "Text Preview",
-      content: `## Extracted Text Preview
+### Metadata
+- **Source**: PDF Extract from ${row.file}
+- **Pages**: ${pages || "Unknown"}
+- **Characters Extracted**: ${charsExtracted?.toLocaleString() || "Unknown"}
+- **DOI**: ${row.doi || "Not provided"}
+${keywords.length > 0 ? `- **Keywords**: ${keywords.join(", ")}` : ""}
 
-### Abstract
+### Content Preview
+${abstract 
+  ? `**Abstract**: ${truncateText(abstract, 400)}`
+  : "**Abstract**: Not available in extract. See full text below."}
 
-${abstract || "No abstract text was recovered from the extract."}
-
-### Opening Excerpt
-
-${previewExcerpt}
-
-### Why This Matters
-
-This preview uses the actual OCR/text extract, so the frontend can show meaningful content even when the PDF metadata is sparse or placeholder-filled.
-`,
-    },
-    {
-      id: `${title}-full-extract`,
-      type: "extract",
-      title: "Full Text Extract",
-      content: fullExtract || "No text extract was recovered for this paper.",
+${introExcerpt && introExcerpt !== abstract 
+  ? `**Opening Statement**: ${truncateText(introExcerpt, 300)}`
+  : ""}`,
     },
   ];
+
+  // Add full extract section
+  if (textExtract && textExtract.length > 100) {
+    sections.push({
+      id: `text-${title.substring(0, 20)}`,
+      type: "markdown",
+      title: "Full Text Extract",
+      content: `## Extracted Content
+
+The following text has been extracted from the original PDF and processed for readability.
+
+---
+
+${truncateText(textExtract, 3000)}
+
+${textExtract.length > 3000 ? "\n\n*Note: Full extract available. Scroll to view complete content.*" : ""}`,
+    });
+  }
+
+  return sections;
 }
 
 async function toPaperArtifact(row: ManifestRow): Promise<PaperArtifact> {
-  const rawTitle = normalizeWhitespace(row.title);
-  const derivedTitle = humanizeFromFilename(row.file);
+  const manifestTitle = cleanTitle(row.title);
   const textExtract = await readTextExtract(row.text_file);
   const metadata = await readExtractMetadata(row.metadata_file);
+  const humanizedTitle = humanizeFromFilename(row.file);
 
+  // Try multiple sources for title
   const extractedTitle = deriveTitleFromText(textExtract);
-  const metadataTitle = normalizeWhitespace(metadata.Title || metadata.title || "");
-  const title =
-    (!isPlaceholderTitle(rawTitle) ? rawTitle : "") ||
-    extractedTitle ||
-    (!isPlaceholderTitle(metadataTitle) ? metadataTitle : "") ||
-    derivedTitle;
+  const metadataTitle = cleanTitle(metadata.Title || metadata.title || "");
+  
+  const title = 
+    (!isPlaceholderTitle(manifestTitle) && manifestTitle.length > 10) ? manifestTitle :
+    (extractedTitle && extractedTitle.length > 10) ? extractedTitle :
+    (!isPlaceholderTitle(metadataTitle) && metadataTitle.length > 10) ? metadataTitle :
+    humanizedTitle;
 
-  const year = Number.parseInt(row.year, 10) || new Date().getFullYear();
-  const pages = Number.parseInt(row.pages, 10) || 0;
-  const charsExtracted = Number.parseInt(row.chars_extracted, 10) || 0;
-  const abstract = normalizeWhitespace(row.abstract.replace(/--- Page \d+ ---\s*/g, ""));
+  const year = parseInt(row.year, 10) || new Date().getFullYear();
+  const pages = parseInt(row.pages, 10) || 0;
+  const charsExtracted = parseInt(row.chars_extracted, 10) || 0;
+  
+  // Extract and clean abstract
+  const manifestAbstract = cleanAbstract(row.abstract);
+  const textAbstract = extractAbstractFromText(textExtract);
+  const abstract = textAbstract || manifestAbstract;
+  
   const publicationType = inferPublicationType(title, row.doi);
   const tags = inferTags(title, abstract);
+  
+  // Extract authors
   const parsedAuthors = extractAuthorsFromText(textExtract, title);
   const manifestAuthors = splitAuthors(row.authors);
   const metadataAuthors = splitAuthors(metadata.Author || metadata.author || "");
-  const authors =
-    parsedAuthors.length > 0
-      ? parsedAuthors
-      : metadataAuthors.length > 0 && !isPlaceholderAuthor(metadataAuthors[0])
-        ? metadataAuthors
-        : !isPlaceholderAuthor(row.authors)
-          ? manifestAuthors
-          : metadataAuthors;
-    const introExcerpt = extractIntroExcerpt(textExtract);
-    const keywords = extractKeywordsText(textExtract)
-      .split(/[,;]+/)
-      .map((keyword) => normalizeWhitespace(keyword))
-      .filter(Boolean)
-      .slice(0, 6);
-    const normalizedAbstract = normalizeWhitespace(extractAbstractText(textExtract) || abstract || "");
+  
+  const authors = 
+    (parsedAuthors.length > 0 && !parsedAuthors.every(a => a === "Unknown")) ? parsedAuthors :
+    (metadataAuthors.length > 0) ? metadataAuthors :
+    (manifestAuthors.length > 0) ? manifestAuthors :
+    ["Unknown Author"];
+  
+  const introExcerpt = extractIntroExcerpt(textExtract);
+  const keywords = extractKeywordsFromText(textExtract);
+  
+  const summary = generateSummary(abstract, 280) || `Research summary for ${title}.`;
+  
+  // Clean up DOI
+  const doi = row.doi?.replace(/^https?:\/\/doi\.org\//i, "").trim() || undefined;
 
   return {
     id: path.basename(row.metadata_file, path.extname(row.metadata_file)),
@@ -573,20 +634,21 @@ async function toPaperArtifact(row: ManifestRow): Promise<PaperArtifact> {
     authors,
     year,
     publicationType,
-    abstract: normalizedAbstract || abstract || `Placeholder abstract for ${title}.`,
-    summary: buildSummary(normalizedAbstract || abstract, title),
-    whyItMatters:
-      `This extract is visible in the frontend so the full set of paper previews can be browsed immediately. Replace this placeholder with a fuller note as the dataset is curated.`,
+    abstract: abstract || `Research extract for ${title}.`,
+    summary,
+    whyItMatters: abstract 
+      ? `This paper presents findings relevant to precision agriculture. ${generateSummary(abstract, 200)}`
+      : `Extract available for research review. Full synthesis pending.`,
     tags,
     category: publicationType,
     heatScore: getHeatScore(year, pages, tags),
     readTime: getReadTime(pages, abstract),
-    keyClaims: buildKeyClaims(title, pages, charsExtracted, row.doi, normalizedAbstract || abstract, introExcerpt),
+    keyClaims: buildKeyClaims(title, pages, charsExtracted, doi || "", abstract, introExcerpt, authors),
     experiments: buildExperiments(title, tags, introExcerpt),
-    sections: buildSections(row, title, authors, pages, charsExtracted, normalizedAbstract || abstract, introExcerpt, keywords, textExtract),
+    sections: buildSections(row, title, authors, pages, charsExtracted, abstract, introExcerpt, keywords, textExtract),
     relatedPapers: [] satisfies RelatedPaper[],
     source: "pdf_extracts",
-    doi: row.doi || undefined,
+    doi,
   };
 }
 
@@ -600,16 +662,24 @@ export async function loadExtractedPaperArtifacts(): Promise<PaperArtifact[]> {
 
   const [headerRow, ...dataRows] = rows;
 
-  return Promise.all(
+  const artifacts = await Promise.all(
     dataRows
       .filter((row) => row.length > 0 && row.some((field) => field.trim().length > 0))
       .map(async (row) => {
-      const record = headerRow.reduce<Partial<ManifestRow>>((accumulator, header, index) => {
-        accumulator[header as keyof ManifestRow] = row[index] ?? "";
-        return accumulator;
-      }, {});
+        const record = headerRow.reduce<Partial<ManifestRow>>((acc, header, index) => {
+          acc[header as keyof ManifestRow] = row[index] ?? "";
+          return acc;
+        }, {});
 
-        return toPaperArtifact(record as ManifestRow);
+        try {
+          return await toPaperArtifact(record as ManifestRow);
+        } catch (error) {
+          console.error(`Failed to process paper: ${record.title}`, error);
+          return null;
+        }
       })
   );
+
+  // Filter out failed artifacts
+  return artifacts.filter((a): a is PaperArtifact => a !== null);
 }
