@@ -32,7 +32,7 @@ export interface ExperimentIdea {
 
 export interface ArtifactSection {
   id: string;
-  type: "markdown" | "diagram" | "code" | "metrics";
+  type: "markdown" | "diagram" | "code" | "metrics" | "extract";
   title: string;
   content: string;
 }

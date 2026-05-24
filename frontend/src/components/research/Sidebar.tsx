@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Command } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ interface SidebarProps {
   onToggleCategory: (category: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  searchFocusRequest: number;
   className?: string;
 }
 
@@ -72,10 +74,29 @@ export function Sidebar({
   onToggleCategory,
   searchQuery,
   onSearchChange,
+  searchFocusRequest,
   className,
 }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showMobileList, setShowMobileList] = useState(false);
+  const [searchHotkeyActive, setSearchHotkeyActive] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchFocusRequest === 0) {
+      return;
+    }
+
+    searchInputRef.current?.focus();
+    searchInputRef.current?.select();
+
+    setSearchHotkeyActive(true);
+    const timeoutId = window.setTimeout(() => {
+      setSearchHotkeyActive(false);
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchFocusRequest]);
 
   // Get all available tags
   const allTags = Array.from(
@@ -107,16 +128,41 @@ export function Sidebar({
 
   const sidebarContent = (
     <div className={cn("flex flex-col h-full", className)}>
+      <div className="px-3 pt-3 pb-1 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            Research explorer
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            {artifacts.length} extracted papers loaded from the folder preview.
+          </p>
+        </div>
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+          pdf_extracts
+        </Badge>
+      </div>
+
       {/* Search */}
-      <div className="px-3 py-3">
-        <div className="relative">
+      <div className="px-3 py-3 flex">
+        <div
+          className={cn(
+            "relative w-full rounded-lg transition-all duration-200",
+            searchHotkeyActive &&
+              "ring-2 ring-primary/35 shadow-[0_0_0_4px_hsl(var(--primary)/0.12)]"
+          )}
+        >
           <SearchIcon />
           <Input
+            ref={searchInputRef}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search papers..."
-            className="pl-9 h-9 bg-muted/30 border-transparent focus:border-input focus:bg-background transition-colors"
+            className="h-10 w-full rounded-lg border-transparent bg-muted/30 pl-11 pr-20 transition-colors focus:border-input focus:bg-background"
           />
+          <div className="pointer-events-none absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-md border border-border/70 bg-background px-2 py-1 text-[10px] font-mono text-muted-foreground shadow-sm">
+            <Command className="h-3 w-3" />
+            <span className="ml-0.5">K</span>
+          </div>
         </div>
       </div>
 
@@ -278,7 +324,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 flex-shrink-0 flex-col border-r border-border/50 bg-muted/10">
+      <aside className="hidden lg:flex w-72 shrink-0 flex-col border-r border-border/50 bg-muted/10">
         {sidebarContent}
       </aside>
 

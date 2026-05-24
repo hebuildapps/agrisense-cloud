@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Sidebar,
   PaperArtifact,
@@ -12,21 +12,81 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { ProfileSettingsDialog } from "@/components/research/ProfileSettingsDialog";
 
 export default function HomePage() {
+  const [artifacts, setArtifacts] = useState<PaperArtifactType[]>(mockPaperArtifacts);
   const [selectedId, setSelectedId] = useState<string>(mockPaperArtifacts[0]?.id || "");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [askModalOpen, setAskModalOpen] = useState(false);
   const [utilityPanelOpen, setUtilityPanelOpen] = useState(false);
+  const [searchFocusRequest, setSearchFocusRequest] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const selectedArtifact = mockPaperArtifacts.find((a) => a.id === selectedId);
+  useEffect(() => {
+    if (!mounted) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadArtifacts = async () => {
+      try {
+        const response = await fetch("/api/papers");
+        if (!response.ok) {
+          throw new Error(`Failed to load papers: ${response.status}`);
+        }
+
+        const loadedArtifacts = (await response.json()) as PaperArtifactType[];
+        if (cancelled) {
+          return;
+        }
+
+        setArtifacts(loadedArtifacts);
+        setSelectedId((currentId) =>
+          loadedArtifacts.some((artifact) => artifact.id === currentId)
+            ? currentId
+            : loadedArtifacts[0]?.id || ""
+        );
+      } catch {
+        if (!cancelled) {
+          setArtifacts(mockPaperArtifacts);
+          setSelectedId(mockPaperArtifacts[0]?.id || "");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadArtifacts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mounted]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchFocusRequest((currentValue) => currentValue + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const selectedArtifact = artifacts.find((a) => a.id === selectedId);
 
   const handleToggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -46,12 +106,12 @@ export default function HomePage() {
     setSelectedId(paperId);
   };
 
-  if (!mounted) {
+  if (!mounted || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading research artifacts...</p>
+          <p className="text-sm text-muted-foreground">Loading paper extracts from the folder preview...</p>
         </div>
       </div>
     );
@@ -61,7 +121,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-background flex">
       {/* Left Sidebar */}
       <Sidebar
-        artifacts={mockPaperArtifacts}
+        artifacts={artifacts}
         selectedId={selectedId}
         onSelectArtifact={setSelectedId}
         selectedTags={selectedTags}
@@ -71,6 +131,7 @@ export default function HomePage() {
         onToggleCategory={handleToggleCategory}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        searchFocusRequest={searchFocusRequest}
       />
 
       {/* Main Content Area */}
@@ -90,6 +151,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <ProfileSettingsDialog />
             <Button
               variant="ghost"
               size="sm"
@@ -156,12 +218,14 @@ export default function HomePage() {
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
-                  <p className="text-2xl font-semibold">{mockPaperArtifacts.length}</p>
+                  <p className="text-2xl font-semibold">{artifacts.length}</p>
                   <p className="text-xs text-muted-foreground">Papers</p>
                 </div>
                 <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
                   <p className="text-2xl font-semibold">
-                    {Math.round(mockPaperArtifacts.reduce((sum, a) => sum + a.heatScore, 0) / mockPaperArtifacts.length)}
+                    {artifacts.length > 0
+                      ? Math.round(artifacts.reduce((sum, a) => sum + a.heatScore, 0) / artifacts.length)
+                      : 0}
                   </p>
                   <p className="text-xs text-muted-foreground">Avg Heat</p>
                 </div>
@@ -173,7 +237,7 @@ export default function HomePage() {
                 Reading Queue
               </h3>
               <div className="space-y-2">
-                {mockPaperArtifacts.slice(0, 3).map((paper, i) => (
+                {artifacts.slice(0, 3).map((paper, i) => (
                   <div
                     key={paper.id}
                     className={cn(
@@ -223,6 +287,7 @@ export default function HomePage() {
         onClose={() => setAskModalOpen(false)}
         paperTitle={selectedArtifact?.title}
         paperId={selectedId}
+        paper={selectedArtifact}
       />
     </div>
   );

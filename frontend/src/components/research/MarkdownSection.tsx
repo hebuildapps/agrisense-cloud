@@ -39,6 +39,26 @@ export function MarkdownSection({
     );
   }
 
+  if (type === "extract") {
+    const characterCount = content.length.toLocaleString();
+    const pageCount = Math.max(0, content.match(/^--- Page \d+ ---$/gm)?.length ?? 0);
+
+    return (
+      <div className={cn("rounded-lg border border-border/50 bg-card overflow-hidden", className)}>
+        <div className="px-4 py-3 border-b border-border/50 bg-muted/20 flex flex-wrap items-center justify-between gap-2">
+          <h4 className="text-sm font-medium text-foreground">{title}</h4>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {pageCount > 0 && <span>{pageCount} pages</span>}
+            <span>{characterCount} chars</span>
+          </div>
+        </div>
+        <pre className="max-h-[70vh] overflow-auto whitespace-pre-wrap break-words p-4 text-sm leading-6 text-foreground/90 font-mono bg-background">
+          {content}
+        </pre>
+      </div>
+    );
+  }
+
   if (type === "diagram") {
     return (
       <div className={cn("rounded-lg border border-border/50 bg-card p-4", className)}>

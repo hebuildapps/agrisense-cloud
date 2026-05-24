@@ -11,28 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import type { ConversationMessage } from "@/types/artifact";
+import type { ConversationMessage, PaperArtifact } from "@/types/artifact";
 
 interface AskAgentModalProps {
   isOpen: boolean;
   onClose: () => void;
   paperTitle?: string;
   paperId?: string;
+  paper?: PaperArtifact;
 }
-
-// Mock responses for demonstration
-const mockResponses: Record<string, string> = {
-  default:
-    "Based on my analysis of this paper, I can provide insights on the methodology, key findings, and potential applications. The hierarchical ensemble TinyML approach shows particularly promising results for edge-based agricultural monitoring systems.",
-  methodology:
-    "The paper employs a two-layered TinyML architecture where individual sensor nodes run lightweight ML models, and edge aggregators perform ensemble fusion. The authors validate this through a real smart-agriculture deployment, measuring transmission reduction, latency, and energy consumption metrics.",
-  findings:
-    "Key findings include: 73% reduction in wireless transmissions, 41% decrease in energy consumption, and 68% improvement in response latency compared to cloud-only processing. The system maintained 94% decision accuracy across the hierarchical ensemble.",
-  experiments:
-    "The authors propose three experiment directions: (1) Deploying the hierarchical ensemble on ESP32 sensor networks, (2) Benchmarking edge vs cloud inference for crop disease detection, and (3) Simulating the decision fusion in NS-3 network simulator.",
-  applications:
-    "Practical applications include precision irrigation systems, crop health monitoring, autonomous pest detection, and livestock security systems. The edge-first approach is particularly valuable in areas with limited connectivity or where real-time responses are critical.",
-};
 
 const suggestedQuestions = [
   "What methodology does this paper use?",
@@ -41,31 +28,153 @@ const suggestedQuestions = [
   "What are practical applications?",
 ];
 
-function generateMockResponse(question: string): string {
-  const lowerQ = question.toLowerCase();
-  if (lowerQ.includes("methodolog")) return mockResponses.methodology;
-  if (lowerQ.includes("finding") || lowerQ.includes("result")) return mockResponses.findings;
-  if (lowerQ.includes("experiment") || lowerQ.includes("propos")) return mockResponses.experiments;
-  if (lowerQ.includes("applic") || lowerQ.includes("practical") || lowerQ.includes("use case")) return mockResponses.applications;
-  return mockResponses.default;
+const STOP_WORDS = new Set([
+  "about",
+  "after",
+  "again",
+  "also",
+  "and",
+  "are",
+  "can",
+  "does",
+  "for",
+  "from",
+  "give",
+  "has",
+  "how",
+  "into",
+  "its",
+  "key",
+  "like",
+  "paper",
+  "show",
+  "that",
+  "the",
+  "this",
+  "use",
+  "uses",
+  "what",
+  "when",
+  "where",
+  "which",
+  "with",
+]);
+
+function getPaperExtract(paper: PaperArtifact): string {
+  return paper.sections.find((section) => section.type === "extract")?.content || "";
+}
+
+function getQuestionTerms(question: string): string[] {
+  return question
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((term) => term.length > 2 && !STOP_WORDS.has(term));
+}
+
+function splitSentences(value: string): string[] {
+  return value
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length >= 45 && sentence.length <= 360);
+}
+
+function findRelevantSentences(paper: PaperArtifact, question: string): string[] {
+  const terms = getQuestionTerms(question);
+  const lowerQuestion = question.toLowerCase();
+  const topicHints = [
+    lowerQuestion.includes("methodolog") || lowerQuestion.includes("architecture") ? "method architecture system design approach" : "",
+    lowerQuestion.includes("finding") || lowerQuestion.includes("result") ? "result finding evaluation performance accuracy reduction improvement" : "",
+    lowerQuestion.includes("experiment") || lowerQuestion.includes("propos") ? "experiment evaluation simulation validation test deployment" : "",
+    lowerQuestion.includes("applic") || lowerQuestion.includes("practical") ? "application farmer irrigation monitoring control deployment field" : "",
+  ]
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const searchTerms = [...new Set([...terms, ...topicHints])];
+  const sourceText = [
+    paper.abstract,
+    paper.summary,
+    paper.whyItMatters,
+    ...paper.keyClaims,
+    ...paper.experiments.map((experiment) => `${experiment.title}. ${experiment.description}`),
+    getPaperExtract(paper),
+  ].join("\n");
+
+  return splitSentences(sourceText)
+    .map((sentence) => {
+      const lowerSentence = sentence.toLowerCase();
+      const score = searchTerms.reduce(
+        (total, term) => total + (lowerSentence.includes(term) ? 1 : 0),
+        0
+      );
+      return { sentence, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((left, right) => right.score - left.score)
+    .slice(0, 4)
+    .map((item) => item.sentence);
+}
+
+function generateScopedResponse(question: string, paper?: PaperArtifact): string {
+  if (!paper) {
+    return "Open a paper first, then ask again. I will answer only from that selected paper.";
+  }
+
+  const lowerQuestion = question.toLowerCase();
+  const relevantSentences = findRelevantSentences(paper, question);
+  const scopedPrefix = `Using only "${paper.title}":`;
+
+  if (lowerQuestion.includes("author")) {
+    return `${scopedPrefix}\n\nAuthors listed for this record: ${paper.authors.join(", ") || "not recovered from the extract"}.`;
+  }
+
+  if (lowerQuestion.includes("doi")) {
+    return `${scopedPrefix}\n\nDOI: ${paper.doi || "not supplied in this paper record"}.`;
+  }
+
+  if (lowerQuestion.includes("experiment") || lowerQuestion.includes("propos")) {
+    const experimentLines = paper.experiments.map(
+      (experiment, index) => `${index + 1}. ${experiment.title}: ${experiment.description}`
+    );
+    return `${scopedPrefix}\n\n${experimentLines.join("\n\n")}`;
+  }
+
+  if (lowerQuestion.includes("claim") || lowerQuestion.includes("finding") || lowerQuestion.includes("result")) {
+    return `${scopedPrefix}\n\n${paper.keyClaims.map((claim, index) => `${index + 1}. ${claim}`).join("\n\n")}`;
+  }
+
+  if (relevantSentences.length > 0) {
+    return `${scopedPrefix}\n\n${relevantSentences.map((sentence) => `- ${sentence}`).join("\n")}`;
+  }
+
+  return `${scopedPrefix}\n\n${paper.summary || paper.abstract}\n\nI could not find a more specific matching passage in this paper's extract.`;
 }
 
 export function AskAgentModal({
   isOpen,
   onClose,
   paperTitle = "Untitled Paper",
+  paper,
 }: AskAgentModalProps) {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ConversationMessage[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: `I'm ready to help you explore "${paperTitle}". I can discuss the methodology, findings, experiments, and practical applications. What would you like to know?`,
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMessages([
+      {
+        id: `welcome-${paper?.id || "none"}`,
+        role: "assistant",
+        content: `I'm scoped to "${paper?.title || paperTitle}". Ask me anything, and I will answer only from this opened paper's extract and artifact data.`,
+        timestamp: new Date(),
+      },
+    ]);
+    setInput("");
+    setIsLoading(false);
+  }, [paper?.id, paper?.title, paperTitle]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -87,10 +196,9 @@ export function AskAgentModal({
     setInput("");
     setIsLoading(true);
 
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    await new Promise((resolve) => setTimeout(resolve, 350));
 
-    const response = generateMockResponse(userMessage.content);
+    const response = generateScopedResponse(userMessage.content, paper);
     const assistantMessage: ConversationMessage = {
       id: `assistant-${Date.now()}`,
       role: "assistant",
@@ -182,7 +290,7 @@ export function AskAgentModal({
                 )}
                 <div
                   className={cn(
-                    "rounded-2xl px-4 py-3 max-w-[85%] leading-relaxed text-sm",
+                    "rounded-2xl px-4 py-3 max-w-[85%] leading-relaxed text-sm whitespace-pre-line",
                     message.role === "assistant"
                       ? "bg-muted/60 text-foreground border border-border/50"
                       : "bg-primary text-primary-foreground"
@@ -300,8 +408,7 @@ export function AskAgentModal({
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground/60 mt-2 text-center">
-            Responses are for demonstration. Connect to your AI backend for real
-            answers.
+            Answers are scoped to the currently opened paper only.
           </p>
         </div>
       </DialogContent>

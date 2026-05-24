@@ -46,7 +46,7 @@ function ExperimentCard({
   return (
     <div className="group p-4 rounded-lg border border-border/50 bg-card hover:border-primary/20 hover:shadow-sm transition-all duration-200">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+        <div className="shrink-0 w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
           <ExperimentIcon className="w-4 h-4 text-muted-foreground" />
         </div>
         <div className="flex-1 min-w-0">
@@ -56,7 +56,7 @@ function ExperimentCard({
             </h4>
             <span
               className={cn(
-                "flex-shrink-0 text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wide font-medium",
+                "shrink-0 text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wide font-medium",
                 difficultyColors[experiment.difficulty]
               )}
             >
@@ -119,7 +119,7 @@ export function PaperArtifact({
           <HeatIndicator
             score={artifact.heatScore}
             size="lg"
-            className="flex-shrink-0"
+            className="shrink-0"
           />
         </div>
 
@@ -236,7 +236,7 @@ export function PaperArtifact({
               key={index}
               className="flex items-start gap-3 p-3 rounded-lg bg-card border border-border/50"
             >
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-mono text-muted-foreground">
+              <span className="shrink-0 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-mono text-muted-foreground">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span className="text-sm leading-relaxed text-foreground/90">

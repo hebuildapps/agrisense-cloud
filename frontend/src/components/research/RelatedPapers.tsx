@@ -59,7 +59,7 @@ export function RelatedPapers({
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-start gap-2">
-                  <span className="text-xs text-muted-foreground font-mono mt-0.5 flex-shrink-0">
+                  <span className="text-xs text-muted-foreground font-mono mt-0.5 shrink-0">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div className="min-w-0">
@@ -75,7 +75,7 @@ export function RelatedPapers({
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 <HeatBadge score={paper.heatScore} />
                 <ArrowIcon className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
               </div>

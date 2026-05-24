@@ -70,7 +70,7 @@ const HeatBar: React.FC<{ score: number; className?: string }> = ({
   score,
   className,
 }) => (
-  <div className={cn("flex gap-[2px]", className)}>
+  <div className={cn("flex gap-0.5", className)}>
     {[...Array(10)].map((_, i) => {
       const threshold = (i + 1) * 10;
       const filled = score >= threshold;
@@ -80,7 +80,7 @@ const HeatBar: React.FC<{ score: number; className?: string }> = ({
         <div
           key={i}
           className={cn(
-            "h-2 w-3 rounded-[2px] transition-all duration-300",
+            "h-2 w-3 rounded-xs transition-all duration-300",
             filled
               ? "bg-amber-500"
               : partialFill
