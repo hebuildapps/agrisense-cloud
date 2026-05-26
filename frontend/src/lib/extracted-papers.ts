@@ -325,29 +325,29 @@ function buildLoadedDocumentData(
     ? metadata.sections
     : [];
 
-  const sectionsFromMetadata: LoadedDocumentSection[] = metadataSections
-    .map((section) => {
-      if (!section || typeof section !== "object") {
-        return null;
-      }
+  const sectionsFromMetadata: LoadedDocumentSection[] = [];
 
-      const typedSection = section as {
-        title?: unknown;
-        type?: unknown;
-        content?: unknown;
-      };
+  for (const section of metadataSections) {
+    if (!section || typeof section !== "object") {
+      continue;
+    }
 
-      if (typeof typedSection.content !== "string" || typedSection.content.trim().length === 0) {
-        return null;
-      }
+    const typedSection = section as {
+      title?: unknown;
+      type?: unknown;
+      content?: unknown;
+    };
 
-      return {
-        title: typeof typedSection.title === "string" ? cleanText(typedSection.title) : undefined,
-        type: typeof typedSection.type === "string" ? cleanText(typedSection.type) : undefined,
-        content: cleanText(typedSection.content),
-      };
-    })
-    .filter((section): section is LoadedDocumentSection => section !== null);
+    if (typeof typedSection.content !== "string" || typedSection.content.trim().length === 0) {
+      continue;
+    }
+
+    sectionsFromMetadata.push({
+      title: typeof typedSection.title === "string" ? cleanText(typedSection.title) : undefined,
+      type: typeof typedSection.type === "string" ? cleanText(typedSection.type) : undefined,
+      content: cleanText(typedSection.content),
+    });
+  }
 
   const sections = sectionsFromMetadata.length > 0
     ? sectionsFromMetadata
