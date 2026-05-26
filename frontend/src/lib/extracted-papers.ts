@@ -6,6 +6,8 @@ import path from "node:path";
 import type {
   ArtifactSection,
   ExperimentIdea,
+  LoadedDocumentData,
+  LoadedDocumentSection,
   PaperArtifact,
   RelatedPaper,
 } from "@/types/artifact";
@@ -14,6 +16,7 @@ import {
   cleanTitle,
   cleanAuthorName,
   cleanAbstract,
+  cleanExtractText,
   cleanSectionContent,
   generateSummary,
   truncateText,
@@ -32,7 +35,8 @@ type ManifestRow = {
   abstract: string;
 };
 
-type ExtractMetadata = Record<string, string>;
+type ExtractMetadata = Record<string, unknown>;
+type ExtractInventoryRow = ManifestRow;
 
 const MANIFEST_PATH = path.join(process.cwd(), "..", "pdf_extracts", "manifest.csv");
 const EXTRACT_ROOT = path.join(process.cwd(), "..", "pdf_extracts");
@@ -292,25 +296,109 @@ function extractAuthorsFromText(text: string, title: string): string[] {
 async function readExtractMetadata(relativePath: string): Promise<ExtractMetadata> {
   try {
     const rawMetadata = await fs.readFile(resolveExtractPath(relativePath), "utf8");
-    const parsed = JSON.parse(rawMetadata) as ExtractMetadata;
-    // Clean metadata values
-    const cleaned: ExtractMetadata = {};
-    for (const [key, value] of Object.entries(parsed)) {
-      cleaned[key] = cleanText(value as string);
-    }
-    return cleaned;
+    return JSON.parse(rawMetadata) as ExtractMetadata;
   } catch {
     return {};
   }
 }
 
+function getCleanMetadataValue(metadata: ExtractMetadata, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = metadata[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return cleanText(value);
+    }
+  }
+  return "";
+}
+
+function buildLoadedDocumentData(
+  metadata: ExtractMetadata,
+  fallbackText: string
+): LoadedDocumentData {
+  const metadataFullText = metadata.full_text;
+  const fullText = typeof metadataFullText === "string" && metadataFullText.trim().length > 0
+    ? cleanText(metadataFullText)
+    : fallbackText;
+
+  const metadataSections = Array.isArray(metadata.sections)
+    ? metadata.sections
+    : [];
+
+  const sectionsFromMetadata: LoadedDocumentSection[] = metadataSections
+    .map((section) => {
+      if (!section || typeof section !== "object") {
+        return null;
+      }
+
+      const typedSection = section as {
+        title?: unknown;
+        type?: unknown;
+        content?: unknown;
+      };
+
+      if (typeof typedSection.content !== "string" || typedSection.content.trim().length === 0) {
+        return null;
+      }
+
+      return {
+        title: typeof typedSection.title === "string" ? cleanText(typedSection.title) : undefined,
+        type: typeof typedSection.type === "string" ? cleanText(typedSection.type) : undefined,
+        content: cleanText(typedSection.content),
+      };
+    })
+    .filter((section): section is LoadedDocumentSection => section !== null);
+
+  const sections = sectionsFromMetadata.length > 0
+    ? sectionsFromMetadata
+    : fullText
+      ? [
+          {
+            title: "Extracted Content",
+            type: "extract",
+            content: fullText,
+          },
+        ]
+      : [];
+
+  return {
+    full_text: fullText || undefined,
+    sections: sections.length > 0 ? sections : undefined,
+  };
+}
+
 async function readTextExtract(relativePath: string): Promise<string> {
   try {
     const raw = await fs.readFile(resolveExtractPath(relativePath), "utf8");
-    return cleanText(raw);
+    return cleanExtractText(raw);
   } catch {
     return "";
   }
+}
+
+async function buildInventoryFromExtractFiles(): Promise<ExtractInventoryRow[]> {
+  const entries = await fs.readdir(EXTRACT_ROOT, { withFileTypes: true });
+
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".json") && entry.name !== "manifest.csv")
+    .map((entry) => {
+      const baseName = entry.name.replace(/\.json$/i, "");
+      const metadataFile = path.posix.join("pdf_extracts", entry.name);
+      const textFile = path.posix.join("pdf_extracts", `${baseName}.txt`);
+
+      return {
+        file: `${baseName}.pdf`,
+        text_file: textFile,
+        metadata_file: metadataFile,
+        title: baseName.replace(/[_-]+/g, " "),
+        authors: "",
+        year: "",
+        doi: "",
+        pages: "0",
+        chars_extracted: "0",
+        abstract: "",
+      };
+    });
 }
 
 function humanizeFromFilename(filePath: string): string {
@@ -525,7 +613,8 @@ function buildSections(
   abstract: string,
   introExcerpt: string,
   keywords: string[],
-  textExtract: string
+  textExtract: string,
+  documentData?: LoadedDocumentData
 ): ArtifactSection[] {
   const authorDisplay = authors.length > 0 
     ? `${authors.slice(0, 3).join(", ")}${authors.length > 3 ? " et al." : ""}`
@@ -560,21 +649,14 @@ ${introExcerpt && introExcerpt !== abstract
     },
   ];
 
-  // Add full extract section
-  if (textExtract && textExtract.length > 100) {
+  // Add full extract section as raw text to preserve spacing/layout from extraction.
+  const fullText = documentData?.full_text || textExtract;
+  if (fullText && fullText.length > 100) {
     sections.push({
       id: `text-${title.substring(0, 20)}`,
-      type: "markdown",
+      type: "extract",
       title: "Full Text Extract",
-      content: `## Extracted Content
-
-The following text has been extracted from the original PDF and processed for readability.
-
----
-
-${truncateText(textExtract, 3000)}
-
-${textExtract.length > 3000 ? "\n\n*Note: Full extract available. Scroll to view complete content.*" : ""}`,
+      content: fullText,
     });
   }
 
@@ -585,11 +667,12 @@ async function toPaperArtifact(row: ManifestRow): Promise<PaperArtifact> {
   const manifestTitle = cleanTitle(row.title);
   const textExtract = await readTextExtract(row.text_file);
   const metadata = await readExtractMetadata(row.metadata_file);
+  const documentData = buildLoadedDocumentData(metadata, textExtract);
   const humanizedTitle = humanizeFromFilename(row.file);
 
   // Try multiple sources for title
   const extractedTitle = deriveTitleFromText(textExtract);
-  const metadataTitle = cleanTitle(metadata.Title || metadata.title || "");
+  const metadataTitle = cleanTitle(getCleanMetadataValue(metadata, "/Title", "Title", "title"));
   
   const title = 
     (!isPlaceholderTitle(manifestTitle) && manifestTitle.length > 10) ? manifestTitle :
@@ -612,7 +695,7 @@ async function toPaperArtifact(row: ManifestRow): Promise<PaperArtifact> {
   // Extract authors
   const parsedAuthors = extractAuthorsFromText(textExtract, title);
   const manifestAuthors = splitAuthors(row.authors);
-  const metadataAuthors = splitAuthors(metadata.Author || metadata.author || "");
+  const metadataAuthors = splitAuthors(getCleanMetadataValue(metadata, "/Author", "Author", "author"));
   
   const authors = 
     (parsedAuthors.length > 0 && !parsedAuthors.every(a => a === "Unknown")) ? parsedAuthors :
@@ -645,7 +728,8 @@ async function toPaperArtifact(row: ManifestRow): Promise<PaperArtifact> {
     readTime: getReadTime(pages, abstract),
     keyClaims: buildKeyClaims(title, pages, charsExtracted, doi || "", abstract, introExcerpt, authors),
     experiments: buildExperiments(title, tags, introExcerpt),
-    sections: buildSections(row, title, authors, pages, charsExtracted, abstract, introExcerpt, keywords, textExtract),
+    sections: buildSections(row, title, authors, pages, charsExtracted, abstract, introExcerpt, keywords, textExtract, documentData),
+    documentData,
     relatedPapers: [] satisfies RelatedPaper[],
     source: "pdf_extracts",
     doi,
@@ -653,31 +737,43 @@ async function toPaperArtifact(row: ManifestRow): Promise<PaperArtifact> {
 }
 
 export async function loadExtractedPaperArtifacts(): Promise<PaperArtifact[]> {
-  const manifestText = await fs.readFile(MANIFEST_PATH, "utf8");
-  const rows = parseCsv(manifestText);
+  let rows: ManifestRow[] = [];
 
-  if (rows.length < 2) {
-    return [];
+  try {
+    const manifestText = await fs.readFile(MANIFEST_PATH, "utf8");
+    const parsedRows = parseCsv(manifestText);
+
+    if (parsedRows.length >= 2) {
+      const [headerRow, ...dataRows] = parsedRows;
+
+      rows = dataRows
+        .filter((row) => row.length > 0 && row.some((field) => field.trim().length > 0))
+        .map((row) => {
+          const record = headerRow.reduce<Partial<ManifestRow>>((acc, header, index) => {
+            acc[header as keyof ManifestRow] = row[index] ?? "";
+            return acc;
+          }, {});
+
+          return record as ManifestRow;
+        });
+    }
+  } catch {
+    rows = [];
   }
 
-  const [headerRow, ...dataRows] = rows;
+  if (rows.length === 0) {
+    rows = await buildInventoryFromExtractFiles();
+  }
 
   const artifacts = await Promise.all(
-    dataRows
-      .filter((row) => row.length > 0 && row.some((field) => field.trim().length > 0))
-      .map(async (row) => {
-        const record = headerRow.reduce<Partial<ManifestRow>>((acc, header, index) => {
-          acc[header as keyof ManifestRow] = row[index] ?? "";
-          return acc;
-        }, {});
-
-        try {
-          return await toPaperArtifact(record as ManifestRow);
-        } catch (error) {
-          console.error(`Failed to process paper: ${record.title}`, error);
-          return null;
-        }
-      })
+    rows.map(async (row) => {
+      try {
+        return await toPaperArtifact(row);
+      } catch (error) {
+        console.error(`Failed to process paper: ${row.title}`, error);
+        return null;
+      }
+    })
   );
 
   // Filter out failed artifacts

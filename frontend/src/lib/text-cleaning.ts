@@ -17,9 +17,15 @@ import type { ArtifactSection } from "@/types/artifact";
  * e.g., "p recision" -> "precision"
  */
 function fixRandomSpaces(text: string): string {
-  // Fix "character space character" patterns that are OCR errors
-  // e.g., "p recision" -> "precision", "I oT" -> "IoT"
-  return text.replace(/([a-zA-Z])\s+([a-zA-Z])/g, "$1$2");
+  // Fix obvious OCR fragments such as "p recision" -> "precision" or "w orld" -> "world".
+  // Keep legitimate single-letter words like "a" and "i" intact.
+  return text.replace(/\b([a-z])\s+([a-z][a-zA-Z]{1,11})\b/g, (match, left, right) => {
+    if (left === "a" || left === "i" || left === "o") {
+      return match;
+    }
+
+    return `${left}${right}`;
+  });
 }
 
 /**
@@ -274,6 +280,27 @@ export function cleanAbstract(text: string): string {
   // Clean up multiple blank lines
   cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
   
+  return cleaned.trim();
+}
+
+/**
+ * Clean extracted paper text while preserving real word spacing.
+ * This avoids over-aggressive OCR repairs that merge adjacent words.
+ */
+export function cleanExtractText(text: string): string {
+  if (!text) return "";
+
+  let cleaned = text;
+
+  cleaned = cleaned.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  cleaned = removePageMarkers(cleaned);
+  cleaned = fixHyphenation(cleaned);
+  cleaned = fixBrokenWords(cleaned);
+  cleaned = fixLineBreaks(cleaned);
+  cleaned = normalizeUnicode(cleaned);
+  cleaned = fixDoubleSpaces(cleaned);
+  cleaned = cleanPathReferences(cleaned);
+
   return cleaned.trim();
 }
 

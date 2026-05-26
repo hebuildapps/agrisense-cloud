@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(".codex_deps").resolve()))
 
-from pypdf import PdfReader  # noqa: E402
+import fitz  # noqa: E402
 
 
 PAPERS_DIR = Path("papers")
@@ -82,16 +82,16 @@ def main():
     OUT_DIR.mkdir(exist_ok=True)
     rows = []
     for pdf_path in sorted(PAPERS_DIR.glob("*.pdf")):
-        reader = PdfReader(str(pdf_path))
-        metadata = {str(k): str(v) for k, v in (reader.metadata or {}).items()}
-        page_texts = []
-        for index, page in enumerate(reader.pages, start=1):
-            try:
-                page_text = page.extract_text() or ""
-            except Exception as exc:
-                page_text = f"[TEXT EXTRACTION ERROR ON PAGE {index}: {exc}]"
-            page_texts.append(f"\n\n--- Page {index} ---\n\n{page_text}")
-        text = clean_text("\n".join(page_texts))
+        with fitz.open(str(pdf_path)) as doc:
+            metadata = {str(k): str(v) for k, v in (doc.metadata or {}).items()}
+            page_texts = []
+            for index, page in enumerate(doc, start=1):
+                try:
+                    page_text = page.get_text() or ""
+                except Exception as exc:
+                    page_text = f"[TEXT EXTRACTION ERROR ON PAGE {index}: {exc}]"
+                page_texts.append(f"\n\n--- Page {index} ---\n\n{page_text}")
+            text = clean_text("\n".join(page_texts))
         stem = safe_stem(pdf_path)
         text_path = OUT_DIR / f"{stem}.txt"
         metadata_path = OUT_DIR / f"{stem}.json"
@@ -108,11 +108,15 @@ def main():
                 "authors": infer_authors(text, metadata),
                 "year": infer_year(text, metadata),
                 "doi": infer_doi(text),
-                "pages": len(reader.pages),
+                "pages": len(doc),
                 "chars_extracted": len(text),
                 "abstract": infer_abstract(text),
             }
         )
+
+    if not rows:
+        print(f"No PDF files found in {PAPERS_DIR.resolve()}; nothing to extract.")
+        return
 
     with MANIFEST.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))

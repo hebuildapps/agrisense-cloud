@@ -20,6 +20,18 @@ export interface PaperArtifact {
   source: string;
   doi?: string;
   link?: string;
+  documentData?: LoadedDocumentData;
+}
+
+export interface LoadedDocumentData {
+  full_text?: string;
+  sections?: LoadedDocumentSection[];
+}
+
+export interface LoadedDocumentSection {
+  title?: string;
+  type?: string;
+  content: string;
 }
 
 export interface ExperimentIdea {

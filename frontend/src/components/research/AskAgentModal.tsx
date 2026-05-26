@@ -64,6 +64,20 @@ function getPaperExtract(paper: PaperArtifact): string {
   return paper.sections.find((section) => section.type === "extract")?.content || "";
 }
 
+function getDocumentContext(paper: PaperArtifact): string {
+  const fullText = paper.documentData?.full_text || "";
+  const sectionText = (paper.documentData?.sections || [])
+    .map((section) => section.content)
+    .filter((content) => content && content.trim().length > 0)
+    .join("\n\n");
+
+  if (fullText.trim().length > 0 || sectionText.trim().length > 0) {
+    return [fullText, sectionText].filter(Boolean).join("\n\n");
+  }
+
+  return getPaperExtract(paper);
+}
+
 function getQuestionTerms(question: string): string[] {
   return question
     .toLowerCase()
@@ -93,13 +107,14 @@ function findRelevantSentences(paper: PaperArtifact, question: string): string[]
     .filter(Boolean);
 
   const searchTerms = [...new Set([...terms, ...topicHints])];
+  const documentContext = getDocumentContext(paper);
   const sourceText = [
     paper.abstract,
     paper.summary,
     paper.whyItMatters,
     ...paper.keyClaims,
     ...paper.experiments.map((experiment) => `${experiment.title}. ${experiment.description}`),
-    getPaperExtract(paper),
+    documentContext,
   ].join("\n");
 
   return splitSentences(sourceText)
