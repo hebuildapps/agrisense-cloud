@@ -1,7 +1,7 @@
 # skills.md — Research Pilot Study Generator
 
 ## Role
-You are acting as a senior research analyst and technical literature reviewer for an engineering startup-research project called **AgroSense**.
+You are acting as a senior research analyst and technical literature reviewer for an engineering startup-research project called **AgriSense**.
 
 Your task is to read and analyze ALL PDF research papers present inside the `/papers` directory and generate a deeply structured, research-oriented **Pilot Study / Literature Review document**.
 
@@ -9,9 +9,9 @@ The folder contains approximately 17 research papers.
 
 ---
 
-# Project Context — AgroSense
+# Project Context — AgriSense
 
-AgroSense is a low-cost precision agriculture system designed for Indian smallholder farmers.
+AgriSense is a low-cost precision agriculture system designed for Indian smallholder farmers.
 
 The system combines:
 
@@ -51,7 +51,7 @@ The report should help:
 3. Extract useful techniques
 4. Compare cloud vs edge approaches
 5. Identify research gaps
-6. Improve AgroSense system design
+6. Improve AgriSense system design
 7. Build a strong IEEE-style literature review foundation
 
 ---
@@ -69,7 +69,7 @@ with the following structure.
 # 1. Cover Title
 
 # Pilot Study and Literature Review
-## Cloud–Edge Precision Agriculture Systems for AgroSense
+## Cloud–Edge Precision Agriculture Systems for AgriSense
 
 Include:
 - date
@@ -83,7 +83,7 @@ Include:
 Create a structured markdown table containing ALL papers.
 
 Columns:
-| No | Paper Title | Year | Publisher | Main Focus | Cloud / Edge / Hybrid | Key Contribution | Relevance to AgroSense |
+| No | Paper Title | Year | Publisher | Main Focus | Cloud / Edge / Hybrid | Key Contribution | Relevance to AgriSense |
 
 This table should become the quick-reference overview for the entire pilot study.
 
@@ -152,11 +152,11 @@ Identify:
 - power constraints
 etc.
 
-### Relevance to AgroSense
+### Relevance to AgriSense
 MOST IMPORTANT SECTION.
 
 Explicitly connect the paper to:
-- AgroSense architecture
+- AgriSense architecture
 - UAV pipeline
 - sensor fusion
 - ESP32 deployment
@@ -174,7 +174,7 @@ Suggest:
 - algorithms
 - workflows
 - optimizations
-that AgroSense can adopt.
+that AgriSense can adopt.
 
 ---
 
@@ -237,7 +237,7 @@ Focus heavily on:
 
 ---
 
-# 7. Opportunities for AgroSense
+# 7. Opportunities for AgriSense
 
 Generate:
 - architectural recommendations
@@ -251,14 +251,14 @@ Generate:
 - product differentiation opportunities
 
 This section should feel like:
-“how AgroSense can become better than existing systems.”
+“how AgriSense can become better than existing systems.”
 
 ---
 
 # 8. Suggested Final Architecture
 
 Using insights from ALL papers:
-Design an improved architecture for AgroSense.
+Design an improved architecture for AgriSense.
 
 Include:
 - edge layer
@@ -280,7 +280,7 @@ Summarize:
 - major learnings
 - strongest research directions
 - key innovations
-- implementation priorities for AgroSense
+- implementation priorities for AgriSense
 
 The conclusion should feel like a strong IEEE-style research synthesis.
 

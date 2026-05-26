@@ -173,6 +173,7 @@ export function AskAgentModal({
   paperTitle = "Untitled Paper",
   paper,
 }: AskAgentModalProps) {
+  const [provider, setProvider] = useState<string>("openai");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -197,13 +198,16 @@ export function AskAgentModal({
     }
   }, [messages, isLoading]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (mode: "ask" | "summary" = "ask") => {
+    if (isLoading) return;
+    if (mode === "ask" && !input.trim()) return;
+
+    const userContent = mode === "ask" ? input.trim() : "Generate a concise summary for this paper.";
 
     const userMessage: ConversationMessage = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: input.trim(),
+      content: userContent,
       timestamp: new Date(),
     };
 
@@ -211,18 +215,49 @@ export function AskAgentModal({
     setInput("");
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    try {
+      const res = await fetch("/api/assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: userMessage.content, paperId: paper?.id, provider, mode }),
+      });
 
-    const response = generateScopedResponse(userMessage.content, paper);
-    const assistantMessage: ConversationMessage = {
-      id: `assistant-${Date.now()}`,
-      role: "assistant",
-      content: response,
-      timestamp: new Date(),
-    };
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const assistantMessage: ConversationMessage = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: `Error: ${err?.error || res.statusText || "Failed to reach assistant"}`,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+        return;
+      }
 
-    setMessages((prev) => [...prev, assistantMessage]);
-    setIsLoading(false);
+      const payload = await res.json();
+      const assistantMessage: ConversationMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: payload.answer || "I couldn't find an answer in the document.",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      const assistantMessage: ConversationMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: `Error: ${err instanceof Error ? err.message : String(err)}`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    await handleSend("summary");
   };
 
   const handleSuggestedQuestion = (question: string) => {
@@ -238,13 +273,13 @@ export function AskAgentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-150 max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
         {/* Header */}
         <DialogHeader className="px-5 py-4 border-b border-border/50 bg-muted/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Agent avatar */}
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center shadow-sm">
+              <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary/80 to-primary flex items-center justify-center shadow-sm">
                 <svg
                   className="w-5 h-5 text-primary-foreground"
                   fill="none"
@@ -275,6 +310,19 @@ export function AskAgentModal({
           </div>
         </DialogHeader>
 
+          <div className="px-5 py-2 border-b border-border/20 bg-muted/10 flex items-center justify-end gap-3">
+            <label className="text-xs text-muted-foreground/80">Provider</label>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              className="text-xs bg-card border border-border/50 px-2 py-1 rounded"
+            >
+              <option value="openai">OpenAI</option>
+              <option value="groq">Groq</option>
+              <option value="claude">Claude</option>
+            </select>
+          </div>
+
         {/* Messages */}
         <ScrollArea ref={scrollRef} className="flex-1 min-h-0">
           <div className="p-5 space-y-5">
@@ -287,7 +335,7 @@ export function AskAgentModal({
                 )}
               >
                 {message.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/80 to-primary flex-shrink-0 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-full bg-linear-to-br from-primary/80 to-primary shrink-0 flex items-center justify-center">
                     <svg
                       className="w-3.5 h-3.5 text-primary-foreground"
                       fill="none"
@@ -314,7 +362,7 @@ export function AskAgentModal({
                   {message.content}
                 </div>
                 {message.role === "user" && (
-                  <div className="w-7 h-7 rounded-full bg-primary/20 flex-shrink-0 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-full bg-primary/20 shrink-0 flex items-center justify-center">
                     <svg
                       className="w-3.5 h-3.5 text-primary"
                       fill="none"
@@ -336,7 +384,7 @@ export function AskAgentModal({
             {/* Loading indicator */}
             {isLoading && (
               <div className="flex gap-3">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/80 to-primary flex-shrink-0 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-linear-to-br from-primary/80 to-primary shrink-0 flex items-center justify-center">
                   <svg
                     className="w-3.5 h-3.5 text-primary-foreground"
                     fill="none"
@@ -392,36 +440,42 @@ export function AskAgentModal({
 
         {/* Input */}
         <div className="p-4 border-t border-border/50 bg-card/50">
-          <div className="flex gap-2">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask a question about this paper..."
-              className="min-h-[44px] max-h-[120px] resize-none bg-background"
-              rows={1}
-            />
-            <Button
-              onClick={handleSend}
-              disabled={!input.trim() || isLoading}
-              className="h-auto px-4 bg-primary hover:bg-primary/90"
-              size="icon"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 12L3.269 3.126A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.876L5.999 12zm0 0h7.5"
-                />
-              </svg>
-            </Button>
-          </div>
+            <div className="flex gap-2 items-end w-full">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask a question about this paper..."
+                className="min-h-11 max-h-30 resize-none bg-background flex-1"
+                rows={1}
+              />
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleSend("ask")}
+                  disabled={!input.trim() || isLoading}
+                  className="h-auto px-3 py-2 bg-white border border-border/50 hover:bg-white/95"
+                  size="default"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-6 h-6 bg-muted/30 text-xs font-mono flex items-center justify-center rounded-sm">Q</span>
+                    <span className="text-sm">Ask</span>
+                  </span>
+                </Button>
+
+                <Button
+                  onClick={handleGenerateSummary}
+                  disabled={isLoading}
+                  className="h-auto px-3 py-2 bg-white border border-border/50 hover:bg-white/95"
+                  size="default"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-6 h-6 bg-muted/30 text-xs font-mono flex items-center justify-center rounded-sm">S</span>
+                    <span className="text-sm">Generate Summary</span>
+                  </span>
+                </Button>
+              </div>
+            </div>
           <p className="text-[10px] text-muted-foreground/60 mt-2 text-center">
             Answers are scoped to the currently opened paper only.
           </p>
